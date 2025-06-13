@@ -1,3 +1,4 @@
+import path from 'node:path'
 import vue from '@vitejs/plugin-vue'
 import { ProNaiveUIResolver } from 'pro-naive-ui-resolver'
 import UnoCSS from 'unocss/vite'
@@ -13,4 +14,9 @@ export default defineConfig({
     }),
     UnoCSS(),
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
 })
