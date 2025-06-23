@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import AppProvider from '@/components/app-provider/index.vue'
+import Layout from '@/components/layout/index.vue'
+import PerferenceDrawer from '@/components/preference-drawer/index.vue'
 </script>
 
 <template>
-  <div class="c-red size-20">
-    123
-  </div>
+  <AppProvider class="h-full">
+    <Layout />
+    <PerferenceDrawer />
+  </AppProvider>
 </template>

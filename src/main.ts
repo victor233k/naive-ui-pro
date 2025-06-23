@@ -1,6 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import pinia from './store'
 import 'virtual:uno.css'
-import '@unocss/reset/eric-meyer.css'
+import './assets/reset.css'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+app.use(pinia)
+app.mount('#app')
