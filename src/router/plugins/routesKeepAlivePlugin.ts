@@ -1,7 +1,7 @@
 import type { RouteRecordNameGeneric } from 'vue-router'
 import type { Plugin } from '../composables/create-router'
 import { isBoolean, isString } from 'lodash-es'
-import { useRouteKeepAliveStore } from '@/store'
+import { useRouteKeepAliveStore } from '@/store/use-route-keep-alive'
 
 declare module 'vue-router' {
   interface RouteMeta {
