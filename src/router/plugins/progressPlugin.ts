@@ -1,18 +1,17 @@
 import type { Plugin } from '../composables/create-router'
-import { startProgress, stopProgress } from '@/utils'
+import NProgress from 'nprogress'
 
 export function progressPlugin(): Plugin {
   return {
     name: 'progress',
     beforeEach() {
-      startProgress()
-      return true
+      NProgress.start()
     },
     afterEach() {
-      stopProgress()
+      NProgress.done()
     },
     onError(err) {
-      stopProgress()
+      NProgress.done()
       console.warn('路由错误', err)
     },
   }

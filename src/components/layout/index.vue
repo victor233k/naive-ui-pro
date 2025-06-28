@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { storeToRefs } from 'pinia'
 import { useLayoutStore } from '@/store/use-layout'
+import Content from './content.vue'
 import Footer from './footer.vue'
 import HeaderCenter from './header-center.vue'
 import HeaderLeft from './header-left.vue'
@@ -71,7 +72,7 @@ const {
       <SidebarExtra />
     </template>
     <template #default>
-      <div>main....</div>
+      <Content />
     </template>
     <template #footer>
       <Footer />

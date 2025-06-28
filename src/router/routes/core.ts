@@ -1,6 +1,9 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 const loginRouter = () => import('@/views/login.vue')
+const Layout = () => import('@/components/layout/index.vue')
+const IFrameView = () => import('@/views/iframe').then(m => m.IFrameView)
+
 /** 全局404页面 */
 const fallbackNotFoundRoute: RouteRecordRaw = {
   component: loginRouter,
@@ -16,15 +19,65 @@ const coreRoutes: RouteRecordRaw[] = [
    * 此路由必须存在，且不应修改
    */
   {
+    component: Layout,
+    meta: {
+      title: 'Root',
+      hideInBreadcrumb: true,
+    },
     name: 'Root',
     path: '/',
-    redirect: '/admain',
+    redirect: '/list',
+    children: [
+      {
+        path: '/list',
+        name: 'List',
+        redirect: '/list/basic-list',
+        meta: {
+          title: 'List',
+        },
+        children: [
+          {
+            name: 'basic-list',
+            path: 'basic-list',
+            meta: {
+              title: 'basic-list',
+              keepAlive: {
+                noCacheWhenBackFrom: ['basic-info'],
+              },
+            },
+            component: () => import('@/views/basic-list.vue'),
+            children: [
+              {
+                path: 'basic-list-item',
+                name: 'basic-list-item',
+                meta: {
+                  title: 'basic-list-item',
+                  keepAlive: true,
+                },
+                component: () => import('@/views/basic-list-item.vue'),
+              },
+            ],
+          },
+          {
+            path: 'basic-info/:id?',
+            name: 'basic-info',
+            meta: {
+              title: 'basic-info',
+              leaveConfirm: true,
+              keepAlive: true,
+            },
+            component: () => import('@/views/basic-info.vue'),
+          },
+        ],
+      },
+    ],
   },
   {
     name: 'Admain',
     path: '/admain',
     meta: {
       title: 'admain',
+      keepAlive: true,
     },
     component: () => import('@/views/admin.vue'),
   },
@@ -37,21 +90,14 @@ const coreRoutes: RouteRecordRaw[] = [
     component: loginRouter,
   },
   {
-    name: 'List',
-    path: '/list',
+    name: 'IframeView',
+    path: '/baidu',
     meta: {
-      title: 'list',
       keepAlive: true,
+      title: 'baidu',
+      frameUrl: 'https://www.baidu.com/',
     },
-    component: () => import('@/views/list.vue'),
-  },
-  {
-    name: 'Detail',
-    path: '/detail',
-    meta: {
-      title: 'detail',
-    },
-    component: () => import('@/views/detail.vue'),
+    component: IFrameView,
   },
 ]
 

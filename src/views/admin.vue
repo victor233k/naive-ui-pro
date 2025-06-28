@@ -1,9 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Layout from '@/components/layout/index.vue'
+import PerferenceDrawer from '@/components/preference-drawer/index.vue'
+
+defineOptions({ name: 'Admain' })
+</script>
 
 <template>
-  <div>
-    <n-button @click="$router.push({ name: 'List' })">
-      跳转到login页
-    </n-button>
-  </div>
+  <Layout />
+  <PerferenceDrawer />
 </template>

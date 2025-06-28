@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppProvider: typeof import('./src/components/app-provider/index.vue')['default']
+    Content: typeof import('./src/components/layout/content.vue')['default']
     Footer: typeof import('./src/components/layout/footer.vue')['default']
     HeaderCenter: typeof import('./src/components/layout/header-center.vue')['default']
     HeaderLeft: typeof import('./src/components/layout/header-left.vue')['default']
@@ -22,6 +23,7 @@ declare module 'vue' {
     NDrawerContent: typeof import('naive-ui')['NDrawerContent']
     NFlex: typeof import('naive-ui')['NFlex']
     NIcon: typeof import('naive-ui')['NIcon']
+    NInput: typeof import('naive-ui')['NInput']
     NInputNumber: typeof import('naive-ui')['NInputNumber']
     NSelect: typeof import('naive-ui')['NSelect']
     NSwitch: typeof import('naive-ui')['NSwitch']
