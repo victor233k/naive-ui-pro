@@ -1,6 +1,6 @@
 import type { MaybeRef, UseTitleOptionsBase } from '@vueuse/core'
 import type { NavigationFailure, RouteLocationNormalized } from 'vue-router'
-import type { Plugin } from '../create-router'
+import type { ProRouterPlugin } from '../create-router'
 import { useTitle } from '@vueuse/core'
 import { isFunction, isString } from 'lodash-es'
 
@@ -43,7 +43,7 @@ type RawTitle = string | ((route: RouteLocationNormalized) => string)
 
 export function documentTitlePlugin(
   options: TitlePluginOptions = {},
-): Plugin {
+): ProRouterPlugin {
   let template: TitleTemplate
   function resolveTitleOptions(
     title: string,
@@ -87,7 +87,7 @@ export function documentTitlePlugin(
   }
 
   return {
-    name: 'document-title',
+    name: '@pro/router-plugin-document-title',
     afterEach(to, from, failure) {
       const title = resolveTitle(to)
       const options = resolveTitleOptions(title, to, from, failure)

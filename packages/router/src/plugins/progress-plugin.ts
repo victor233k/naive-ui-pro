@@ -1,9 +1,9 @@
-import type { Plugin } from '../create-router'
+import type { ProRouterPlugin } from '../create-router'
 import NProgress from 'nprogress'
 
-export function progressPlugin(): Plugin {
+export function progressPlugin(): ProRouterPlugin {
   return {
-    name: 'progress',
+    name: '@pro/router-plugin-progress',
     beforeEach() {
       NProgress.start()
     },
@@ -12,7 +12,9 @@ export function progressPlugin(): Plugin {
     },
     onError(err) {
       NProgress.done()
-      console.warn('路由错误', err)
+      if (__DEV__) {
+        console.error(err)
+      }
     },
   }
 }
