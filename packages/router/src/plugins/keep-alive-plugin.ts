@@ -1,6 +1,15 @@
 import type { RouteRecordNameGeneric, RouteRecordRaw } from 'vue-router'
-import type { Plugin } from '../create-router'
+import type { ProRouterPlugin } from '../create-router'
 import { isBoolean, isString } from 'lodash-es'
+
+declare module 'vue-router' {
+  interface RouteMeta {
+    keepAlive?: boolean | {
+      // 这些路由返回时，不缓存当前页面
+      exclude: string[]
+    }
+  }
+}
 
 function extractKeepAliveNames(routes: readonly RouteRecordRaw[]): string[] {
   const result: string[] = []
@@ -22,16 +31,7 @@ function extractKeepAliveNames(routes: readonly RouteRecordRaw[]): string[] {
   return result
 }
 
-declare module 'vue-router' {
-  interface RouteMeta {
-    keepAlive?: boolean | {
-      // 这些路由返回时，不缓存当前页面
-      noCacheWhenBackFrom: string[]
-    }
-  }
-}
-
-export interface KeepAliveStoreLike {
+interface KeepAliveStoreLike {
   /**
    * 初始化缓存列表
    * @param keepAlive 路由 name 组成的缓存列表
@@ -49,7 +49,11 @@ export interface KeepAliveStoreLike {
   remove: (name: string) => void
 }
 
-export function keepAlivePlugin(store: KeepAliveStoreLike, routes: RouteRecordRaw[]): Plugin {
+interface KeepAlivePluginOptions {
+  store: KeepAliveStoreLike
+}
+
+export function keepAlivePlugin(store: KeepAlivePluginOptions): ProRouterPlugin {
   // 插件初始化阶段，提取全部默认需要缓存的 name
   const defaultKeepAliveNames = extractKeepAliveNames(routes)
   store.init(defaultKeepAliveNames)
@@ -63,7 +67,7 @@ export function keepAlivePlugin(store: KeepAliveStoreLike, routes: RouteRecordRa
   }
 
   return {
-    name: 'route-keep-alive',
+    name: '@pro/router-plugin-keep-alive',
     beforeEach(to, from) {
       if (!from.name)
         return
