@@ -1,4 +1,4 @@
-import type { Router, RouterOptions } from 'vue-router'
+import type { NavigationGuardWithThis, NavigationHookAfter, Router, RouterOptions } from 'vue-router'
 import { createRouter as _createRouter } from 'vue-router'
 
 type ProRouterPluginName
@@ -15,27 +15,27 @@ export interface ProRouterPlugin {
   /**
    * 可以修改传递给 `createRouter` 的配置
    */
-  config?: (options: RouterOptions) => RouterOptions
+  config?: (this: void, options: RouterOptions) => RouterOptions
   /**
    * 传递给 `createRouter` 的配置完成后调用的钩子
    */
-  configResolved?: (options: RouterOptions) => void
+  configResolved?: (this: void, options: RouterOptions) => void
   /**
    * 路由错误处理函数,等同于 `router.onError`
    */
-  onError?: (this: Router, ...args: Parameters<Router['onError']>) => void
+  onError?: (this: Router, ...args: Parameters<Parameters<Router['onError']>[0]>) => void
   /**
    * 路由守卫,等同于 `router.afterEach`
    */
-  afterEach?: (this: Router, guard: Parameters<Router['afterEach']>[0]) => void
+  afterEach?: (this: Router, ...args: Parameters<NavigationHookAfter>) => void
   /**
    * 路由守卫,等同于 `router.beforeEach`
    */
-  beforeEach?: (this: Router, ...args: Parameters<Router['beforeEach']>) => void
+  beforeEach?: (this: Router, ...args: Parameters<NavigationGuardWithThis<Router>>) => void
   /**
    * 路由解析前钩子,等同于 `router.beforeResolve`
    */
-  beforeResolve?: (this: Router, ...args: Parameters<Router['beforeResolve']>) => void
+  beforeResolve?: (this: Router, ...args: Parameters<NavigationGuardWithThis<Router>>) => void
 }
 
 export interface ProRouterOptions extends RouterOptions {
