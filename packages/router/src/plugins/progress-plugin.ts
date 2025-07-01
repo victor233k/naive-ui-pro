@@ -1,4 +1,4 @@
-import type { Plugin } from '../composables/create-router'
+import type { Plugin } from '../create-router'
 import NProgress from 'nprogress'
 
 export function progressPlugin(): Plugin {

@@ -1,6 +1,6 @@
 import type { MaybeRef, UseTitleOptionsBase } from '@vueuse/core'
 import type { NavigationFailure, RouteLocationNormalized } from 'vue-router'
-import type { Plugin } from '../composables/create-router'
+import type { Plugin } from '../create-router'
 import { useTitle } from '@vueuse/core'
 import { isFunction, isString } from 'lodash-es'
 

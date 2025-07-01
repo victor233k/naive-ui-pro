@@ -1,4 +1,4 @@
-import type { BreadcrumbItem } from '@/router/plugins/routeToBreadcrumbPlugin'
+import type { BreadcrumbItem } from '@pro/router/plugins/routeToBreadcrumbPlugin'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 

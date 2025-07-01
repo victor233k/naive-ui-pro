@@ -1,5 +1,5 @@
 import type { RouteLocationNormalized } from 'vue-router'
-import type { Plugin } from '../composables/create-router'
+import type { Plugin } from '../create-router'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -18,7 +18,7 @@ export interface BreadcrumbStoreLike {
   updateBreadcrumbs: (items: BreadcrumbItem[]) => void
 }
 
-export function routeToBreadcrumbPlugin(store: BreadcrumbStoreLike): Plugin {
+export function convertToBreadcrumbPlugin(store: BreadcrumbStoreLike): Plugin {
   function buildBreadcrumbs(route: RouteLocationNormalized): BreadcrumbItem[] {
     const breadcrumbs: BreadcrumbItem[] = []
     route.matched.forEach((record) => {

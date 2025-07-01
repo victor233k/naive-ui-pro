@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@ant-design/colors": "^7.2.1",
+    "@pro/router": "workspace:*",
     "@unocss/preset-wind3": "^66.2.0",
     "@unocss/reset": "^66.2.0",
     "@vicons/antd": "^0.13.0",
@@ -24,7 +25,6 @@
     "axios": "^1.9.0",
     "lodash-es": "^4.17.21",
     "naive-ui": "^2.41.1",
-    "nprogress": "^0.2.0",
     "pinia": "^3.0.3",
     "pro-composables": "^3.3.0",
     "pro-naive-ui": "^2.2.0",
@@ -36,7 +36,6 @@
     "@antfu/eslint-config": "^4.14.1",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^24.0.1",
-    "@types/nprogress": "^0.2.3",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
     "eslint": "^9.28.0",

@@ -1,5 +1,5 @@
 import type { RouteRecordNameGeneric, RouteRecordRaw } from 'vue-router'
-import type { Plugin } from '../composables/create-router'
+import type { Plugin } from '../create-router'
 import { isBoolean, isString } from 'lodash-es'
 
 function extractKeepAliveNames(routes: readonly RouteRecordRaw[]): string[] {
@@ -49,7 +49,7 @@ export interface KeepAliveStoreLike {
   remove: (name: string) => void
 }
 
-export function routesKeepAlivePlugin(store: KeepAliveStoreLike, routes: RouteRecordRaw[]): Plugin {
+export function keepAlivePlugin(store: KeepAliveStoreLike, routes: RouteRecordRaw[]): Plugin {
   // 插件初始化阶段，提取全部默认需要缓存的 name
   const defaultKeepAliveNames = extractKeepAliveNames(routes)
   store.init(defaultKeepAliveNames)

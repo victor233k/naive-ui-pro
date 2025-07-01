@@ -1,0 +1,8 @@
+export { tabbarPlugin } from './plugins/tabbar-plugin'
+export { progressPlugin } from './plugins/progress-plugin'
+export { keepAlivePlugin } from './plugins/keep-alive-plugin'
+export { documentTitlePlugin } from './plugins/document-title-plugin'
+export { convertToMenusPlugin } from './plugins/convert-to-menus-plugin'
+export { routeLeaveConfirmPlugin } from './plugins/route-leave-confirm-plugin'
+export { convertToBreadcrumbPlugin } from './plugins/convert-to-breadcrumb-plugin'
+export { createRouter } from './create-router'

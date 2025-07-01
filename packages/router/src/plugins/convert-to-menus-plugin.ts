@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import type { Plugin } from '../composables/create-router'
+import type { Plugin } from '../create-router'
 import type { MenuItem } from '@/store/use-menu'
 import { cloneDeep, isArray } from 'lodash-es'
 
@@ -51,7 +51,7 @@ function transformRoutesToMenus(routes: RouteRecordRaw[], parentPath = ''): Menu
     })
 }
 
-export function routesToMenusPlugin(store: MenuStoreLike, routes: RouteRecordRaw[]): Plugin {
+export function convertToMenusPlugin(store: MenuStoreLike, routes: RouteRecordRaw[]): Plugin {
   console.log(routes, 'routes')
   const menus = transformRoutesToMenus(cloneDeep(routes))
   store.initMenus(menus)

@@ -9,6 +9,9 @@
       ],
       "@root/*": [
         "./*"
+      ],
+      "@pro/router": [
+        "./packages/router/src/index.ts"
       ]
     },
     /* Linting */
@@ -19,5 +22,11 @@
     "erasableSyntaxOnly": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "types/*.d.ts", "./global.d.ts", "preference.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "typings/*.d.ts",
+    "preference.ts"
+  ]
 }

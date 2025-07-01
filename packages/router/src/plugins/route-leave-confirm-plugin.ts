@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import type { Plugin } from '../composables/create-router'
+import type { Plugin } from '../create-router'
 import { isString } from 'lodash-es'
 
 declare module 'vue-router' {

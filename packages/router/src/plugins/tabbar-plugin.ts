@@ -1,5 +1,5 @@
 import type { RouteLocationNormalized } from 'vue-router'
-import type { Plugin } from '../composables/create-router'
+import type { Plugin } from '../create-router'
 
 declare module 'vue-router' {
   interface RouteMeta {

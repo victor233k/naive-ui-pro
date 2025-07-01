@@ -1,14 +1,12 @@
+import type { RouterOptions as _RouterOptions, Router } from 'vue-router'
 import { isFunction } from 'lodash-es'
-import { createRouter as _createRouter, type RouterOptions as _RouterOptions, type Router } from 'vue-router'
+import { createRouter as _createRouter } from 'vue-router'
 
-type BeforeEachHook = Parameters<Router['beforeEach']>[0]
-type AfterEachHook = Parameters<Router['afterEach']>[0]
-type ErrorHook = Parameters<Router['onError']>[0]
 export interface Plugin {
   name: string
-  beforeEach?: BeforeEachHook
-  afterEach?: AfterEachHook
-  onError?: ErrorHook
+  onError?: Parameters<Router['onError']>[0]
+  afterEach?: Parameters<Router['afterEach']>[0]
+  beforeEach?: Parameters<Router['beforeEach']>[0]
 }
 
 type RouterPlugin = Plugin | ((router: Router) => Plugin)
@@ -27,12 +25,12 @@ export function createRouter(options: RouterOptions): Router {
       beforeEach && router.beforeEach(beforeEach)
       afterEach && router.afterEach(afterEach)
       onError && router.onError(onError)
-      console.warn(`[RouterPlugin] ✅ 插件 "${name}" 已加载`)
+      console.info(`[@pro/router] ✅ 插件 "${name}" 已加载`)
     }
     catch (err) {
       if (__DEV__) {
         const pluginName = (isFunction(plugin) ? plugin.name : plugin?.name) ?? `[Plugin#${idx}]`
-        console.error(`[RouterPlugin] 插件 "${pluginName}" 加载失败:`, err)
+        console.error(`[@pro/router] 插件 "${pluginName}" 错误:`, err)
       }
     }
   })
