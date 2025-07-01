@@ -11,6 +11,16 @@ import { preferenceConfig } from './preference'
 export default defineConfig(({ mode }) => {
   const nodeEnv = loadEnv(mode, './').VITE_USER_NODE_ENV
   return {
+    optimizeDeps: {
+      include: [
+        'vue',
+        'vue-router',
+        'pinia',
+        'naive-ui',
+        'pro-naive-ui',
+        '@vueuse/core',
+      ],
+    },
     define: {
       __DEV__: nodeEnv !== 'production',
     },
