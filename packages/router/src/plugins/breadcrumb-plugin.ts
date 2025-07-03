@@ -1,6 +1,7 @@
 import type { ComputedRef } from 'vue'
 import type { ProRouterPlugin } from '../create-router'
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -41,11 +42,12 @@ interface BreadcrumbItem {
 export function breadcrumbPlugin(): ProRouterPlugin {
   return {
     name: '@pro/router-plugin-breadcrumb',
-    beforeEach({ matched }) {
+    afterEach() {
       if (!this.breadcrumbs) {
+        const route = useRoute()
         this.breadcrumbs = computed(() => {
           const breadcrumbs: BreadcrumbItem[] = []
-          matched.forEach(({ meta, path, name }) => {
+          route.matched.forEach(({ meta, path, name }) => {
             const { title, icon, iconColor, hideInBreadcrumb } = meta
             if (title && !hideInBreadcrumb) {
               breadcrumbs.push({
