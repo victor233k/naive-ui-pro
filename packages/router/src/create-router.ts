@@ -79,10 +79,10 @@ export function createRouter(options: ProRouterOptions): Router {
       afterEach.call(router, ...args)
     })
     beforeEach && router.beforeEach((...args) => {
-      beforeEach.call(router, ...args)
+     return beforeEach.call(router, ...args)
     })
     beforeResolve && router.beforeResolve((...args) => {
-      beforeResolve.call(router, ...args)
+     return beforeResolve.call(router, ...args)
     })
     installedPluginNames.add(name)
     console.info(`[@pro/router] ✅ 插件 "${name}" 已注册`)
