@@ -1,67 +1,106 @@
-import type { RouteRecordRaw } from 'vue-router'
-import type { Plugin } from '../create-router'
-import { isString } from 'lodash-es'
+import type { ProRouterPlugin } from '../create-router'
+import { isFunction, isString, isSymbol } from 'lodash-es'
 
 declare module 'vue-router' {
-  interface RouteMeta {
+  interface Router {
     /**
-     * 离开页面时提示确认
-     * - true：使用默认提示
-     * - string：自定义提示内容
+     * 启用当前页面的离开确认
      */
-    leaveConfirm?: boolean | string
+    enableLeaveConfirm: (message?: string | (() => Promise<boolean>)) => void
+    /**
+     * 临时禁用当前页面的离开确认
+     * 调用后，当前页面离开时将不再提示确认
+     */
+    disableLeaveConfirm: () => void
   }
 }
 
-export interface leaveConfirmStoreLike {
-  init: (routeNames: string[]) => void
-  has: (routeName: string) => boolean
+/**
+ * 路由离开确认插件配置选项
+ */
+interface RouteLeaveConfirmPluginOptions {
+  /** 默认确认消息 */
+  defaultMessage?: string
 }
 
-function extractConfirmRouteNames(routes: RouteRecordRaw[]): string[] {
-  const result: string[] = []
+// 页面状态管理
+interface LeaveConfirmConfig {
+  message?: string
+  handler?: () => Promise<boolean>
+}
 
-  function traverse(routes: RouteRecordRaw[]) {
-    for (const route of routes) {
-      if (
-        route.meta?.leaveConfirm === true
-        || typeof route.meta?.leaveConfirm === 'string'
-      ) {
-        if (route.name && typeof route.name === 'string')
-          result.push(route.name)
-      }
-      if (route.children)
-        traverse(route.children)
+let activeLeaveGuards: Map<string, LeaveConfirmConfig> = new Map()
+let currentRouteName: string
+
+export function routeLeaveConfirmPlugin(options: RouteLeaveConfirmPluginOptions = {}): ProRouterPlugin {
+  const {
+    defaultMessage = '页面有未保存的更改，确定要离开吗？'
+  } = options
+
+  // 启用当前页面的离开确认
+  function enableLeaveConfirm(messageOrHandler?: string | (() => Promise<boolean>)) {
+    if (isString(messageOrHandler)) {
+      activeLeaveGuards.set(currentRouteName, { message: messageOrHandler })
+    } else if (isFunction(messageOrHandler)) {
+      activeLeaveGuards.set(currentRouteName, { handler: messageOrHandler })
+    } else {
+      activeLeaveGuards.set(currentRouteName, { message: defaultMessage })
     }
   }
 
-  traverse(routes)
-  return result
-}
+  // 禁用当前页面的离开确认
+  function disableLeaveConfirm() {
+    activeLeaveGuards.delete(currentRouteName)
+  }
 
-export function routeLeaveConfirmPlugin(store: leaveConfirmStoreLike, routes: RouteRecordRaw[]): Plugin {
-  const initialConfirmNames = extractConfirmRouteNames(routes)
-  store.init(initialConfirmNames)
+  // beforeunload 事件处理函数
+  function handleBeforeUnload(event: BeforeUnloadEvent) {
+    if (activeLeaveGuards.has(currentRouteName)) {
+      const config = activeLeaveGuards.get(currentRouteName)
+      const message = config?.message
+      event.preventDefault()
+      return message
+    }
+  }
 
   return {
-    name: 'route-leave-confirm',
+    name: '@pro/router-plugin-route-leave-confirm',
 
-    beforeEach(_, from) {
-      const routeName = from.name?.toString()
-      if (!routeName)
+    async beforeEach(_, from) {
+      if (!this.enableLeaveConfirm && !this.disableLeaveConfirm) {
+        this.enableLeaveConfirm = enableLeaveConfirm.bind(this)
+        this.disableLeaveConfirm = disableLeaveConfirm.bind(this)
+      }
+      const name = from.name && String(from.name)
+      currentRouteName = name
+      if (!name || !activeLeaveGuards.has(name)) {
         return true
+      }
+      const config = activeLeaveGuards.get(name)
+      if (config?.handler) {
+        try {
+          const result = await config.handler()
+          return !!result
+        } catch {
+          return false
+        }
+      }
+      const message = config?.message
+      return confirm(message)
+    },
 
-      const meta = from.meta
-      const needConfirm = store.has(routeName)
+    afterEach(to, from, failure) {
+      // 跳转后移除 from 的 activeLeaveGuards，仅当跳转成功时
+      if (failure === undefined && from && from.name) {
+        activeLeaveGuards.delete(String(from.name))
+      }
+      currentRouteName = to.name ? String(to.name) : null
+    },
 
-      if (!needConfirm)
-        return true
-
-      const message = isString(meta.leaveConfirm)
-        ? meta.leaveConfirm
-        : '您有未保存的信息，确认要离开此页面吗？'
-
-      return window.confirm(message)
+    configResolved() {
+      if (window) {
+        window.addEventListener('beforeunload', handleBeforeUnload)
+      }
     },
   }
 }
