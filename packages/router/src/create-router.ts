@@ -44,6 +44,9 @@ export interface ProRouterOptions extends RouterOptions {
 
 const installedPluginNames = new Set<string>()
 
+/**
+ * TODO: 卸载事件（考虑微前端场景）、插件的执行顺序，守卫 ts 类型问题
+ */
 export function createRouter(options: ProRouterOptions): Router {
   let {
     plugins = [],
@@ -79,13 +82,15 @@ export function createRouter(options: ProRouterOptions): Router {
       afterEach.call(router, ...args)
     })
     beforeEach && router.beforeEach((...args) => {
-     return beforeEach.call(router, ...args)
+      return beforeEach.call(router, ...args)
     })
     beforeResolve && router.beforeResolve((...args) => {
-     return beforeResolve.call(router, ...args)
+      return beforeResolve.call(router, ...args)
     })
     installedPluginNames.add(name)
-    console.info(`[@pro/router] ✅ 插件 "${name}" 已注册`)
+    if (__DEV__) {
+      console.info(`[@pro/router] ✅ 插件 "${name}" 已注册`)
+    }
   }
   return router
 }

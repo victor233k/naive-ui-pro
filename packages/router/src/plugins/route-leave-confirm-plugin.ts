@@ -32,6 +32,9 @@ interface LeaveConfirmConfig {
 let activeLeaveGuards: Map<string, LeaveConfirmConfig> = new Map()
 let currentRouteName: string
 
+/**
+ * TODO: 要优化
+ */
 export function routeLeaveConfirmPlugin(options: RouteLeaveConfirmPluginOptions = {}): ProRouterPlugin {
   const {
     defaultMessage = '页面有未保存的更改，确定要离开吗？'

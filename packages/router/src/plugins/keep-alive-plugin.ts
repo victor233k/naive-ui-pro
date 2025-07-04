@@ -36,6 +36,9 @@ function normalizeRouteName(name: RouteRecordNameGeneric): string {
   return isSymbol(name) ? (new RegExp(name.toString())).toString() : name.toString()
 }
 
+/**
+ * TODO: 要重构
+ */
 export function keepAlivePlugin({
   store,
   defualtKeepAlive = false,

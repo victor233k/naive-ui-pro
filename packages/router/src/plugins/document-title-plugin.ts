@@ -5,7 +5,7 @@ import { isString } from 'lodash-es'
 
 declare module 'vue-router' {
   interface RouteMeta {
-    title: string
+    title?: string
   }
 }
 
