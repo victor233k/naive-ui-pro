@@ -25,8 +25,7 @@
     "access": "public"
   },
   "dependencies": {
-    "nprogress": "^0.2.0",
-    "@pro/router-plugin-system": "workspace:*"
+    "nprogress": "^0.2.0"
   },
   "devDependencies": {
     "@types/nprogress": "^0.2.3"

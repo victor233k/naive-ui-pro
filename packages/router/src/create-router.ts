@@ -1,96 +1,74 @@
-import type { NavigationGuardWithThis, NavigationHookAfter, Router, RouterOptions } from 'vue-router'
+import type { App, EffectScope } from 'vue'
+import type { RouterOptions as _RouterOptions, Router } from 'vue-router'
+import type { ProRouterPlugin, ProRouterPluginRunWithAppHandler, ProRouterPluginUnmountHandler } from './plugin'
 import { createRouter as _createRouter } from 'vue-router'
+import { setupPlugin } from './plugin'
+import { ALREADY_INSTALLED, APP, EFFECT_SCOPE, RUN_WITH_APP_HANDLERS, UNMOUNT_HANDLERS } from './symbols'
 
-type ProRouterPluginName
-// builtin plugin
-= | `@pro/router-plugin-${string}`
-// external plugin
-  | `pro-router-plugin-${string}`
-
-export interface ProRouterPlugin {
-  /**
-   * 插件名称
-   */
-  name: ProRouterPluginName
-  /**
-   * 可以修改传递给 `createRouter` 的配置
-   */
-  config?: (this: void, options: RouterOptions) => RouterOptions
-  /**
-   * 传递给 `createRouter` 的配置完成后调用的钩子
-   */
-  configResolved?: (this: void, options: RouterOptions) => void
-  /**
-   * 路由错误处理函数,等同于 `router.onError`
-   */
-  onError?: (this: Router, ...args: Parameters<Parameters<Router['onError']>[0]>) => void
-  /**
-   * 路由守卫,等同于 `router.afterEach`
-   */
-  afterEach?: (this: Router, ...args: Parameters<NavigationHookAfter>) => void
-  /**
-   * 路由守卫,等同于 `router.beforeEach`
-   */
-  beforeEach?: (this: Router, ...args: Parameters<NavigationGuardWithThis<Router>>) => void
-  /**
-   * 路由解析前钩子,等同于 `router.beforeResolve`
-   */
-  beforeResolve?: (this: Router, ...args: Parameters<NavigationGuardWithThis<Router>>) => void
-}
-
-export interface ProRouterOptions extends RouterOptions {
+export interface ProRouterOptions extends _RouterOptions {
   plugins?: ProRouterPlugin[]
 }
 
-const installedPluginNames = new Set<string>()
-
-/**
- * TODO: 卸载事件（考虑微前端场景）、插件的执行顺序，守卫 ts 类型问题
- */
 export function createRouter(options: ProRouterOptions): Router {
-  let {
-    plugins = [],
-    ...routerOptions
-  } = options
+  const { plugins = [], ...vueRouterOptions } = options
+  const router = _createRouter(vueRouterOptions)
+  const { install } = router
 
-  for (let i = 0; i < plugins.length; i++) {
-    const plugin = plugins[i]
-    plugin.config && (routerOptions = plugin.config(routerOptions))
+  router.install = (...args) => {
+    const [app] = args
+    prepareInstall(app, router)
+    install.apply(router, args)
+    const runWithAppHandlers = (router[RUN_WITH_APP_HANDLERS] ??= [])
+    runWithAppHandlers.forEach(handler => handler(app))
+    runWithAppHandlers.length = 0
   }
-  for (let i = 0; i < plugins.length; i++) {
-    const plugin = plugins[i]
-    plugin.configResolved && plugin.configResolved(routerOptions)
-  }
-  const router = _createRouter(routerOptions)
-  for (let i = 0; i < plugins.length; i++) {
-    const {
-      name,
-      onError,
-      afterEach,
-      beforeEach,
-      beforeResolve,
-    } = plugins[i]
-    if (installedPluginNames.has(name)) {
-      if (__DEV__) {
-        console.warn(`[@pro/router] 插件 "${name}" 被重复注册`)
-      }
-    }
-    onError && router.onError((...args) => {
-      onError.call(router, ...args)
-    })
-    afterEach && router.afterEach((...args) => {
-      afterEach.call(router, ...args)
-    })
-    beforeEach && router.beforeEach((...args) => {
-      return beforeEach.call(router, ...args)
-    })
-    beforeResolve && router.beforeResolve((...args) => {
-      return beforeResolve.call(router, ...args)
-    })
-    installedPluginNames.add(name)
-    if (__DEV__) {
-      console.info(`[@pro/router] ✅ 插件 "${name}" 已注册`)
-    }
-  }
+
+  plugins.forEach((plugin) => {
+    setupPlugin({ router, plugin })
+  })
   return router
+}
+
+function prepareInstall(app: App, router: Router) {
+  if (router[ALREADY_INSTALLED]) {
+    return
+  }
+  router[APP] = app
+  router[ALREADY_INSTALLED] = true
+
+  app.onUnmount(() => {
+    router[EFFECT_SCOPE]?.stop()
+    router[UNMOUNT_HANDLERS]?.forEach(handler => handler())
+
+    delete router[APP]
+    delete router[EFFECT_SCOPE]
+    delete router[UNMOUNT_HANDLERS]
+    delete router[ALREADY_INSTALLED]
+    delete router[RUN_WITH_APP_HANDLERS]
+  })
+}
+
+declare module 'vue-router' {
+  export interface Router {
+    /**
+     * vue instance
+     */
+    [APP]?: App
+    /**
+     * The vue effect scope.
+     */
+    [EFFECT_SCOPE]?: EffectScope
+    /**
+     * The router plugin uninstall functions.
+     */
+    [UNMOUNT_HANDLERS]?: ProRouterPluginUnmountHandler[]
+    /**
+     * The router plugin run with app functions.
+     */
+    [RUN_WITH_APP_HANDLERS]?: ProRouterPluginRunWithAppHandler[]
+    /**
+     * The flag to indicate whether the router is prepared.
+     */
+    [ALREADY_INSTALLED]?: boolean
+  }
 }

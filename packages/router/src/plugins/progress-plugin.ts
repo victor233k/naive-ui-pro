@@ -1,4 +1,4 @@
-import type { ProRouterPlugin } from '@pro/router-plugin-system'
+import type { ProRouterPlugin } from '../plugin'
 import NProgress from 'nprogress'
 
 /**
@@ -15,7 +15,6 @@ export function progressPlugin(): ProRouterPlugin {
     })
 
     router.onError((err) => {
-
       NProgress.done()
       if (__DEV__) {
         console.error(err)

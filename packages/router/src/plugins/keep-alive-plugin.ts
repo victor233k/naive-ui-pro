@@ -1,5 +1,5 @@
 import type { RouteRecordNameGeneric } from 'vue-router'
-import type { ProRouterPlugin } from '../create-router'
+import type { ProRouterPlugin } from '../plugin'
 import { isBoolean, isSymbol } from 'lodash-es'
 
 declare module 'vue-router' {

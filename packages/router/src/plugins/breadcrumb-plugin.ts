@@ -1,5 +1,5 @@
 import type { ShallowRef } from 'vue'
-import type { ProRouterPlugin } from '@pro/router-plugin-system'
+import type { ProRouterPlugin } from '../plugin'
 import { shallowReadonly, shallowRef } from 'vue'
 
 declare module 'vue-router' {

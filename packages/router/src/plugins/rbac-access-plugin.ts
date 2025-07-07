@@ -1,6 +1,6 @@
 import type { MaybeRefOrGetter } from '@vueuse/core'
 import type { RouteLocationNormalizedGeneric, RouteLocationNormalizedLoadedGeneric, RouteRecordRaw } from 'vue-router'
-import type { ProRouterPlugin } from '@pro/router-plugin-system'
+import type { ProRouterPlugin } from '../plugin'
 import { toValue } from 'vue'
 
 declare module 'vue-router' {
@@ -56,7 +56,7 @@ export function rbacAccessPlugin({
   verify,
   redirectToWhenVerifyFailed,
   ignoreAccessRouteNames = [],
-  getRoles
+  getRoles,
 }: RbacAccessPluginOptions): ProRouterPlugin {
   return ({ router }) => {
     router.beforeEach(async (to, from) => {

@@ -1,5 +1,5 @@
 import type { NavigationFailure, RouteLocationNormalized } from 'vue-router'
-import type { ProRouterPlugin } from '@pro/router-plugin-system'
+import type { ProRouterPlugin } from '../plugin'
 import { useTitle } from '@vueuse/core'
 import { isString } from 'lodash-es'
 
@@ -11,8 +11,8 @@ declare module 'vue-router' {
 
 interface DocumentTitlePluginOptions {
   template:
-  | string
-  | ((to: RouteLocationNormalized, from: RouteLocationNormalized, failure?: NavigationFailure | void) => string)
+    | string
+    | ((to: RouteLocationNormalized, from: RouteLocationNormalized, failure?: NavigationFailure | void) => string)
 }
 
 export function documentTitlePlugin({ template }: DocumentTitlePluginOptions): ProRouterPlugin {

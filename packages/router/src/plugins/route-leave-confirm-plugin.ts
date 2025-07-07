@@ -1,4 +1,4 @@
-import type { ProRouterPlugin } from '@pro/router-plugin-system'
+import type { ProRouterPlugin } from '../plugin'
 import { useEventListener } from '@vueuse/core'
 import { isFunction, isString, isSymbol } from 'lodash-es'
 
@@ -38,16 +38,18 @@ let currentRouteName: string
  */
 export function routeLeaveConfirmPlugin(options: RouteLeaveConfirmPluginOptions = {}): ProRouterPlugin {
   const {
-    defaultMessage = '页面有未保存的更改，确定要离开吗？'
+    defaultMessage = '页面有未保存的更改，确定要离开吗？',
   } = options
 
   // 启用当前页面的离开确认
   function enableLeaveConfirm(messageOrHandler?: string | (() => Promise<boolean>)) {
     if (isString(messageOrHandler)) {
       activeLeaveGuards.set(currentRouteName, { message: messageOrHandler })
-    } else if (isFunction(messageOrHandler)) {
+    }
+    else if (isFunction(messageOrHandler)) {
       activeLeaveGuards.set(currentRouteName, { handler: messageOrHandler })
-    } else {
+    }
+    else {
       activeLeaveGuards.set(currentRouteName, { message: defaultMessage })
     }
   }
@@ -86,7 +88,8 @@ export function routeLeaveConfirmPlugin(options: RouteLeaveConfirmPluginOptions 
         try {
           const result = await config.handler()
           return !!result
-        } catch {
+        }
+        catch {
           return false
         }
       }
