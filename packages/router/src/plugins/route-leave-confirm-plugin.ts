@@ -1,4 +1,5 @@
-import type { ProRouterPlugin } from '../create-router'
+import type { ProRouterPlugin } from '@pro/router-plugin-system'
+import { useEventListener } from '@vueuse/core'
 import { isFunction, isString, isSymbol } from 'lodash-es'
 
 declare module 'vue-router' {
@@ -66,10 +67,11 @@ export function routeLeaveConfirmPlugin(options: RouteLeaveConfirmPluginOptions 
     }
   }
 
-  return {
-    name: '@pro/router-plugin-route-leave-confirm',
+  return ({ router }) => {
+    // window.beforeunload
+    useEventListener('beforeunload', handleBeforeUnload)
 
-    async beforeEach(_, from) {
+    router.beforeEach(async (_, from) => {
       if (!this.enableLeaveConfirm && !this.disableLeaveConfirm) {
         this.enableLeaveConfirm = enableLeaveConfirm.bind(this)
         this.disableLeaveConfirm = disableLeaveConfirm.bind(this)
@@ -90,20 +92,14 @@ export function routeLeaveConfirmPlugin(options: RouteLeaveConfirmPluginOptions 
       }
       const message = config?.message
       return confirm(message)
-    },
+    })
 
-    afterEach(to, from, failure) {
+    router.afterEach((to, from, failure) => {
       // 跳转后移除 from 的 activeLeaveGuards，仅当跳转成功时
       if (failure === undefined && from && from.name) {
         activeLeaveGuards.delete(String(from.name))
       }
       currentRouteName = to.name ? String(to.name) : null
-    },
-
-    configResolved() {
-      if (window) {
-        window.addEventListener('beforeunload', handleBeforeUnload)
-      }
-    },
+    })
   }
 }

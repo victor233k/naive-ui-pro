@@ -1,7 +1,6 @@
-import type { ComputedRef } from 'vue'
-import type { ProRouterPlugin } from '../create-router'
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import type { ShallowRef } from 'vue'
+import type { ProRouterPlugin } from '@pro/router-plugin-system'
+import { shallowReadonly, shallowRef } from 'vue'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -28,7 +27,7 @@ declare module 'vue-router' {
     /**
      * 面包屑数据
      */
-    breadcrumbs: ComputedRef<BreadcrumbItem[]>
+    breadcrumbs: Readonly<ShallowRef<BreadcrumbItem[]>>
   }
 }
 
@@ -40,27 +39,24 @@ interface BreadcrumbItem {
 }
 
 export function breadcrumbPlugin(): ProRouterPlugin {
-  return {
-    name: '@pro/router-plugin-breadcrumb',
-    afterEach() {
-      if (!this.breadcrumbs) {
-        const route = useRoute()
-        this.breadcrumbs = computed(() => {
-          const breadcrumbs: BreadcrumbItem[] = []
-          route.matched.forEach(({ meta, path, name }) => {
-            const { title, icon, iconColor, hideInBreadcrumb } = meta
-            if (title && !hideInBreadcrumb) {
-              breadcrumbs.push({
-                path,
-                icon,
-                iconColor,
-                title: title ?? name.toString(),
-              })
-            }
+  return ({ router }) => {
+    const breadcrumbs = shallowRef<BreadcrumbItem[]>()
+    router.breadcrumbs = shallowReadonly(breadcrumbs)
+
+    router.afterEach((to) => {
+      const newBreadcrumbs: BreadcrumbItem[] = []
+      to.matched.forEach(({ meta, path, name }) => {
+        const { title, icon, iconColor, hideInBreadcrumb } = meta
+        if (title && !hideInBreadcrumb) {
+          newBreadcrumbs.push({
+            path,
+            icon,
+            iconColor,
+            title: title ?? name.toString(),
           })
-          return breadcrumbs
-        })
-      }
-    },
+        }
+      })
+      breadcrumbs.value = newBreadcrumbs
+    })
   }
 }
