@@ -1,6 +1,5 @@
 import type { App } from 'vue'
 import type { Router } from 'vue-router'
-import { effectScope } from 'vue'
 import { APP, EFFECT_SCOPE, RUN_WITH_APP_HANDLERS, UNMOUNT_HANDLERS } from './symbols'
 
 export type ProRouterPluginUnmountHandler = () => void
@@ -35,8 +34,7 @@ export function setupPlugin({
   router: Router
   plugin: ProRouterPlugin
 }) {
-  const scope = (router[EFFECT_SCOPE] ??= effectScope(true))
-  scope.run(() => {
+  router[EFFECT_SCOPE].run(() => {
     plugin({
       router,
       onUnmount(handler) {
