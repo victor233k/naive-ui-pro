@@ -1,8 +1,8 @@
 {
-  "name": "@pro/router",
+  "name": "@pro/router-plugin-system",
   "version": "0.1.0",
-  "description": "Naive UI Pro router plugins for monorepo usage.",
-  "author": "ZhengChangfu",
+  "description": "Naive UI Pro router plugin system for monorepo usage.",
+  "author": "leihaohao",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -23,12 +23,5 @@
   ],
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "nprogress": "^0.2.0",
-    "@pro/router-plugin-system": "workspace:*"
-  },
-  "devDependencies": {
-    "@types/nprogress": "^0.2.3"
   }
 }

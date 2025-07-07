@@ -102,6 +102,9 @@ importers:
 
   packages/router:
     dependencies:
+      '@pro/router-plugin-system':
+        specifier: workspace:*
+        version: link:../router-plugin-system
       nprogress:
         specifier: ^0.2.0
         version: 0.2.0
@@ -109,6 +112,8 @@ importers:
       '@types/nprogress':
         specifier: ^0.2.3
         version: 0.2.3
+
+  packages/router-plugin-system: {}
 
 packages:
 

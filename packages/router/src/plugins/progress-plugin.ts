@@ -1,23 +1,25 @@
-import type { ProRouterPlugin } from '../create-router'
+import type { ProRouterPlugin } from '@pro/router-plugin-system'
 import NProgress from 'nprogress'
 
 /**
  * TODO: 考虑一下加载过的页面，是否需要显示进度条
  */
 export function progressPlugin(): ProRouterPlugin {
-  return {
-    name: '@pro/router-plugin-progress',
-    beforeEach() {
+  return ({ router }) => {
+    router.beforeEach(() => {
       NProgress.start()
-    },
-    afterEach() {
+    })
+
+    router.afterEach(() => {
       NProgress.done()
-    },
-    onError(err) {
+    })
+
+    router.onError((err) => {
+
       NProgress.done()
       if (__DEV__) {
         console.error(err)
       }
-    },
+    })
   }
 }

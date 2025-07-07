@@ -1,6 +1,6 @@
 import type { MaybeRefOrGetter } from '@vueuse/core'
 import type { RouteLocationNormalizedGeneric, RouteLocationNormalizedLoadedGeneric, RouteRecordRaw } from 'vue-router'
-import type { ProRouterPlugin } from '../create-router'
+import type { ProRouterPlugin } from '@pro/router-plugin-system'
 import { toValue } from 'vue'
 
 declare module 'vue-router' {
@@ -56,10 +56,10 @@ export function rbacAccessPlugin({
   verify,
   redirectToWhenVerifyFailed,
   ignoreAccessRouteNames = [],
+  getRoles
 }: RbacAccessPluginOptions): ProRouterPlugin {
-  return {
-    name: '@pro/router-plugin-rbac-access',
-    async beforeEach(to, from) {
+  return ({ router }) => {
+    router.beforeEach(async (to, from) => {
       const success = verify(to, from)
       if (!success) {
         // 校验失败但是访问的是忽略权限验证的路由，直接放行
@@ -76,11 +76,11 @@ export function rbacAccessPlugin({
         }
       }
       // 获取当前用户角色
-      const roles = await store.getRoles(to, from)
+      const roles = await getRoles(to, from)
       // 检查是否具有访问权限
       if (roles.some(role => to.meta.roles?.includes(role))) {
         return true
       }
-    },
+    })
   }
 }
