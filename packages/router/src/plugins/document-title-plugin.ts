@@ -10,17 +10,17 @@ declare module 'vue-router' {
 }
 
 interface DocumentTitlePluginOptions {
-  template:
+  titleTemplate:
     | string
     | ((to: RouteLocationNormalized, from: RouteLocationNormalized, failure?: NavigationFailure | void) => string)
 }
 
-export function documentTitlePlugin({ template }: DocumentTitlePluginOptions): ProRouterPlugin {
+export function documentTitlePlugin({ titleTemplate }: DocumentTitlePluginOptions): ProRouterPlugin {
   return ({ router }) => {
     router.afterEach((to, from, failure) => {
       useTitle(to.meta.title, {
         titleTemplate: () => {
-          return isString(template) ? template : template(to, from, failure)
+          return isString(titleTemplate) ? titleTemplate : titleTemplate(to, from, failure)
         },
       })
     })
