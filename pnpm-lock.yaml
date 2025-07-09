@@ -102,12 +102,15 @@ importers:
 
   packages/router:
     dependencies:
-      '@pro/router-plugin-system':
-        specifier: workspace:*
-        version: link:../router-plugin-system
       nprogress:
         specifier: ^0.2.0
         version: 0.2.0
+      pro-composables:
+        specifier: ^3.3.0
+        version: 3.3.0(vue@3.5.17(typescript@5.8.3))
+      type-fest:
+        specifier: ^4.41.0
+        version: 4.41.0
     devDependencies:
       '@types/nprogress':
         specifier: ^0.2.3
