@@ -233,14 +233,12 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
 }
 
 function getRoutesNames(routes: RouteRecordRaw[]) {
-  const routeNames: Set<RouteName> = new Set()
+  const routeNames: RouteName[] = []
   eachTree(routes, (route) => {
     if (route.name) {
-      routeNames.add(
-        isSymbol(route.name)
-          ? route.name.toString()
-          : route.name,
-      )
+      if (!routeNames.includes(route.name)) {
+        routeNames.push(route.name)
+      }
     }
   }, 'children')
   return routeNames
