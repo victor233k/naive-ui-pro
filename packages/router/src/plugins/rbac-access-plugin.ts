@@ -104,19 +104,14 @@ async function resolveOptions(
 ): Promise<Required<RbacAccessPluginServiceReturned>> {
   if (!cachedOptions) {
     const {
-      mode,
-      routes,
-      isLogin,
       homePath,
       loginPath,
       staticRouteNames,
       parentNameForAddRoute,
+      ...rest
     } = await options.service()
-
     cachedOptions = {
-      mode,
-      routes,
-      isLogin,
+      ...rest,
       homePath: homePath ?? '/home',
       loginPath: loginPath ?? '/login',
       parentNameForAddRoute: parentNameForAddRoute ?? null,
