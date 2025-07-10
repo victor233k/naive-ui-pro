@@ -1,7 +1,9 @@
+import type { EventHookOn } from '@vueuse/core'
 import type { Merge } from 'type-fest'
-import type { RouteLocationNormalized, RouteLocationNormalizedLoaded, Router, RouteRecordRaw } from 'vue-router'
+import type { Router, RouteRecordRaw } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
-import { cloneDeep, isString } from 'lodash-es'
+import { createEventHook } from '@vueuse/core'
+import { cloneDeep, isSymbol } from 'lodash-es'
 import { eachTree, mapTree } from 'pro-composables'
 
 declare module 'vue-router' {
@@ -13,6 +15,7 @@ declare module 'vue-router' {
   }
 }
 
+type RouteName = string | symbol
 type MaybePromise<T> = T | Promise<T>
 
 type RouteRecordRawStringComponent = Merge<RouteRecordRaw, {
@@ -20,7 +23,7 @@ type RouteRecordRawStringComponent = Merge<RouteRecordRaw, {
   children?: RouteRecordRawStringComponent[]
 }>
 
-type ResolveComponent = (routeRecord: RouteRecordRawStringComponent) => Exclude<RouteRecordRaw['component'], void>
+type ResolveComponent = (component: string) => NonNullable<RouteRecordRaw['component']>
 
 interface RbacAccessPluginBaseServiceReturned {
   /**
@@ -34,17 +37,23 @@ interface RbacAccessPluginBaseServiceReturned {
    */
   loginPath?: string
   /**
+   * 添加路由时的父级路由名称，设置后使用 router.addRoute(parentNameForAddRoute,routes)，默认使用 router.addRoute(routes)
+   */
+  parentNameForAddRoute?: string
+  /**
+   * 这些路由名称不需要进行权限控制，访问这些路由时不需要登录，如果不设置，则使用传递给 createRouter 的 routes 中的路由名称
+   */
+  staticRouteNames?: RouteName[]
+  /**
    * 是否已登录
    */
-  logined: boolean
+  isLogin: () => boolean
 }
 
-type RbacAccessPluginService<Returned extends Record<string, any>> = (
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalizedLoaded) => MaybePromise<Merge<
+type RbacAccessPluginService<Returned extends Record<string, any>> = () => MaybePromise<Merge<
     Returned,
     RbacAccessPluginBaseServiceReturned
-  >>
+>>
 
 type RbacAccessPluginFrontendService = RbacAccessPluginService<{
   /**
@@ -77,52 +86,127 @@ type RbacAccessPluginBackendService = RbacAccessPluginService<{
   resolveComponent: ResolveComponent
 }>
 
+type RbacAccessPluginServiceReturned
+= | Awaited<ReturnType<RbacAccessPluginBackendService>>
+  | Awaited<ReturnType<RbacAccessPluginFrontendService>>
+
 interface RbacAccessPluginOptions {
   service: RbacAccessPluginBackendService | RbacAccessPluginFrontendService
 }
 
-export function rbacAccessPlugin({
-  service,
-}: RbacAccessPluginOptions): ProRouterPlugin {
-  return ({ router, onUnmount }) => {
-    // 是否已经注册过路由
-    let registeredRoutes = false
-    // 移除路由的函数列表
-    const removeRouteHandlers: (() => void)[] = []
-    // 静态路由列表名称集合
-    const staticRouteNames = getStaticRouteNames(router)
-    // 缓存服务结果，避免重复调用
-    let cachedServiceResult: Awaited<ReturnType<RbacAccessPluginOptions['service']>> | null = null
+let cachedOptions = null
+async function resolveOptions(
+  options: RbacAccessPluginOptions,
+  { router, onCleanup }: {
+    router: Router
+    onCleanup: EventHookOn
+  },
+): Promise<Required<RbacAccessPluginServiceReturned>> {
+  if (!cachedOptions) {
+    const {
+      mode,
+      routes,
+      isLogin,
+      homePath,
+      loginPath,
+      staticRouteNames,
+      parentNameForAddRoute,
+    } = await options.service()
 
-    function cleanup() {
-      registeredRoutes = false
-      cachedServiceResult = null
-      removeRouteHandlers.forEach(removeRoute => removeRoute())
-      removeRouteHandlers.length = 0
+    cachedOptions = {
+      mode,
+      routes,
+      isLogin,
+      homePath: homePath ?? '/home',
+      loginPath: loginPath ?? '/login',
+      parentNameForAddRoute: parentNameForAddRoute ?? null,
+      staticRouteNames: staticRouteNames ?? getRoutesNames((router.options.routes ?? []) as RouteRecordRaw[]),
     }
 
-    router.beforeEach(async (to, from) => {
-      if (!cachedServiceResult) {
-        cachedServiceResult = await service(to, from)
-      }
+    onCleanup(() => {
+      cachedOptions = null
+    })
+  }
+  return cachedOptions
+}
+
+let registeredRoutes = false
+const removeRouteHandlers: (() => void)[] = []
+function resolveRoutes(
+  options: Required<RbacAccessPluginServiceReturned>,
+  { router, onCleanup }: {
+    router: Router
+    onCleanup: EventHookOn
+  },
+) {
+  const {
+    mode,
+    routes,
+    isLogin,
+    parentNameForAddRoute,
+  } = options
+
+  if (registeredRoutes || !isLogin()) {
+    return
+  }
+
+  const finalRoutes = buildRoutes({
+    mode,
+    routes,
+    roles: (options as any).roles,
+    resolveComponent: (options as any).resolveComponent,
+  })
+
+  finalRoutes.forEach((route) => {
+    removeRouteHandlers.push(
+      parentNameForAddRoute
+        ? router.addRoute(parentNameForAddRoute, route)
+        : router.addRoute(route),
+    )
+  })
+
+  registeredRoutes = true
+
+  onCleanup(() => {
+    registeredRoutes = false
+    removeRouteHandlers.forEach(removeRoute => removeRoute())
+    removeRouteHandlers.length = 0
+  })
+}
+
+export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlugin {
+  return ({ router, onUnmount }) => {
+    const { on: onCleanup, trigger: cleanup } = createEventHook()
+
+    router.beforeEach(async (to) => {
+      const resolvedOptions = await resolveOptions(options, {
+        router,
+        onCleanup,
+      })
+
+      resolveRoutes(resolvedOptions, {
+        router,
+        onCleanup,
+      })
 
       const {
-        mode,
-        routes,
-        logined,
-        homePath = '/home',
-        loginPath = '/login',
-      } = cachedServiceResult
+        isLogin,
+        homePath,
+        loginPath,
+        staticRouteNames,
+      } = resolvedOptions
+
+      const logined = isLogin()
 
       // 访问的是静态路由，不需要拦截
-      if (staticRouteNames.has(to.name as string)) {
+      if (staticRouteNames.includes(to.name)) {
         if (logined && to.path === loginPath) {
           // 如果已登录且访问的是登录页，重定向到 redirect 参数或者 homePath
           return {
             path: (to.query.redirect as string) ?? homePath,
           }
         }
-        return
+        return to
       }
 
       if (!logined) {
@@ -136,36 +220,13 @@ export function rbacAccessPlugin({
             },
           }
         }
-        return to
       }
 
-      if (registeredRoutes) {
-        return
-      }
-
-      const finalRoutes = buildRoutes({
-        mode,
-        routes,
-        roles: (cachedServiceResult as any).roles,
-        resolveComponent: (cachedServiceResult as any).resolveComponent,
-      })
-
-      if (finalRoutes.length > 0) {
-        // 动态注册路由
-        finalRoutes.forEach((route) => {
-          removeRouteHandlers.push(router.addRoute(route))
-        })
-        registeredRoutes = true
-      }
-
-      return {
-        ...to,
-        replace: true,
-      }
+      return to
     })
 
     router.afterEach((to) => {
-      if (cachedServiceResult && to.path === cachedServiceResult.loginPath) {
+      if (cachedOptions && to.path === cachedOptions.loginPath) {
         cleanup()
       }
     })
@@ -176,12 +237,15 @@ export function rbacAccessPlugin({
   }
 }
 
-function getStaticRouteNames(router: Router) {
-  const routeNames: Set<string> = new Set()
-  const routes = (router.options.routes ?? []) as RouteRecordRaw[]
+function getRoutesNames(routes: RouteRecordRaw[]) {
+  const routeNames: Set<RouteName> = new Set()
   eachTree(routes, (route) => {
-    if (isString(route.name) && route.name.length > 0) {
-      routeNames.add(route.name)
+    if (route.name) {
+      routeNames.add(
+        isSymbol(route.name)
+          ? route.name.toString()
+          : route.name,
+      )
     }
   }, 'children')
   return routeNames
@@ -209,9 +273,9 @@ function buildRoutesByFrontend(
   roles: string[],
 ): RouteRecordRaw[] {
   routes = cloneDeep(routes)
-  const hasAuth = (route:RouteRecordRaw) => {
+  const hasAuth = (route: RouteRecordRaw) => {
     const routeRoles = route.meta.roles ?? []
-    if(routeRoles.length <= 0){
+    if (routeRoles.length <= 0) {
       // 如果没有设置 roles，则表示所有角色都可以访问
       return true
     }
@@ -219,8 +283,8 @@ function buildRoutesByFrontend(
   }
   const filterRoutes = (routes: RouteRecordRaw[]) => {
     return routes.filter((route) => {
-      if(hasAuth(route)){
-        if(route.children){
+      if (hasAuth(route)) {
+        if (route.children) {
           route.children = filterRoutes(route.children)
         }
         return true
@@ -236,9 +300,12 @@ function buildRoutesByBackend(
   resolveComponent: ResolveComponent,
 ) {
   return mapTree(routes, (route) => {
+    if (!route.component) {
+      return route
+    }
     return {
       ...route,
-      component: resolveComponent(route),
+      component: resolveComponent(route.component),
     }
   }, 'children') as RouteRecordRaw[]
 }
