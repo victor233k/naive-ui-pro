@@ -3,7 +3,7 @@ import type { Merge } from 'type-fest'
 import type { Router, RouteRecordRaw } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { createEventHook } from '@vueuse/core'
-import { cloneDeep, isSymbol } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 import { eachTree, mapTree } from 'pro-composables'
 
 declare module 'vue-router' {
@@ -28,14 +28,14 @@ type ResolveComponent = (component: string) => NonNullable<RouteRecordRaw['compo
 interface RbacAccessPluginBaseServiceReturned {
   /**
    * 首页路径，如果登录，会跳转到此路径
-   * @default '/home'
+   * @default 'Home'
    */
-  homePath?: string
+  homeName?: string
   /**
    * 登录路径，如果未登录，会跳转到此路径
-   * @default '/login'
+   * @default 'Login'
    */
-  loginPath?: string
+  loginName?: string
   /**
    * 添加路由时的父级路由名称，设置后使用 router.addRoute(parentNameForAddRoute,routes)，默认使用 router.addRoute(routes)
    */
@@ -43,7 +43,7 @@ interface RbacAccessPluginBaseServiceReturned {
   /**
    * 这些路由名称不需要进行权限控制，访问这些路由时不需要登录，如果不设置，则使用传递给 createRouter 的 routes 中的路由名称
    */
-  staticRouteNames?: RouteName[]
+  ignoreAccessRouteNames?: RouteName[]
   /**
    * 是否已登录
    */
@@ -86,15 +86,15 @@ type RbacAccessPluginBackendService = RbacAccessPluginService<{
   resolveComponent: ResolveComponent
 }>
 
-type RbacAccessPluginServiceReturned
+export type RbacAccessPluginServiceReturned
 = | Awaited<ReturnType<RbacAccessPluginBackendService>>
   | Awaited<ReturnType<RbacAccessPluginFrontendService>>
 
-interface RbacAccessPluginOptions {
+export interface RbacAccessPluginOptions {
   service: RbacAccessPluginBackendService | RbacAccessPluginFrontendService
 }
 
-let cachedOptions = null
+let cachedOptions: Required<RbacAccessPluginServiceReturned> = null
 async function resolveOptions(
   options: RbacAccessPluginOptions,
   { router, onCleanup }: {
@@ -104,18 +104,18 @@ async function resolveOptions(
 ): Promise<Required<RbacAccessPluginServiceReturned>> {
   if (!cachedOptions) {
     const {
-      homePath,
-      loginPath,
-      staticRouteNames,
+      homeName,
+      loginName,
       parentNameForAddRoute,
+      ignoreAccessRouteNames,
       ...rest
     } = await options.service()
     cachedOptions = {
       ...rest,
-      homePath: homePath ?? '/home',
-      loginPath: loginPath ?? '/login',
+      homeName: homeName ?? 'Home',
+      loginName: loginName ?? 'Login',
       parentNameForAddRoute: parentNameForAddRoute ?? null,
-      staticRouteNames: staticRouteNames ?? getRoutesNames((router.options.routes ?? []) as RouteRecordRaw[]),
+      ignoreAccessRouteNames: ignoreAccessRouteNames ?? getRoutesNames((router.options.routes ?? []) as RouteRecordRaw[]),
     }
 
     onCleanup(() => {
@@ -186,42 +186,45 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
 
       const {
         isLogin,
-        homePath,
-        loginPath,
-        staticRouteNames,
+        homeName,
+        loginName,
+        ignoreAccessRouteNames,
       } = resolvedOptions
 
       const logined = isLogin()
 
-      // 访问的是静态路由，不需要拦截
-      if (staticRouteNames.includes(to.name)) {
-        if (logined && to.path === loginPath) {
-          // 如果已登录且访问的是登录页，重定向到 redirect 参数或者 homePath
-          return {
-            path: (to.query.redirect as string) ?? homePath,
-          }
+      // 已登录跳转 login 页面，重定向到 redirect 参数或者 homePath
+      if (logined && to.name === loginName) {
+        return {
+          hash: to.hash,
+          name: homeName,
+          query: to.query,
+          params: to.params,
         }
-        return to
       }
 
+      // 如果是不需要鉴权的路由则放行
+      if (ignoreAccessRouteNames.includes(to.name)) {
+        return
+      }
+
+      // 未登录重定向到登录页
       if (!logined) {
-        // 如果未登录且访问的不是登录页，重定向到登录页
-        if (to.path !== loginPath) {
-          return {
-            path: loginPath,
-            replace: true,
-            query: {
-              redirect: to.fullPath, // 方便登录后重定向到当前访问的路径
-            },
-          }
+        return {
+          name: loginName,
+          query: {
+            ...to.query,
+            redirect: to.fullPath,
+          },
+          replace: true,
+          hash: to.hash,
+          params: to.params,
         }
       }
-
-      return to
     })
 
     router.afterEach((to) => {
-      if (cachedOptions && to.path === cachedOptions.loginPath) {
+      if (cachedOptions && to.name === cachedOptions.loginName) {
         cleanup()
       }
     })

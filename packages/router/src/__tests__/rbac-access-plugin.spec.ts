@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
-import type { RouteRecordRawStringComponent } from '../plugins/rbac-access-plugin'
+import type { RbacAccessPluginServiceReturned } from '../plugins/rbac-access-plugin'
 import { describe, expect, it } from 'vitest'
+import { createApp } from 'vue'
 import { createWebHashHistory } from 'vue-router'
 import { createRouter } from '../../src/create-router'
 import { rbacAccessPlugin } from '../plugins/rbac-access-plugin'
@@ -13,12 +14,8 @@ const Register = { template: `<div>Register</div>` }
 const BasicInfo = { template: `<div>BasicInfo</div>` }
 const BasicList = { template: `<div>BasicList</div>` }
 
-const coreRoutes: RouteRecordRaw[] = [
+const ignoreAccessRoutes: RouteRecordRaw[] = [
   {
-    meta: {
-      title: 'Root',
-      hideInBreadcrumb: true,
-    },
     name: 'Root',
     path: '/',
     redirect: '/list',
@@ -28,26 +25,16 @@ const coreRoutes: RouteRecordRaw[] = [
   {
     name: 'admin',
     path: '/admin',
-    meta: {
-      title: 'admin',
-      keepAlive: true,
-    },
     component: Admin,
   },
   {
     name: 'Login',
     path: '/login',
-    meta: {
-      title: 'login',
-    },
     component: Login,
   },
   {
     name: 'Register',
     path: '/register',
-    meta: {
-      title: 'Register',
-    },
     component: Register,
   },
   {
@@ -57,7 +44,7 @@ const coreRoutes: RouteRecordRaw[] = [
   },
 ]
 
-const asyncRoutes: RouteRecordRaw[] = [
+const accessRoutes: RouteRecordRaw[] = [
   {
     path: '/list',
     name: 'List',
@@ -89,107 +76,111 @@ const asyncRoutes: RouteRecordRaw[] = [
 ]
 
 // 封装router初始化函数，便于不同登录状态下测试
-function setupRouter(isLogin: boolean) {
-  return createRouter({
+function setupRouter(options: Partial<RbacAccessPluginServiceReturned> = {}) {
+  let login = null
+  const finalOptions = {
+    mode: 'frontend',
+    routes: accessRoutes,
+    homeName: 'Root',
+    roles: [],
+    parentNameForAddRoute: 'Root',
+    ...(options as any),
+    isLogin: () => {
+      return login
+        ?? options.isLogin
+        ? (login = options.isLogin())
+        : (login = false)
+    },
+  }
+  const app = createApp({})
+  const router = createRouter({
     history: createWebHashHistory(),
-    routes: coreRoutes,
+    routes: ignoreAccessRoutes,
     plugins: [
       rbacAccessPlugin({
         service: async () => {
-          return {
-            mode: 'frontend',
-            isLogin: () => isLogin,
-            routes: asyncRoutes,
-            homePath: '/',
-            roles: [],
-            parentNameForAddRoute: 'Root',
-          }
+          return finalOptions
         },
       }),
     ],
   })
+  app.use(router)
+  app.mount(document.createElement('div'))
+  return {
+    ...router,
+    unmount: () => {
+      app.unmount()
+      login = null
+    },
+    setLogin: (value: boolean) => {
+      login = value
+    },
+  }
 }
 
 describe('rbac-access-plugin', () => {
   describe('not-login', () => {
-    it('初始化跳转已存在路由，应跳转到 /login?redirect=/list', async () => {
-      const router = setupRouter(false)
+    it('redirect to NotFound when navigation to not exsit path', async () => {
+      const router = setupRouter({})
       await router.push('/')
-      expect(router.currentRoute.value.fullPath).toBe('/login?redirect=/list')
+      expect(router.currentRoute.value.name).toBe('FallbackNotFound')
+      router.unmount()
     })
 
-    it('初始化跳转登录路由，应正常跳转且无 redirect 参数', async () => {
-      const router = setupRouter(false)
-      await router.push('/login')
-      expect(router.currentRoute.value.fullPath).toBe('/login')
-      expect(router.currentRoute.value.query.redirect).toBeUndefined()
+    it('redirect to Login when navigation to not exsit path', async () => {
+      const router = setupRouter({ ignoreAccessRouteNames: ignoreAccessRoutes.map(route => route.name).slice(0, -1) })
+      await router.push('/')
+      expect(router.currentRoute.value.name).toBe('Login')
+      expect(router.currentRoute.value.query.redirect).toBe('/list')
+      router.unmount()
     })
 
-    it('已存在路由跳转已存在路由，应跳转到 /admin', async () => {
-      const router = setupRouter(false)
+    it('navigation to constant path', async () => {
+      const router = setupRouter()
       await router.push('/register')
       await router.push('/admin')
       expect(router.currentRoute.value.fullPath).toBe('/admin')
-    })
-
-    it('已存在路由跳转登录路由，应跳转到 /login', async () => {
-      const router = setupRouter(false)
-      await router.push('/register')
-      await router.push('/login')
-      expect(router.currentRoute.value.fullPath).toBe('/login')
-    })
-
-    it('当前为登录页，跳转登录页，应无 redirect 参数', async () => {
-      const router = setupRouter(false)
-      await router.push('/login')
-      await router.push('/login')
-      expect(router.currentRoute.value.fullPath).toBe('/login')
-      expect(router.currentRoute.value.query.redirect).toBeUndefined()
-    })
-
-    it('跳转不存在的路由，应跳转 NotFound 页面', async () => {
-      const router = setupRouter(false)
-      await router.push('/not-exist')
-      expect(router.currentRoute.value.name).toBe('FallbackNotFound')
+      router.unmount()
     })
   })
 
   describe('logined', () => {
-    it('跳转登录页，应跳转到首页 /', async () => {
-      const router = setupRouter(true)
+    it('redirect to Home when navigation to Login', async () => {
+      const router = setupRouter({ isLogin: () => true })
       await router.push('/login')
       expect(router.currentRoute.value.fullPath).toBe('/list/basic-list')
+      router.unmount()
     })
 
-    it('跳转存在的基础路由，应正常跳转', async () => {
-      const router = setupRouter(true)
+    it('navigation to exsit path', async () => {
+      const router = setupRouter({ isLogin: () => true })
       await router.push('/admin')
       expect(router.currentRoute.value.fullPath).toBe('/admin')
+      await router.push('/list/basic-list')
+      expect(router.currentRoute.value.fullPath).toBe('/list/basic-list')
+      router.unmount()
     })
 
-    it('跳转存在的动态路由，应正常跳转', async () => {
-      const router = setupRouter(true)
-      await router.push({ name: 'basic-info' })
-      expect(router.currentRoute.value.name).toBe('basic-info')
-    })
-
-    it('跳转不存在的路由，应跳转 NotFound 页面', async () => {
-      const router = setupRouter(true)
-      await router.push('/not-exist')
+    it('redirect to NotFound when navigation to not exsit path', async () => {
+      const router = setupRouter({ isLogin: () => true })
+      await router.push('/not-exsit-path')
       expect(router.currentRoute.value.name).toBe('FallbackNotFound')
+      expect(router.currentRoute.value.query.redirect).toBeUndefined()
+      router.unmount()
+    })
+
+    it('logout', async () => {
+      const router = setupRouter({ isLogin: () => true })
+      await router.push('/list/basic-list')
+      expect(router.currentRoute.value.fullPath).toBe('/list/basic-list')
+      router.setLogin(false)
+      await router.push('/list/basic-list')
+      expect(router.currentRoute.value.name).toBe('Login')
+      expect(router.currentRoute.value.query.redirect).toBe('/list/basic-list')
+      await router.push('/login')
+      expect(router.currentRoute.value.name).toBe('Login')
+      expect(router.currentRoute.value.query.redirect).toBeUndefined()
+      router.unmount()
     })
   })
 })
-
-/**
-* 1、未登录
-*   1) 初始化跳转已存在路由；预期：正常跳转
-*   2) 初始化跳转登录路由；预期：正常跳转，不携带 redirect 参数
-*   3）已存在路由跳转已存在路由；预期：正常跳转
-*   4）当前为登录页，跳转登录页；预期：redirect 参数为空
-*   5) 跳转不存在的路由；预期：跳转 NotFound 页面
-* 2、已登录
-*   1) 跳转登录页;预期：跳转到首页
-*   2）跳转存在的路由；预期：正常跳转
-*   3）跳转不存在路由；预期：跳转 NotFound 页面
-*/
