@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "test:@pro/router": "vitest ./packages/router/src/__tests__/rbac-access-plugin.spec.ts"
+    "test:@pro/router": "pnpm --filter @pro/router run test"
   },
   "dependencies": {
     "@ant-design/colors": "^7.2.1",
@@ -48,7 +48,6 @@
     "unplugin-vue-components": "^28.7.0",
     "vite": "^6.3.5",
     "vite-plugin-html": "^3.2.2",
-    "vitest": "^3.2.4",
     "vue-tsc": "^2.2.8"
   }
 }
