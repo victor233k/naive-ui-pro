@@ -2,7 +2,7 @@
 import Layout from '@/components/layout/index.vue'
 import PerferenceDrawer from '@/components/preference-drawer/index.vue'
 
-defineOptions({ name: 'Admain' })
+defineOptions({ name: 'admin' })
 </script>
 
 <template>

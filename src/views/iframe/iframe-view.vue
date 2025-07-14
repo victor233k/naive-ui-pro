@@ -1,3 +1,3 @@
 <template>
-  <div />
+  <div>iframe</div>
 </template>

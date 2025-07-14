@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDialog, useMessage } from 'naive-ui'
-import { useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
 defineOptions({ name: 'BasicInfo' })
 
@@ -9,10 +9,14 @@ const dialog = useDialog()
 const message = useMessage()
 
 function submit() {
-  console.log('submit')
-  router.disableLeaveConfirm()
+  router.disableLeaveGuard()
   router.push({ name: 'basic-list' })
 }
+
+// router.enableLeaveGuard(handleConfirm)
+onBeforeRouteLeave(() => {
+  return handleConfirm()
+})
 
 function handleConfirm() {
   return new Promise<boolean>((resolve) => {
@@ -38,7 +42,7 @@ function handleConfirm() {
 <template>
   <div>
     当前页面: base-info
-    <n-button @click="$router.enableLeaveConfirm(handleConfirm)">
+    <n-button @click="$router.enableLeaveGuard()">
       添加离开提示
     </n-button>
     <n-button @click="submit">
