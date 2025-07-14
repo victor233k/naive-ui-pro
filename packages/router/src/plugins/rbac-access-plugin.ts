@@ -167,6 +167,8 @@ function resolveRoutes(
     removeRouteHandlers.forEach(removeRoute => removeRoute())
     removeRouteHandlers.length = 0
   })
+
+  return registeredRoutes
 }
 
 export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlugin {
@@ -179,10 +181,19 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
         onCleanup,
       })
 
-      resolveRoutes(resolvedOptions, {
+      const shouldRedirect = resolveRoutes(resolvedOptions, {
         router,
         onCleanup,
       })
+
+      if (shouldRedirect) {
+        return {
+          replace: true,
+          hash: to.hash,
+          query: to.query,
+          path: to.fullPath,
+        }
+      }
 
       const {
         isLogin,
