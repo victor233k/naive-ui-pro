@@ -29,7 +29,7 @@ interface KeepAlivePluginOptions {
   /**
    * @default false
    */
-  defualtKeepAlive?: boolean
+  defaultKeepAlive?: boolean
 }
 
 function normalizeRouteName(name: RouteRecordNameGeneric): string {
@@ -52,23 +52,20 @@ function remove(router: Router, name: string): void {
   router.keepAliveList.value = router.keepAliveList.value.filter(item => item !== name)
 }
 
-/**
- * TODO: 要重构
- */
 export function keepAlivePlugin({
-  defualtKeepAlive = false,
+  defaultKeepAlive = false,
 }: KeepAlivePluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
     if (!router.keepAliveList) {
       router.keepAliveList = ref([])
     }
 
-    router.beforeEach((to, from) => {
+    router.afterEach((to, from) => {
       if (!from.name) {
         return
       }
 
-      const { keepAlive = defualtKeepAlive } = from.meta
+      const { keepAlive = defaultKeepAlive } = from.meta
       const normalizedName = normalizeRouteName(from.name)
       if (isBoolean(keepAlive)) {
         keepAlive
