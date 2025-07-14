@@ -1,4 +1,5 @@
 export { createRouter } from './create-router'
+export { linkPlugin } from './plugins/link-plugin'
 export { progressPlugin } from './plugins/progress-plugin'
 export { keepAlivePlugin } from './plugins/keep-alive-plugin'
 export { transitionPlugin } from './plugins/transition-plugin'
