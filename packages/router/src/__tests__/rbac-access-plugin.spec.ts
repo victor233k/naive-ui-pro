@@ -77,20 +77,14 @@ const accessRoutes: RouteRecordRaw[] = [
 
 // 封装router初始化函数，便于不同登录状态下测试
 function setupRouter(options: Partial<RbacAccessPluginServiceReturned> = {}) {
-  let login = null
-  const finalOptions = {
+  let finalOptions = {
     mode: 'frontend',
     routes: accessRoutes,
     homeName: 'Root',
     roles: [],
     parentNameForAddRoute: 'Root',
+    logined: false,
     ...(options as any),
-    isLogin: () => {
-      return login
-        ?? options.isLogin
-        ? (login = options.isLogin())
-        : (login = false)
-    },
   }
   const app = createApp({})
   const router = createRouter({
@@ -110,10 +104,12 @@ function setupRouter(options: Partial<RbacAccessPluginServiceReturned> = {}) {
     ...router,
     unmount: () => {
       app.unmount()
-      login = null
     },
-    setLogin: (value: boolean) => {
-      login = value
+    setOptions: (value: Partial<RbacAccessPluginServiceReturned>) => {
+      finalOptions = {
+        ...finalOptions,
+        ...value,
+      }
     },
   }
 }
@@ -146,14 +142,14 @@ describe('rbac-access-plugin', () => {
 
   describe('logined', () => {
     it('redirect to Home when navigation to Login', async () => {
-      const router = setupRouter({ isLogin: () => true })
+      const router = setupRouter({ logined: true })
       await router.push('/login')
       expect(router.currentRoute.value.fullPath).toBe('/list/basic-list')
       router.unmount()
     })
 
     it('navigation to exsit path', async () => {
-      const router = setupRouter({ isLogin: () => true })
+      const router = setupRouter({ logined: true })
       await router.push('/admin')
       expect(router.currentRoute.value.fullPath).toBe('/admin')
       await router.push('/list/basic-list')
@@ -162,7 +158,7 @@ describe('rbac-access-plugin', () => {
     })
 
     it('redirect to NotFound when navigation to not exsit path', async () => {
-      const router = setupRouter({ isLogin: () => true })
+      const router = setupRouter({ logined: true })
       await router.push('/not-exsit-path')
       expect(router.currentRoute.value.name).toBe('FallbackNotFound')
       expect(router.currentRoute.value.query.redirect).toBeUndefined()
@@ -170,10 +166,10 @@ describe('rbac-access-plugin', () => {
     })
 
     it('logout', async () => {
-      const router = setupRouter({ isLogin: () => true })
+      const router = setupRouter({ logined: true })
       await router.push('/list/basic-list')
       expect(router.currentRoute.value.fullPath).toBe('/list/basic-list')
-      router.setLogin(false)
+      router.setOptions({ logined: false })
       await router.push('/list/basic-list?a=1')
       expect(router.currentRoute.value.name).toBe('Login')
       expect(router.currentRoute.value.query.redirect).toBe('/list/basic-list?a=1')

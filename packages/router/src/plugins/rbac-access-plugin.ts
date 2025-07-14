@@ -47,7 +47,7 @@ interface RbacAccessPluginBaseServiceReturned {
   /**
    * 是否已登录
    */
-  isLogin: () => boolean
+  logined: boolean
 }
 
 type RbacAccessPluginService<Returned extends Record<string, any>> = () => MaybePromise<Merge<
@@ -94,7 +94,8 @@ export interface RbacAccessPluginOptions {
   service: RbacAccessPluginBackendService | RbacAccessPluginFrontendService
 }
 
-let cachedOptions: Required<RbacAccessPluginServiceReturned> = null
+let cachedRouteNames: RouteName[] | null = null
+let finalOptions: Required<RbacAccessPluginServiceReturned> = null
 async function resolveOptions(
   options: RbacAccessPluginOptions,
   { router, onCleanup }: {
@@ -102,27 +103,26 @@ async function resolveOptions(
     onCleanup: EventHookOn
   },
 ): Promise<Required<RbacAccessPluginServiceReturned>> {
-  if (!cachedOptions) {
-    const {
-      homeName,
-      loginName,
-      parentNameForAddRoute,
-      ignoreAccessRouteNames,
-      ...rest
-    } = await options.service()
-    cachedOptions = {
-      ...rest,
-      homeName: homeName ?? 'Home',
-      loginName: loginName ?? 'Login',
-      parentNameForAddRoute: parentNameForAddRoute ?? null,
-      ignoreAccessRouteNames: ignoreAccessRouteNames ?? getRoutesNames((router.options.routes ?? []) as RouteRecordRaw[]),
-    }
-
+  if (!finalOptions) {
     onCleanup(() => {
-      cachedOptions = null
+      finalOptions = null
+      cachedRouteNames = null
     })
   }
-  return cachedOptions
+  const {
+    homeName,
+    loginName,
+    parentNameForAddRoute,
+    ignoreAccessRouteNames,
+    ...rest
+  } = await options.service()
+  return {
+    ...rest,
+    homeName: homeName ?? 'Home',
+    loginName: loginName ?? 'Login',
+    parentNameForAddRoute: parentNameForAddRoute ?? null,
+    ignoreAccessRouteNames: ignoreAccessRouteNames ?? (cachedRouteNames ||= getRoutesNames((router.options.routes ?? []) as RouteRecordRaw[])),
+  }
 }
 
 let registeredRoutes = false
@@ -136,12 +136,12 @@ function resolveRoutes(
 ) {
   const {
     mode,
+    logined,
     routes,
-    isLogin,
     parentNameForAddRoute,
   } = options
 
-  if (registeredRoutes || !isLogin()) {
+  if (registeredRoutes || !logined) {
     return
   }
 
@@ -196,13 +196,11 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
       }
 
       const {
-        isLogin,
+        logined,
         homeName,
         loginName,
         ignoreAccessRouteNames,
       } = resolvedOptions
-
-      const logined = isLogin()
 
       // 已登录跳转 login 页面，重定向到 redirect 参数或者 homePath
       if (logined && to.name === loginName) {
@@ -235,7 +233,7 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
     })
 
     router.afterEach((to) => {
-      if (cachedOptions && to.name === cachedOptions.loginName) {
+      if (finalOptions && to.name === finalOptions.loginName) {
         cleanup()
       }
     })
