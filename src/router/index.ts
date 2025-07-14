@@ -6,7 +6,7 @@ import {
   keepAlivePlugin,
   progressPlugin,
   rbacAccessPlugin,
-  routeLeaveConfirmPlugin,
+  transitionPlugin,
 } from '@pro/router'
 import { isFunction } from 'lodash-es'
 import { createWebHistory } from 'vue-router'
@@ -28,21 +28,38 @@ export async function setupRouter(app: App) {
     history: createWebHistory(),
     routes,
     plugins: [
+      /**
+       * 路由进度条插件
+       */
       progressPlugin(),
-      // documentTitlePlugin({
-      //   template: (to, from) => {
-      //     return `从${from.path}到${to.path} - admain`
-      //   },
-      // }),
+      /**
+       * 路由标题插件
+       */
+      documentTitlePlugin(),
+      /**
+       * 面包屑插件
+       */
       breadcrumbPlugin(),
+      /**
+       * 路由缓存插件
+       */
       keepAlivePlugin(),
+      /**
+       * 路由过渡插件
+       */
+      transitionPlugin({
+        defaultTransitionName: 'fade-down',
+      }),
+      /**
+       * 权限插件
+       */
       rbacAccessPlugin({
         service: async () => {
           return {
             mode: 'frontend',
             roles: ['user'],
             routes: asyncRoutes,
-            homePath: '/',
+            homeName: 'Root',
             isLogin: () => true,
             parentNameForAddRoute: 'Root',
             // resolveComponent: (component) => {
@@ -51,12 +68,8 @@ export async function setupRouter(app: App) {
           }
         },
       }),
-      // routeLeaveConfirmPlugin({
-      //   defaultLeaveConfig: '页面有未保存的更改，确定要离开吗？',
-      // }),
     ],
   })
 
-  // 在页面/组件里用 this.$route.meta.__autoName 拿到自动 name
   app.use(router)
 }
