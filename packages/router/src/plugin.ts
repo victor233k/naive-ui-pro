@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import type { Router } from 'vue-router'
+import type { Router, RouterOptions } from 'vue-router'
 import { APP, EFFECT_SCOPE, RUN_WITH_APP_HANDLERS, UNMOUNT_HANDLERS } from './symbols'
 
 export type ProRouterPluginUnmountHandler = () => void
@@ -20,22 +20,33 @@ export interface ProRouterPluginContext {
   onUnmount: (handler: ProRouterPluginUnmountHandler) => void
 }
 
-export interface ProRouterPlugin {
-  /**
-   * Called when the plugin is installed.
-   */
-  (ctx: ProRouterPluginContext): void
+export interface ProRouterObjectPlugin {
+  install?: (ctx: ProRouterPluginContext) => void
+  resolveOptions?: (options: RouterOptions) => RouterOptions
 }
+
+export interface ProRouterFunctionPlugin {
+/**
+ * Called when the plugin is installed.
+ */
+  (ctx: ProRouterPluginContext): void
+  /**
+   * 插件执行前，可以对 options 进行修改
+   */
+  resolveOptions?: (options: RouterOptions) => RouterOptions
+}
+
+export type ProRouterPlugin = ProRouterObjectPlugin | ProRouterFunctionPlugin
 
 export function setupPlugin({
   router,
   plugin,
 }: {
   router: Router
-  plugin: ProRouterPlugin
+  plugin: ProRouterObjectPlugin
 }) {
   router[EFFECT_SCOPE].run(() => {
-    plugin({
+    plugin.install({
       router,
       onUnmount(handler) {
         const handlers = (router[UNMOUNT_HANDLERS] ??= [])

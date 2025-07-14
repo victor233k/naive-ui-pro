@@ -1,9 +1,10 @@
 import type { App, EffectScope } from 'vue'
 import type { RouterOptions as _RouterOptions, Router } from 'vue-router'
-import type { ProRouterPlugin, ProRouterPluginRunWithAppHandler, ProRouterPluginUnmountHandler } from './plugin'
+import type { ProRouterObjectPlugin, ProRouterPlugin, ProRouterPluginRunWithAppHandler, ProRouterPluginUnmountHandler } from './plugin'
 import { effectScope } from 'vue'
 import { createRouter as _createRouter } from 'vue-router'
 import { setupPlugin } from './plugin'
+import { normalizeRoutesPlugin } from './plugins/normalize-routes-plugin'
 import { ALREADY_INSTALLED, APP, EFFECT_SCOPE, RUN_WITH_APP_HANDLERS, UNMOUNT_HANDLERS } from './symbols'
 
 export interface ProRouterOptions extends _RouterOptions {
@@ -11,8 +12,8 @@ export interface ProRouterOptions extends _RouterOptions {
 }
 
 export function createRouter(options: ProRouterOptions): Router {
-  const { plugins = [], ...vueRouterOptions } = options
-  const router = _createRouter(vueRouterOptions)
+  const { plugins = [], vrOptions } = resolveOptions(options)
+  const router = _createRouter(vrOptions)
   const scope = (router[EFFECT_SCOPE] ??= effectScope(true))
   const { install, beforeEach, beforeResolve, afterEach, onError } = router
 
@@ -80,6 +81,40 @@ function prepareInstall(app: App, router: Router) {
     delete router[ALREADY_INSTALLED]
     delete router[RUN_WITH_APP_HANDLERS]
   })
+}
+
+function resolveOptions(options: ProRouterOptions) {
+  const { plugins = [], ...vueRouterOptions } = options
+
+  const builtinPlugins = [
+    normalizeRoutesPlugin(),
+  ]
+
+  const objectPlugins = [
+    ...builtinPlugins,
+    ...plugins,
+  ].map(convertToObjectPlugin)
+
+  const finalVrOptions = objectPlugins.reduce((p, c) => {
+    if (c.resolveOptions) {
+      return c.resolveOptions(p)
+    }
+    return p
+  }, vueRouterOptions)
+
+  return {
+    plugins: objectPlugins,
+    vrOptions: finalVrOptions,
+  }
+}
+
+function convertToObjectPlugin(plugin: ProRouterPlugin): ProRouterObjectPlugin {
+  if (typeof plugin === 'function') {
+    return {
+      install: plugin,
+    }
+  }
+  return plugin
 }
 
 declare module 'vue-router' {
