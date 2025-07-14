@@ -1,5 +1,4 @@
 import type { ProRouterPlugin } from '../plugin'
-import { isString } from 'lodash-es'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -10,30 +9,40 @@ declare module 'vue-router' {
   }
 }
 
-/**
- * 检查传入的字符串是否为有效的HTTP或HTTPS URL。
- *
- * @param {string} url 要检查的字符串。
- * @return {boolean} 如果字符串是有效的HTTP或HTTPS URL，返回true，否则返回false。
- */
-function isHttpUrl(url?: string) {
-  if (!url) {
-    return false
-  }
-  // 使用正则表达式测试URL是否以http:// 或 https:// 开头
-  const httpRegex = /^https?:\/\/.*$/
-  return httpRegex.test(url)
+interface LinkPluginOptions {
+  /**
+   * 打开外部链接
+   */
+  open?: (url: string) => void
+  /**
+   * 是否为外部链接
+   */
+  isExternalUrl?: (url?: string) => boolean
 }
 
-export function linkPlugin(): ProRouterPlugin {
+export function linkPlugin({
+  open = _open,
+  isExternalUrl = _isExternalUrl,
+}: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
     router.beforeEach((to) => {
       const link = to.meta?.link
-      if (isString(link) && isHttpUrl(link)) {
-        window.open(link, '_blank')
-        // 阻断原有跳转
+      if (isExternalUrl(link)) {
+        open(link)
         return false
       }
     })
   }
+}
+
+function _open(url: string) {
+  window && window.open(url, '_blank')
+}
+
+function _isExternalUrl(url?: string) {
+  if (!url) {
+    return false
+  }
+  const httpRegex = /^https?:\/\/.*$/
+  return httpRegex.test(url)
 }
