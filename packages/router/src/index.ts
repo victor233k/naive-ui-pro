@@ -1,9 +1,10 @@
 export { createRouter } from './create-router'
 export { progressPlugin } from './plugins/progress-plugin'
 export { keepAlivePlugin } from './plugins/keep-alive-plugin'
+export { transitionPlugin } from './plugins/transition-plugin'
 export { breadcrumbPlugin } from './plugins/breadcrumb-plugin'
 export { rbacAccessPlugin } from './plugins/rbac-access-plugin'
 export { documentTitlePlugin } from './plugins/document-title-plugin'
-export { routeLeaveConfirmPlugin } from './plugins/route-leave-confirm-plugin'
+
 export type { ProRouterPlugin } from './plugin'
 export type { ProRouterOptions } from './create-router'

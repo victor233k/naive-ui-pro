@@ -19,15 +19,15 @@ declare module 'vue-router' {
       exclude: (string | symbol)[]
     }
   }
-  
+
   interface Router {
     keepAliveList: Ref<(string | RegExp)[]>
   }
 }
 
 interface KeepAlivePluginOptions {
-  /** 
-   * @default false 
+  /**
+   * @default false
    */
   defualtKeepAlive?: boolean
 }
