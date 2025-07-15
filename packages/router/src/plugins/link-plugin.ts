@@ -21,8 +21,8 @@ interface LinkPluginOptions {
 }
 
 export function linkPlugin({
-  open = _open,
-  isExternalUrl = _isExternalUrl,
+  open = builtinOpen,
+  isExternalUrl = builtinIsExternalUrl,
 }: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
     router.beforeEach((to) => {
@@ -35,11 +35,11 @@ export function linkPlugin({
   }
 }
 
-function _open(url: string) {
+function builtinOpen(url: string) {
   window && window.open(url, '_blank')
 }
 
-function _isExternalUrl(url?: string) {
+function builtinIsExternalUrl(url?: string) {
   if (!url) {
     return false
   }

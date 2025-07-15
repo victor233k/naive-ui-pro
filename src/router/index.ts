@@ -4,12 +4,14 @@ import {
   createRouter,
   documentTitlePlugin,
   keepAlivePlugin,
+  linkPlugin,
+  nMenuPlugin,
   progressPlugin,
   rbacAccessPlugin,
   transitionPlugin,
 } from '@pro/router'
-import { isFunction } from 'lodash-es'
 import { createWebHistory } from 'vue-router'
+import { useMenuStore } from '@/store/use-menu-store'
 import { useRoutesKeepAliveStore } from '@/store/use-routes-keep-alive'
 import A from '@/views/basic-list.vue'
 import { asyncRoutes, mockRoutes, routes } from './routes'
@@ -41,30 +43,42 @@ export async function setupRouter(app: App) {
        */
       breadcrumbPlugin(),
       /**
+       * 外链插件，用于处理外链跳转
+       */
+      linkPlugin(),
+      /**
        * 路由缓存插件
        */
       keepAlivePlugin(),
       /**
        * 路由过渡插件
        */
-      transitionPlugin({
-        defaultTransitionName: 'fade-down',
-      }),
+      transitionPlugin(),
       /**
        * 权限插件
        */
       rbacAccessPlugin({
         service: async () => {
+          const store = useMenuStore()
           return {
-            mode: 'frontend',
-            roles: ['user'],
-            routes: asyncRoutes,
-            homeName: 'Root',
-            isLogin: () => true,
+            mode: 'backend',
+            logined: true,
+            routes: store.menus,
             parentNameForAddRoute: 'Root',
-            // resolveComponent: (component) => {
-            //   return pageMap[component]
-            // },
+            resolveComponent: (component) => {
+              return pageMap[component]
+            },
+          }
+        },
+      }),
+      /**
+       * 菜单插件，将数据转换成 n-menu 菜单数据
+       */
+      nMenuPlugin({
+        service: () => {
+          const store = useMenuStore()
+          return {
+            routes: store.menus,
           }
         },
       }),

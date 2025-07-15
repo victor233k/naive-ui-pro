@@ -25,37 +25,37 @@ const coreRoutes: RouteRecordRaw[] = [
     },
     name: 'Root',
     path: '/',
-    redirect: '/list',
+    redirect: '/home',
     component: Layout,
     children: [],
   },
-  {
-    name: 'admin',
-    path: '/admin',
-    meta: {
-      title: 'admin',
-      keepAlive: true,
-    },
-    component: () => import('@/views/admin.vue'),
-  },
-  {
-    name: 'Login',
-    path: '/login',
-    meta: {
-      title: 'login',
-    },
-    component: loginRouter,
-  },
-  {
-    name: 'IframeView',
-    path: '/baidu',
-    meta: {
-      keepAlive: true,
-      title: 'baidu',
-      frameUrl: 'https://www.baidu.com/',
-    },
-    component: IFrameView,
-  },
+  // {
+  //   name: 'admin',
+  //   path: '/admin',
+  //   meta: {
+  //     title: 'admin',
+  //     keepAlive: true,
+  //   },
+  //   component: () => import('@/views/admin.vue'),
+  // },
+  // {
+  //   name: 'Login',
+  //   path: '/login',
+  //   meta: {
+  //     title: 'login',
+  //   },
+  //   component: loginRouter,
+  // },
+  // {
+  //   name: 'IframeView',
+  //   path: '/baidu',
+  //   meta: {
+  //     keepAlive: true,
+  //     title: 'baidu',
+  //     frameUrl: 'https://www.baidu.com/',
+  //   },
+  //   component: IFrameView,
+  // },
 ]
 
 export { coreRoutes, fallbackNotFoundRoute }

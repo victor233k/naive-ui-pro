@@ -17,6 +17,9 @@ export function normalizeRoutesPlugin(): ProRouterPlugin {
 function tryUpdateComponentName(to: RouteLocationNormalizedGeneric) {
   const currentRoute = to.matched[to.matched.length - 1]
   const currentRouteName = currentRoute.name
+  if (!currentRoute.components) {
+    return
+  }
   const currentRouteComponentName = currentRoute.components.default.name
   if (__DEV__) {
     if (
