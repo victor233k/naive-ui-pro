@@ -1,5 +1,5 @@
 import { nextTick } from 'vue'
-import { useThemeStore } from '@/store/use-theme'
+import { useThemeStore } from '@/store/use-theme-store'
 
 export function useToggleThemeWithAnimation() {
   const theme = useThemeStore()

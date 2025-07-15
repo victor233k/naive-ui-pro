@@ -1,7 +1,7 @@
 <script setup lang='tsx'>
 import type { ProLayoutMode } from 'pro-naive-ui'
 import { storeToRefs } from 'pinia'
-import { useLayoutStore } from '@/store/use-layout'
+import { useLayoutStore } from '@/store/use-layout-store'
 
 const {
   mode,

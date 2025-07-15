@@ -1,7 +1,7 @@
 <script setup lang='tsx'>
 import { ref } from 'vue'
-import { useLayoutStore } from '@/store/use-layout'
-import { useThemeStore } from '@/store/use-theme'
+import { useLayoutStore } from '@/store/use-layout-store'
+import { useThemeStore } from '@/store/use-theme-store'
 import LayoutPreference from './layout-preference.vue'
 import ThemePreference from './theme-preference.vue'
 

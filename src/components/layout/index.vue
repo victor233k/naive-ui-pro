@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { storeToRefs } from 'pinia'
-import { useLayoutStore } from '@/store/use-layout'
+import { useLayoutStore } from '@/store/use-layout-store'
 import Content from './content.vue'
 import Footer from './footer.vue'
 import HeaderCenter from './header-center.vue'
@@ -14,7 +14,7 @@ import Tabbar from './tabbar.vue'
 const {
   mode,
   collapsed,
-  isMobile,
+  mobile,
   showNav,
   showLogo,
   navFixed,
@@ -35,7 +35,7 @@ const {
   <pro-layout
     v-model:collapsed="collapsed"
     :mode="mode"
-    :is-mobile="isMobile"
+    :is-mobile="mobile"
     :show-nav="showNav"
     :show-logo="showLogo"
     :nav-fixed="navFixed"

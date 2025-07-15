@@ -1,4 +1,4 @@
-import type { App, Component } from 'vue'
+import type { App } from 'vue'
 import {
   breadcrumbPlugin,
   createRouter,
@@ -10,25 +10,26 @@ import {
   rbacAccessPlugin,
   transitionPlugin,
 } from '@pro/router'
-import { createWebHistory } from 'vue-router'
-import { useMenuStore } from '@/store/use-menu-store'
-import { useRoutesKeepAliveStore } from '@/store/use-routes-keep-alive'
-import A from '@/views/basic-list.vue'
-import { asyncRoutes, mockRoutes, routes } from './routes'
 
-const matchedPageMap = import.meta.glob('@/views/**/*.vue')
-const pageMap = Object.entries(matchedPageMap).reduce<Record<string, Component>>((p, [path, value]) => {
-  const paths = path.split('/')
-  const lastPath = paths[paths.length - 1]
-  const finalPath = lastPath.split('.').slice(0, -1).join('.')
-  p[finalPath] = value
-  return p
-}, {})
+import {
+  createWebHistory,
+} from 'vue-router'
+
+import {
+  accessRoutes,
+  HOME_ROUTE_NAME,
+  ignoreAccessRoutes,
+  LOGIN_ROUTE_NAME,
+  notFoundRoute,
+} from './routes'
 
 export async function setupRouter(app: App) {
   const router = createRouter({
     history: createWebHistory(),
-    routes,
+    routes: [
+      ...ignoreAccessRoutes,
+      notFoundRoute,
+    ],
     plugins: [
       /**
        * 路由进度条插件
@@ -58,16 +59,16 @@ export async function setupRouter(app: App) {
        * 权限插件
        */
       rbacAccessPlugin({
-        service: async () => {
-          const store = useMenuStore()
+        service: () => {
           return {
-            mode: 'backend',
-            logined: true,
-            routes: store.menus,
+            roles: [],
+            logined: false,
+            mode: 'frontend',
+            routes: accessRoutes,
+            homeName: HOME_ROUTE_NAME,
+            loginName: LOGIN_ROUTE_NAME,
             parentNameForAddRoute: 'Root',
-            resolveComponent: (component) => {
-              return pageMap[component]
-            },
+            ignoreAccessRouteNames: ignoreAccessRoutes.map(t => t.name as string),
           }
         },
       }),
@@ -76,14 +77,13 @@ export async function setupRouter(app: App) {
        */
       nMenuPlugin({
         service: () => {
-          const store = useMenuStore()
           return {
-            routes: store.menus,
+            routes: accessRoutes,
           }
         },
       }),
     ],
   })
-
   app.use(router)
+  await router.isReady()
 }

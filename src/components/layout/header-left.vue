@@ -1,7 +1,7 @@
 <script setup lang='tsx'>
 import { MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined, ReloadOutlined } from '@vicons/antd'
 import { storeToRefs } from 'pinia'
-import { useLayoutStore } from '@/store/use-layout'
+import { useLayoutStore } from '@/store/use-layout-store'
 
 const { collapsed, showSidebar } = storeToRefs(useLayoutStore())
 </script>

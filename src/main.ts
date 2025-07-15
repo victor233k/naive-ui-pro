@@ -9,7 +9,6 @@ async function bootstrap() {
   const app = createApp(App)
   await setupPinia(app)
   await setupRouter(app)
-
   app.mount('#app')
 }
 

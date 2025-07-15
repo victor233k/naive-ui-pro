@@ -2,7 +2,7 @@
 import { Autocorrect20Filled } from '@vicons/fluent'
 import { Moon, Sunny } from '@vicons/ionicons5'
 import { storeToRefs } from 'pinia'
-import { useThemeStore } from '@/store/use-theme'
+import { useThemeStore } from '@/store/use-theme-store'
 
 const {
   themeMode,

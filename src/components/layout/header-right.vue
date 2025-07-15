@@ -4,7 +4,7 @@ import { FullScreenMaximize24Regular, FullScreenMinimize24Regular } from '@vicon
 import { Moon, SunnyOutline } from '@vicons/ionicons5'
 import { useFullscreen } from '@vueuse/core'
 import { useToggleThemeWithAnimation } from '@/composables/use-toggle-theme-with-animation'
-import { useThemeStore } from '@/store/use-theme'
+import { useThemeStore } from '@/store/use-theme-store'
 
 const themeStore = useThemeStore()
 
@@ -12,10 +12,6 @@ const {
   isFullscreen,
   toggle,
 } = useFullscreen()
-
-const {
-  toggle: toggleThemeWithAnimation,
-} = useToggleThemeWithAnimation()
 </script>
 
 <template>
