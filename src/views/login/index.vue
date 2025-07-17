@@ -1,15 +1,51 @@
 <script setup lang="ts">
+import { preferenceConfig } from '@root/preference'
+import { useNotification } from 'naive-ui'
 import { createProForm } from 'pro-naive-ui'
 import { ref } from 'vue'
-import LoginIllustration from './login-illustration.vue'
+import { useRoute, useRouter } from 'vue-router'
+import { HOME_ROUTE_PATH } from '@/router/routes'
+import { useUserStore } from '@/store/use-user-store'
+import IKun from './ikun.vue'
+
+const route = useRoute()
+const router = useRouter()
+const loading = ref(false)
+const userStore = useUserStore()
+const notification = useNotification()
 
 const form = createProForm({
-  onSubmit: (values) => {
-    console.log(values)
+  initialValues: {
+    username: 'super',
+    password: '123456',
+    rememberMe: true,
+  },
+  onSubmit: async (values) => {
+    try {
+      loading.value = true
+      const user = await userStore.login(values)
+      const redirect = route.query.redirect as string ?? HOME_ROUTE_PATH
+      await router.push({
+        path: redirect,
+      })
+      notification.success({
+        title: '登录成功',
+        content: `欢迎回来，${user.name}`,
+        duration: 2000,
+      })
+    }
+    catch (error: any) {
+      notification.error({
+        title: '登录失败',
+        content: error.message,
+        duration: 2000,
+      })
+    }
+    finally {
+      loading.value = false
+    }
   },
 })
-
-const loading = ref(false)
 </script>
 
 <template>
@@ -21,13 +57,13 @@ const loading = ref(false)
       <div class="relative z-10 w-full flex flex-col">
         <div class="flex items-center gap-3 p-8">
           <img src="@/assets/logo.svg" alt="Logo" class="w-8 h-8">
-          <span class="text-xl font-semibold text-gray-800 dark:text-gray-100">Naive UI Pro</span>
+          <span class="text-xl font-semibold text-gray-800 dark:text-gray-100">{{ preferenceConfig.title }}</span>
         </div>
         <div class="flex-grow flex items-center justify-center">
-          <div class="w-[85%] max-w-[480px]">
+          <div class="w-[85%] max-w-[480px] mt-[-100px]">
             <div class="login-illustration relative">
               <div class="relative z-10">
-                <LoginIllustration />
+                <IKun />
               </div>
             </div>
           </div>
@@ -41,7 +77,7 @@ const loading = ref(false)
         <div class="w-full max-w-[420px] px-6 lg:px-12">
           <div class="lg:hidden flex items-center justify-center gap-2 mb-12">
             <img src="@/assets/logo.svg" alt="Logo" class="w-8 h-8">
-            <span class="text-xl font-semibold text-gray-900 dark:text-white">Naive UI Pro</span>
+            <span class="text-xl font-semibold text-gray-900 dark:text-white">{{ preferenceConfig.title }}</span>
           </div>
 
           <div class="mb-12">
@@ -55,8 +91,9 @@ const loading = ref(false)
 
           <pro-form
             :form="form"
-            label-placement="left"
             size="large"
+            :loading="loading"
+            label-placement="left"
           >
             <pro-input
               required
@@ -103,7 +140,7 @@ const loading = ref(false)
         </div>
       </div>
       <div class="p-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-        Copyright © 2024 Naive UI Pro
+        Copyright © 2025 {{ preferenceConfig.title }}
       </div>
     </div>
   </div>

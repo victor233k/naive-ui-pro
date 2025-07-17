@@ -12,6 +12,7 @@
     <path d="M520 330 C525 325, 530 320, 535 325" stroke="#6B7280" stroke-width="2" />
     <!-- 动漫人物 -->
     <!-- 头部 -->
+
     <circle cx="430" cy="250" r="35" fill="#FCD34D" />
     <path d="M410 235 Q430 255 450 235" stroke="#1F2937" stroke-width="2" fill="none" />
     <circle cx="415" cy="230" r="3" fill="#1F2937" />
@@ -19,10 +20,20 @@
     <!-- 头发 -->
     <path d="M395 250 Q430 200 465 250" stroke="#1F2937" stroke-width="20" fill="none" />
     <path d="M400 230 Q430 190 460 230" stroke="#1F2937" stroke-width="8" fill="none" />
-    <!-- 身体 -->
-    <path d="M430 285 L430 350" stroke="#3B82F6" stroke-width="30" />
-    <path d="M430 300 L390 330" stroke="#3B82F6" stroke-width="15" />
-    <path d="M430 300 L470 330" stroke="#3B82F6" stroke-width="15" />
+    <!-- 身体 - 背带裤 -->
+    <!-- 身体底色 -->
+    <rect x="415" y="285" width="30" height="65" fill="#2563EB" rx="2" />
+    <!-- 背带裤主体 -->
+    <rect x="405" y="285" width="50" height="65" fill="#1E40AF" rx="4" />
+    <!-- 背带 -->
+    <path d="M415 285 L415 350" stroke="#FBBF24" stroke-width="6" />
+    <path d="M445 285 L445 350" stroke="#FBBF24" stroke-width="6" />
+    <!-- 背带扣 -->
+    <rect x="412" y="310" width="6" height="6" fill="#F59E0B" rx="1" />
+    <rect x="442" y="310" width="6" height="6" fill="#F59E0B" rx="1" />
+    <!-- 手臂 -->
+    <path d="M430 300 L390 330" stroke="#FCD34D" stroke-width="12" />
+    <path d="M430 300 L470 330" stroke="#FCD34D" stroke-width="12" />
     <!-- 装饰元素 -->
     <circle cx="250" cy="150" r="8" fill="#60A5FA" opacity="0.5" />
     <circle cx="580" cy="180" r="12" fill="#818CF8" opacity="0.5" />

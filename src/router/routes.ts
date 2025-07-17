@@ -4,12 +4,12 @@ import type { RouteRecordRaw } from 'vue-router'
 /**
  * 首页路由名称
  */
-const HOME_ROUTE_NAME = 'Home'
+const HOME_ROUTE_PATH = '/home'
 
 /**
  * 登录路由名称
  */
-const LOGIN_ROUTE_NAME = 'Login'
+const LOGIN_ROUTE_PATH = '/login'
 
 const notFoundRoute: RouteRecordRaw = {
   path: '/:path(.*)*',
@@ -27,7 +27,7 @@ const ignoreAccessRoutes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Root',
-    redirect: '/home',
+    redirect: HOME_ROUTE_PATH,
     component: () => import('@/components/layout/index.vue'),
     children: [],
     meta: {
@@ -35,8 +35,8 @@ const ignoreAccessRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/login',
-    name: LOGIN_ROUTE_NAME,
+    path: LOGIN_ROUTE_PATH,
+    name: 'Login',
     component: () => import('@/views/login/index.vue'),
     meta: {
       title: '登录',
@@ -49,8 +49,8 @@ const ignoreAccessRoutes: RouteRecordRaw[] = [
  */
 const accessRoutes: RouteRecordRaw[] = [
   {
+    path: HOME_ROUTE_PATH,
     name: 'Home',
-    path: '/home',
     component: () => import('@/views/home/index.vue'),
     meta: {
       title: '首页',
@@ -143,9 +143,9 @@ const pageMap = Object.entries(matchedPageMap).reduce<Record<string, Component>>
 
 export {
   accessRoutes,
-  HOME_ROUTE_NAME,
+  HOME_ROUTE_PATH,
   ignoreAccessRoutes,
-  LOGIN_ROUTE_NAME,
+  LOGIN_ROUTE_PATH,
   notFoundRoute,
   pageMap,
 }

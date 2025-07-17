@@ -16,10 +16,14 @@ import {
 } from 'vue-router'
 
 import {
+  useUserStore,
+} from '@/store/use-user-store'
+
+import {
   accessRoutes,
-  HOME_ROUTE_NAME,
+  HOME_ROUTE_PATH,
   ignoreAccessRoutes,
-  LOGIN_ROUTE_NAME,
+  LOGIN_ROUTE_PATH,
   notFoundRoute,
 } from './routes'
 
@@ -59,14 +63,19 @@ export async function setupRouter(app: App) {
        * 权限插件
        */
       rbacAccessPlugin({
-        service: () => {
+        service: async () => {
+          const store = useUserStore()
+          if (store.user.token && store.user.roles.length <= 0) {
+            // 初始化数据
+            await store.fetchUpdateUserInfo()
+          }
           return {
-            roles: [],
-            logined: false,
             mode: 'frontend',
             routes: accessRoutes,
-            homeName: HOME_ROUTE_NAME,
-            loginName: LOGIN_ROUTE_NAME,
+            roles: store.user.roles,
+            logined: !!store.user.token,
+            homePath: HOME_ROUTE_PATH,
+            loginPath: LOGIN_ROUTE_PATH,
             parentNameForAddRoute: 'Root',
             ignoreAccessRouteNames: ignoreAccessRoutes.map(t => t.name as string),
           }
