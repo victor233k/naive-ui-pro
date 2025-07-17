@@ -28,14 +28,14 @@ type ResolveComponent = (component: string) => NonNullable<RouteRecordRaw['compo
 interface RbacAccessPluginBaseServiceReturned {
   /**
    * 首页路径，如果登录，会跳转到此路径
-   * @default 'Home'
+   * @default '/home'
    */
-  homeName?: string
+  homePath?: string
   /**
    * 登录路径，如果未登录，会跳转到此路径
-   * @default 'Login'
+   * @default '/login'
    */
-  loginName?: string
+  loginPath?: string
   /**
    * 添加路由时的父级路由名称，设置后使用 router.addRoute(parentNameForAddRoute,routes)，默认使用 router.addRoute(routes)
    */
@@ -110,16 +110,16 @@ async function resolveOptions(
     })
   }
   const {
-    homeName,
-    loginName,
+    homePath,
+    loginPath,
     parentNameForAddRoute,
     ignoreAccessRouteNames,
     ...rest
   } = await options.service()
   return {
     ...rest,
-    homeName: homeName ?? 'Home',
-    loginName: loginName ?? 'Login',
+    homePath: homePath ?? '/home',
+    loginPath: loginPath ?? '/login',
     parentNameForAddRoute: parentNameForAddRoute ?? null,
     ignoreAccessRouteNames: ignoreAccessRouteNames ?? (cachedRouteNames ||= getRoutesNames((router.options.routes ?? []) as RouteRecordRaw[])),
   }
@@ -188,27 +188,22 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
 
       if (shouldRedirect) {
         return {
-          replace: true,
-          hash: to.hash,
-          query: to.query,
           path: to.fullPath,
+          replace: true,
         }
       }
 
       const {
         logined,
-        homeName,
-        loginName,
+        homePath,
+        loginPath,
         ignoreAccessRouteNames,
       } = resolvedOptions
 
       // 已登录跳转 login 页面，重定向到 redirect 参数或者 homePath
-      if (logined && to.name === loginName) {
+      if (logined && to.path === loginPath) {
         return {
-          hash: to.hash,
-          name: homeName,
-          query: to.query,
-          params: to.params,
+          path: homePath,
         }
       }
 
@@ -220,20 +215,17 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
       // 未登录重定向到登录页
       if (!logined) {
         return {
-          name: loginName,
+          path: loginPath,
           query: {
             ...to.query,
             redirect: to.fullPath,
           },
-          replace: true,
-          hash: to.hash,
-          params: to.params,
         }
       }
     })
 
     router.afterEach((to) => {
-      if (finalOptions && to.name === finalOptions.loginName) {
+      if (finalOptions && to.path === finalOptions.loginPath) {
         cleanup()
       }
     })

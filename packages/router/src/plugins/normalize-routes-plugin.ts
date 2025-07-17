@@ -30,7 +30,6 @@ function tryUpdateComponentName(to: RouteLocationNormalizedGeneric) {
       console.warn(`[@pro/router] Route name "${currentRouteName}" is not equal to component name "${currentRouteComponentName}"`)
       return
     }
-
     if (
       !currentRouteName
       && currentRouteComponentName

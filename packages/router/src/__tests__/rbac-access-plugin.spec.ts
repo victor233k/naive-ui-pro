@@ -75,12 +75,11 @@ const accessRoutes: RouteRecordRaw[] = [
   },
 ]
 
-// 封装router初始化函数，便于不同登录状态下测试
 function setupRouter(options: Partial<RbacAccessPluginServiceReturned> = {}) {
   let finalOptions = {
     mode: 'frontend',
     routes: accessRoutes,
-    homeName: 'Root',
+    homePath: '/',
     roles: [],
     parentNameForAddRoute: 'Root',
     logined: false,
