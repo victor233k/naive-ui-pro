@@ -4,12 +4,12 @@ import { ProNaiveUIResolver } from 'pro-naive-ui-resolver'
 import UnoCSS from 'unocss/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
+import { viteMockServe } from 'vite-plugin-mock'
 import { preferenceConfig } from './preference'
 
 export default defineConfig(({ mode }) => {
-  const nodeEnv = loadEnv(mode, './').VITE_USER_NODE_ENV
   return {
     optimizeDeps: {
       include: [
@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
       ],
     },
     define: {
-      __DEV__: nodeEnv !== 'production',
+      __DEV__: mode === 'development',
     },
     plugins: [
       vue(),
@@ -41,6 +41,10 @@ export default defineConfig(({ mode }) => {
         ],
       }),
       UnoCSS(),
+      viteMockServe({
+        mockPath: 'mock',
+        enable: true,
+      }),
     ],
     resolve: {
       alias: {
