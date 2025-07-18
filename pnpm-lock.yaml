@@ -11,6 +11,9 @@ importers:
       '@ant-design/colors':
         specifier: ^7.2.1
         version: 7.2.1
+      '@css-render/vue3-ssr':
+        specifier: ^0.15.14
+        version: 0.15.14(vue@3.5.17(typescript@5.8.3))
       '@pro/router':
         specifier: workspace:*
         version: link:packages/router
@@ -38,6 +41,9 @@ importers:
       axios:
         specifier: ^1.9.0
         version: 1.10.0
+      css-render:
+        specifier: ^0.15.14
+        version: 0.15.14
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
