@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { preferenceConfig } from '@root/preference'
 import { useNotification } from 'naive-ui'
+import { storeToRefs } from 'pinia'
 import { createProForm } from 'pro-naive-ui'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { HOME_ROUTE_PATH } from '@/router/routes'
+import { useAppStore } from '@/store/use-app-store'
 import { useUserStore } from '@/store/use-user-store'
 import IKun from './ikun.vue'
 
@@ -13,6 +14,7 @@ const router = useRouter()
 const loading = ref(false)
 const userStore = useUserStore()
 const notification = useNotification()
+const { title } = storeToRefs(useAppStore())
 
 const form = createProForm({
   initialValues: {
@@ -53,11 +55,14 @@ const form = createProForm({
     <!-- 左侧区域 -->
     <div class="hidden lg:flex w-[62%] relative overflow-hidden">
       <!-- 主背景 -->
-      <div class="absolute inset-0 blur-2xl" style="background: linear-gradient(154deg,#07070915 30%,#D5E6FF 60%,#07070915 10%)" />
+      <div
+        class="absolute inset-0 blur-2xl"
+        style="background: linear-gradient(154deg,#07070915 30%,#D5E6FF 60%,#07070915 10%)"
+      />
       <div class="relative z-10 w-full flex flex-col">
         <div class="flex items-center gap-3 p-8">
           <img src="@/assets/logo.svg" alt="Logo" class="w-8 h-8">
-          <span class="text-xl font-semibold text-gray-800 dark:text-gray-100">{{ preferenceConfig.title }}</span>
+          <span class="text-xl font-semibold text-gray-800 dark:text-gray-100">{{ title }}</span>
         </div>
         <div class="flex-grow flex items-center justify-center">
           <div class="w-[85%] max-w-[480px] mt-[-100px]">
@@ -77,7 +82,7 @@ const form = createProForm({
         <div class="w-full max-w-[420px] px-6 lg:px-12">
           <div class="lg:hidden flex items-center justify-center gap-2 mb-12">
             <img src="@/assets/logo.svg" alt="Logo" class="w-8 h-8">
-            <span class="text-xl font-semibold text-gray-900 dark:text-white">{{ preferenceConfig.title }}</span>
+            <span class="text-xl font-semibold text-gray-900 dark:text-white">{{ title }}</span>
           </div>
 
           <div class="mb-12">
@@ -89,31 +94,15 @@ const form = createProForm({
             </p>
           </div>
 
-          <pro-form
-            :form="form"
-            size="large"
-            :loading="loading"
-            label-placement="left"
-          >
-            <pro-input
-              required
-              path="username"
-              placeholder="请输入用户名"
-            />
+          <pro-form :form="form" size="large" :loading="loading" label-placement="left">
+            <pro-input required path="username" placeholder="请输入用户名" />
             <pro-password
-              required
-              path="password"
-              placeholder="请输入密码"
-              :field-props="{
+              required path="password" placeholder="请输入密码" :field-props="{
                 showPasswordOn: 'click',
               }"
             />
             <div class="flex justify-between items-center mb-6">
-              <pro-checkbox
-                path="rememberMe"
-                size="small"
-                :show-feedback="false"
-              >
+              <pro-checkbox path="rememberMe" size="small" :show-feedback="false">
                 记住我
               </pro-checkbox>
               <n-button text type="primary">
@@ -121,14 +110,7 @@ const form = createProForm({
               </n-button>
             </div>
 
-            <n-button
-              type="primary"
-              block
-              size="large"
-              :loading="loading"
-              :disabled="loading"
-              attr-type="submit"
-            >
+            <n-button type="primary" block size="large" :loading="loading" :disabled="loading" attr-type="submit">
               {{ loading ? '登录中...' : '登录' }}
             </n-button>
             <div class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -140,7 +122,7 @@ const form = createProForm({
         </div>
       </div>
       <div class="p-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-        Copyright © 2025 {{ preferenceConfig.title }}
+        Copyright © 2025 {{ title }}
       </div>
     </div>
   </div>

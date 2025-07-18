@@ -1,18 +1,17 @@
 <script setup lang='ts'>
 import { storeToRefs } from 'pinia'
-import { useLayoutMenu } from 'pro-naive-ui'
-import { computed, watchEffect } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAppStore } from '@/store/use-app-store'
 import { useLayoutStore } from '@/store/use-layout-store'
 import Content from './content.vue'
 import Footer from './footer.vue'
-import HeaderCenter from './header-center.vue'
 import HeaderLeft from './header-left.vue'
 import HeaderRight from './header-right.vue'
+import { ProLayout as IProLayout } from './layout'
 import Logo from './logo.vue'
-import SidebarExtra from './sidebar-extra.vue'
-import Sidebar from './sidebar.vue'
 import Tabbar from './tabbar.vue'
+import { useLayoutMenu } from './use-layout-menu'
 
 const {
   mode,
@@ -24,14 +23,17 @@ const {
   navHeight,
   showFooter,
   showTabbar,
-  showSidebar,
+  showSidebar: _,
   footerFixed,
   footerHeight,
   sidebarWidth,
   tabbarHeight,
-  sidebarMixedWidth,
   sidebarCollapsedWidth,
 } = storeToRefs(useLayoutStore())
+
+const {
+  title,
+} = storeToRefs(useAppStore())
 
 const route = useRoute()
 const router = useRouter()
@@ -41,27 +43,35 @@ const {
   activeKey,
 } = useLayoutMenu({
   mode,
+  collapsed,
+  autoActiveDetachedSubMenu: false,
   menus: computed(() => router.buildMenus()),
 })
 
-watchEffect(() => {
-  activeKey.value = route.path
-  // TODO: 这行注释掉，应该由 activeKey 管理
-  // expandedKeys.value = route.matched.slice(0, -1).map(item => item.path)
+const showSidebar = computed(() => {
+  return _.value && (layout.value.verticalMenuProps.options ?? []).length > 0
 })
 
-watchEffect(async () => {
-  if (activeKey.value && route.path !== activeKey.value) {
-    const failure = await router.push(activeKey.value as string)
+watch(
+  () => route.path,
+  (value) => {
+    activeKey.value = value
+  },
+)
+
+watch(
+  () => activeKey.value,
+  async (path) => {
+    const failure = await router.push(path as string)
     if (failure) {
       activeKey.value = route.path
     }
-  }
-})
+  },
+)
 </script>
 
 <template>
-  <pro-layout
+  <IProLayout
     v-model:collapsed="collapsed"
     :mode="mode"
     :is-mobile="mobile"
@@ -76,35 +86,45 @@ watchEffect(async () => {
     :footer-height="footerHeight"
     :sidebar-width="sidebarWidth"
     :tabbar-height="tabbarHeight"
-    :sidebar-mixed-width="sidebarMixedWidth"
     :sidebar-collapsed-width="sidebarCollapsedWidth"
   >
     <template #logo>
       <Logo />
     </template>
-    <template #header-left>
+    <template #nav-left>
       <HeaderLeft />
     </template>
-    <template #header-center>
-      <HeaderCenter />
+    <template #nav-center>
+      <div class="flex items-center h-full">
+        <n-menu
+          v-bind="layout.horizontalMenuProps"
+          :indent="18"
+        />
+      </div>
+      <!-- <HeaderCenter /> -->
     </template>
-    <template #header-right>
+    <template #nav-right>
       <HeaderRight />
     </template>
     <template #tabbar>
       <Tabbar />
     </template>
     <template #sidebar>
-      <!-- <Sidebar /> -->
       <n-menu
         v-bind="layout.verticalMenuProps"
         :indent="18"
-        :collapsed="collapsed"
         :collapsed-width="sidebarCollapsedWidth"
       />
     </template>
     <template #sidebar-extra>
-      <SidebarExtra />
+      <div :style="{ height: navHeight }">
+        {{ title }}
+      </div>
+      <n-menu
+        v-bind="layout.verticalExtraMenuProps"
+        :indent="18"
+        :collapsed-width="sidebarCollapsedWidth"
+      />
     </template>
     <template #default>
       <Content />
@@ -112,5 +132,5 @@ watchEffect(async () => {
     <template #footer>
       <Footer />
     </template>
-  </pro-layout>
+  </IProLayout>
 </template>

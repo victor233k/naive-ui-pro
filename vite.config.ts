@@ -1,5 +1,6 @@
 import path from 'node:path'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import { ProNaiveUIResolver } from 'pro-naive-ui-resolver'
 import UnoCSS from 'unocss/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
@@ -26,10 +27,11 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       vue(),
+      vueJsx(),
       createHtmlPlugin({
         inject: {
           data: {
-            title: preferenceConfig.title,
+            title: preferenceConfig.app.title,
             primaryColor: preferenceConfig.theme.primaryColor,
           },
         },

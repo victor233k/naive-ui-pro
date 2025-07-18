@@ -3,20 +3,21 @@ import { SettingOutlined } from '@vicons/antd'
 import { FullScreenMaximize24Regular, FullScreenMinimize24Regular } from '@vicons/fluent'
 import { Moon, SunnyOutline } from '@vicons/ionicons5'
 import { useFullscreen } from '@vueuse/core'
-import { useToggleThemeWithAnimation } from '@/composables/use-toggle-theme-with-animation'
+import { useAppStore } from '@/store/use-app-store'
 import { useThemeStore } from '@/store/use-theme-store'
 
+const appStore = useAppStore()
 const themeStore = useThemeStore()
 
 const {
-  isFullscreen,
   toggle,
+  isFullscreen,
 } = useFullscreen()
 </script>
 
 <template>
   <div class="pr-8px flex items-center h-full">
-    <pro-button quaternary size="small">
+    <pro-button quaternary size="small" @click="appStore.showPreferenceDrawer = true">
       <template #icon>
         <n-icon>
           <SettingOutlined />

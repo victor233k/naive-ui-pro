@@ -1,5 +1,10 @@
 export const preferenceConfig = {
-  title: 'Naive UI Pro',
+  app: {
+    /**
+     * 应用标题
+     */
+    title: 'Naive UI Pro',
+  },
   layout: {
     /**
      * 布局模式
@@ -53,10 +58,6 @@ export const preferenceConfig = {
      * 标签栏高度
      */
     tabbarHeight: 38,
-    /**
-     * 混合侧边栏宽度，仅在 'two-column'、'mixed-two-column' 布局下生效
-     */
-    sidebarMixedWidth: 80,
     /**
      * 侧边栏折叠后的宽度
      */

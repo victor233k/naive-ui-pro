@@ -1,12 +1,12 @@
 <script setup lang='tsx'>
-import { ref } from 'vue'
+import { useAppStore } from '@/store/use-app-store'
 import { useLayoutStore } from '@/store/use-layout-store'
 import { useThemeStore } from '@/store/use-theme-store'
 import LayoutPreference from './layout-preference.vue'
 import ThemePreference from './theme-preference.vue'
 
-const show = ref(true)
-const preferenceItemHeight = 32
+const itemHeight = 32
+const appStore = useAppStore()
 const themeStore = useThemeStore()
 const layoutStore = useLayoutStore()
 
@@ -18,11 +18,11 @@ function resetConfig() {
 
 <template>
   <n-drawer
-    v-model:show="show"
+    v-model:show="appStore.showPreferenceDrawer"
     :auto-focus="false"
     :width="320"
     :style="{
-      '--preference-item-height': preferenceItemHeight,
+      '--preference-item-height': itemHeight,
     }"
   >
     <n-drawer-content
