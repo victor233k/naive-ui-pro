@@ -34,9 +34,9 @@ export const useUserStore = defineStore('user', () => {
       }
       return user.value
     }
-    catch (error: any) {
-      // TODO: 重置所有 store 状态并跳转登录页
-      console.log(error)
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    catch (_) {
+      $reset()
       return user.value
     }
   }
@@ -61,6 +61,7 @@ export const useUserStore = defineStore('user', () => {
       roles: [],
       codes: [],
     }
+    localStorage.removeItem('token')
   }
 
   return {
