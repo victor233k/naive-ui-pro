@@ -19,6 +19,7 @@ declare module 'vue' {
     Layout: typeof import('./src/components/layout/index.vue')['default']
     LayoutPreference: typeof import('./src/components/preference-drawer/layout-preference.vue')['default']
     Logo: typeof import('./src/components/layout/logo.vue')['default']
+    Menu: typeof import('./src/components/menu/menu.vue')['default']
     'Menus.demo': typeof import('./src/components/layout/layout/demos/zhCN/menus.demo.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NColorPicker: typeof import('naive-ui')['NColorPicker']
