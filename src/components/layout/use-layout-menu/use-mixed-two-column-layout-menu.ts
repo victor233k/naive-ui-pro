@@ -113,14 +113,9 @@ export function useMixedTwoColumnLayoutMenu({
     expandedKeys.value = keys
   }
 
-  function collapse(value: boolean) {
-    collapsed.value = value
-  }
-
   return {
     layout,
     active,
     expand,
-    collapse,
   }
 }

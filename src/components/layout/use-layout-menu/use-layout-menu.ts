@@ -4,7 +4,7 @@ import type { ProLayoutMode } from 'pro-naive-ui'
 import type { ComputedRef, Ref } from 'vue'
 import type { ExpandedKey, MenuKey } from './types'
 import { toValue } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useFullContentLayoutMenu } from './use-full-content-layout-menu'
 import { useHorizontalLayoutMenu } from './use-horizontal-layout-menu'
 import { useMenus } from './use-menus'
@@ -48,14 +48,14 @@ export interface SharedLayoutOptions {
   /**
    * 获取菜单完整路径
    */
-  getMenuKeyFullPath: (key: MenuKey) => Exclude<MenuKey, null>[]
+  getMenuKeyFullPath: (key: MenuKey) => NonNullable<MenuKey>[]
   /**
    * 菜单 key 到菜单项信息的映射
    */
-  menuKeyToMetaMap: ComputedRef<Map<Exclude<MenuKey, null>, {
+  menuKeyToMetaMap: ComputedRef<Map<NonNullable<MenuKey>, {
     item: MenuOption
-    childrenKeys: Exclude<MenuKey, null>[]
     parentKey: MenuKey
+    childrenKeys: NonNullable<MenuKey>[]
   }>>
   /**
    * 菜单数据中子菜单的字段名
@@ -75,6 +75,15 @@ interface UseLayoutMenuOptions {
    */
   mode: MaybeRefOrGetter<ProLayoutMode>
   /**
+   * 是否折叠
+   */
+  collapsed?: MaybeRefOrGetter<boolean>
+  /**
+   * 是否为手风琴模式
+   * @default false
+   */
+  accordion?: MaybeRefOrGetter<boolean>
+  /**
    * 是否自动激活被分离的子菜单,只会在 mixed-sidebar、two-column、mixed-two-column 模式下生效
    * 比如在 mixed-sidebar 模式下，如果选中了顶部的菜单，则会自动激活侧边的子菜单
    * @default true
@@ -91,7 +100,6 @@ interface UseLayoutMenuOptions {
  * 根据布局模式和菜单数据，计算出适用于不同布局模式下的菜单 props
  */
 export function useLayoutMenu(options: UseLayoutMenuOptions) {
-  const collapsed = ref(false)
   const activeKey = ref<MenuKey>(null)
   const expandedKeys = ref<ExpandedKey[]>([])
   const childrenField = options.childrenField ?? 'children'
@@ -100,12 +108,21 @@ export function useLayoutMenu(options: UseLayoutMenuOptions) {
     return toValue(options.mode)
   })
 
+  const accordion = computed(() => {
+    return toValue(options.accordion ?? false)
+  })
+
   const autoActiveDetachedSubMenu = computed(() => {
     return toValue(options.autoActiveDetachedSubMenu ?? true)
   })
 
+  const collapsed = computed(() => {
+    return toValue(options.collapsed ?? false)
+  })
+
   const {
     menus,
+    getAncestorKeys,
     menuKeyToMetaMap,
     getMenuKeyFullPath,
   } = useMenus(options.menus, { childrenField })
@@ -196,6 +213,13 @@ export function useLayoutMenu(options: UseLayoutMenuOptions) {
     }
   })
 
+  watchEffect(() => {
+    const keys = accordion.value
+      ? getAncestorKeys(activeKey.value)
+      : [...expandedKeys.value, ...getAncestorKeys(activeKey.value)]
+    expandedKeys.value = Array.from(new Set(keys))
+  })
+
   return {
     layout: computed(() => {
       const privateLayout = layout.value
@@ -205,18 +229,6 @@ export function useLayoutMenu(options: UseLayoutMenuOptions) {
       get: () => activeKey.value,
       set: (key) => {
         layout.value.active(key)
-      },
-    }),
-    expandedKeys: computed({
-      get: () => expandedKeys.value,
-      set: (keys) => {
-        layout.value.expand(keys)
-      },
-    }),
-    collapsed: computed({
-      get: () => collapsed.value,
-      set: (value) => {
-        layout.value.collapse(value)
       },
     }),
     verticalLayout: computed(() => {

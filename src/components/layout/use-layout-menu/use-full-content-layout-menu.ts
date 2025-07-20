@@ -4,7 +4,6 @@ import { computed } from 'vue'
 
 export function useFullContentLayoutMenu({
   activeKey,
-  collapsed,
   expandedKeys,
 }: SharedLayoutOptions) {
   const layout = computed<LayoutMenuReturn>(() => {
@@ -23,14 +22,9 @@ export function useFullContentLayoutMenu({
     expandedKeys.value = keys
   }
 
-  function collapse(value: boolean) {
-    collapsed.value = value
-  }
-
   return {
     layout,
     active,
     expand,
-    collapse,
   }
 }

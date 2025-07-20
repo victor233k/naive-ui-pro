@@ -4,7 +4,6 @@ import { computed } from 'vue'
 
 export function useHorizontalLayoutMenu({
   menus,
-  collapsed,
   activeKey,
   expandedKeys,
 }: SharedLayoutOptions) {
@@ -32,14 +31,9 @@ export function useHorizontalLayoutMenu({
     expandedKeys.value = keys
   }
 
-  function collapse(value: boolean) {
-    collapsed.value = value
-  }
-
   return {
     layout,
     active,
     expand,
-    collapse,
   }
 }
