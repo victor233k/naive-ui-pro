@@ -17,8 +17,8 @@ const {
   footerHeight,
   tabbarHeight,
   sidebarWidth,
-  sidebarMixedWidth,
   sidebarCollapsedWidth,
+  showMenuTitleWhenSidebarCollapsed,
 } = storeToRefs(useLayoutStore())
 
 const layoutOptions: Array<Record<string, ProLayoutMode>> = [
@@ -98,12 +98,12 @@ const layoutOptions: Array<Record<string, ProLayoutMode>> = [
         <n-switch v-model:value="collapsed" />
       </div>
       <div class="preference-item">
-        <span>侧边栏宽度</span>
-        <n-input-number v-model:value="sidebarWidth" class="w-120px" placeholder="请输入" />
+        <span>折叠后显示菜单名</span>
+        <n-switch v-model:value="showMenuTitleWhenSidebarCollapsed" />
       </div>
       <div class="preference-item">
-        <span>混合宽度</span>
-        <n-input-number v-model:value="sidebarMixedWidth" class="w-120px" placeholder="请输入" />
+        <span>侧边栏宽度</span>
+        <n-input-number v-model:value="sidebarWidth" class="w-120px" placeholder="请输入" />
       </div>
       <div class="preference-item">
         <span>折叠后宽度</span>

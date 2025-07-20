@@ -101,6 +101,41 @@ const accessRoutes: RouteRecordRaw[] = [
           keepAlive: true,
           hideInBreadcrumb: false,
         },
+        children: [
+          {
+            name: 'User2',
+            path: 'user',
+            component: () => import('@/views/system/user/index.vue'),
+            meta: {
+              title: '用户管理',
+              icon: 'ant-design:user-outlined',
+              keepAlive: true,
+              hideInBreadcrumb: false,
+            },
+          },
+          {
+            name: 'Role2',
+            path: 'role',
+            component: () => import('@/views/system/role/index.vue'),
+            meta: {
+              title: '角色管理',
+              icon: 'carbon:user-role',
+              keepAlive: true,
+              hideInBreadcrumb: false,
+            },
+          },
+          {
+            name: 'Menu2',
+            path: 'menu',
+            component: () => import('@/views/system/menu/index.vue'),
+            meta: {
+              title: '菜单管理',
+              icon: 'ant-design:menu-outlined',
+              keepAlive: true,
+              hideInBreadcrumb: false,
+            },
+          },
+        ],
       },
     ],
   },
