@@ -2,7 +2,7 @@ import type { SlotsType } from 'vue'
 import type { ProLayoutSlots } from './slots'
 import type { CalcLayoutVarsOptions } from './types'
 import { NScrollbar, useThemeVars } from 'naive-ui'
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, provide, toRef } from 'vue'
 import { useNaiveClsPrefix } from '../_internal/use-cls-prefix'
 import { useMountStyle } from '../_internal/use-mount-style'
 import { resolveWrappedSlot } from '../_utils/resolve-slot'
@@ -124,6 +124,14 @@ export default defineComponent({
       'pro-layout',
       style,
     )
+
+    /**
+     * 没有给 n-menu 设置 collapsed 时，取 props 的 collapsed
+     */
+    provide('n-layout-sider', {
+      collapseModeRef: { value: 'width' },
+      collapsedRef: toRef(props, 'collapsed'),
+    })
     return {
       vars,
       disabled,

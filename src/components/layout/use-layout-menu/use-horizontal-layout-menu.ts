@@ -13,6 +13,7 @@ export function useHorizontalLayoutMenu({
       verticalExtraMenuProps: {},
       horizontalMenuProps: {
         mode: 'horizontal',
+        collapsed: false,
         responsive: true,
         options: menus.value,
         value: activeKey.value,

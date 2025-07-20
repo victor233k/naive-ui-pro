@@ -30,10 +30,6 @@ export interface LayoutMenuReturn {
 
 export interface SharedLayoutOptions {
   /**
-   * 菜单是否折叠
-   */
-  collapsed: Ref<boolean>
-  /**
    * 展开菜单的 key 列表
    */
   expandedKeys: Ref<ExpandedKey[]>
@@ -75,10 +71,6 @@ interface UseLayoutMenuOptions {
    */
   mode: MaybeRefOrGetter<ProLayoutMode>
   /**
-   * 是否折叠
-   */
-  collapsed?: MaybeRefOrGetter<boolean>
-  /**
    * 是否为手风琴模式
    * @default false
    */
@@ -116,10 +108,6 @@ export function useLayoutMenu(options: UseLayoutMenuOptions) {
     return toValue(options.autoActiveDetachedSubMenu ?? true)
   })
 
-  const collapsed = computed(() => {
-    return toValue(options.collapsed ?? false)
-  })
-
   const {
     menus,
     getAncestorKeys,
@@ -127,71 +115,22 @@ export function useLayoutMenu(options: UseLayoutMenuOptions) {
     getMenuKeyFullPath,
   } = useMenus(options.menus, { childrenField })
 
-  const verticalLayout = useVerticalLayoutMenu({
+  const sharedLayoutOptions: SharedLayoutOptions = {
     menus,
-    collapsed,
     activeKey,
     expandedKeys,
     childrenField,
     menuKeyToMetaMap,
     autoActiveDetachedSubMenu,
     getMenuKeyFullPath,
-  })
+  }
 
-  const horizontalLayout = useHorizontalLayoutMenu({
-    menus,
-    collapsed,
-    activeKey,
-    expandedKeys,
-    childrenField,
-    menuKeyToMetaMap,
-    autoActiveDetachedSubMenu,
-    getMenuKeyFullPath,
-  })
-
-  const mixedSidebarLayout = useMixedSidebarLayoutMenu({
-    menus,
-    collapsed,
-    activeKey,
-    expandedKeys,
-    childrenField,
-    menuKeyToMetaMap,
-    autoActiveDetachedSubMenu,
-    getMenuKeyFullPath,
-  })
-
-  const twoColumnLayout = useTwoColumnLayoutMenu({
-    menus,
-    collapsed,
-    activeKey,
-    expandedKeys,
-    childrenField,
-    menuKeyToMetaMap,
-    autoActiveDetachedSubMenu,
-    getMenuKeyFullPath,
-  })
-
-  const mixedTwoColumnLayout = useMixedTwoColumnLayoutMenu({
-    menus,
-    collapsed,
-    activeKey,
-    expandedKeys,
-    childrenField,
-    menuKeyToMetaMap,
-    autoActiveDetachedSubMenu,
-    getMenuKeyFullPath,
-  })
-
-  const fullContentLayout = useFullContentLayoutMenu({
-    menus,
-    collapsed,
-    activeKey,
-    expandedKeys,
-    childrenField,
-    menuKeyToMetaMap,
-    autoActiveDetachedSubMenu,
-    getMenuKeyFullPath,
-  })
+  const verticalLayout = useVerticalLayoutMenu(sharedLayoutOptions)
+  const twoColumnLayout = useTwoColumnLayoutMenu(sharedLayoutOptions)
+  const horizontalLayout = useHorizontalLayoutMenu(sharedLayoutOptions)
+  const fullContentLayout = useFullContentLayoutMenu(sharedLayoutOptions)
+  const mixedSidebarLayout = useMixedSidebarLayoutMenu(sharedLayoutOptions)
+  const mixedTwoColumnLayout = useMixedTwoColumnLayoutMenu(sharedLayoutOptions)
 
   const layout = computed(() => {
     switch (mode.value) {
@@ -221,15 +160,15 @@ export function useLayoutMenu(options: UseLayoutMenuOptions) {
   })
 
   return {
-    layout: computed(() => {
-      const privateLayout = layout.value
-      return privateLayout.layout.value
-    }),
     activeKey: computed({
       get: () => activeKey.value,
       set: (key) => {
         layout.value.active(key)
       },
+    }),
+    layout: computed(() => {
+      const privateLayout = layout.value
+      return privateLayout.layout.value
     }),
     verticalLayout: computed(() => {
       return verticalLayout.layout.value

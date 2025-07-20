@@ -6,7 +6,6 @@ import { splitMenuData } from './utils/split-menu-data'
 
 export function useMixedTwoColumnLayoutMenu({
   menus,
-  collapsed,
   activeKey,
   expandedKeys,
   childrenField,
@@ -63,6 +62,7 @@ export function useMixedTwoColumnLayoutMenu({
       horizontalMenuProps: {
         mode: 'horizontal',
         responsive: true,
+        collapsed: false,
         options: horizontalMenuData.value,
         value: horizontalMenuActiveKey.value,
         onUpdateValue: activeRelatedMenuKey,
@@ -77,7 +77,6 @@ export function useMixedTwoColumnLayoutMenu({
       verticalExtraMenuProps: {
         mode: 'vertical',
         value: activeKey.value,
-        collapsed: collapsed.value,
         expandedKeys: expandedKeys.value,
         options: verticalExtraMenuData.value,
         onUpdateExpandedKeys: expand,

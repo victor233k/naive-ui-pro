@@ -4,7 +4,6 @@ import { computed } from 'vue'
 
 export function useVerticalLayoutMenu({
   menus,
-  collapsed,
   activeKey,
   expandedKeys,
 }: SharedLayoutOptions) {
@@ -16,7 +15,6 @@ export function useVerticalLayoutMenu({
         mode: 'vertical',
         options: menus.value,
         value: activeKey.value,
-        collapsed: collapsed.value,
         expandedKeys: expandedKeys.value,
         onUpdateValue: active,
         onUpdateExpandedKeys: expand,

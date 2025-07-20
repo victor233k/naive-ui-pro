@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject, toValue } from 'vue'
 import { proMenuProps } from './props'
 
 defineOptions({
@@ -7,6 +7,11 @@ defineOptions({
 })
 
 const props = defineProps(proMenuProps)
+const { collapsedRef } = inject('n-layout-sider') as any
+
+const mergedCollapsed = computed(() => {
+  return props.collapsed ?? toValue(collapsedRef) ?? false
+})
 
 const nMenuProps = computed(() => {
   const {
@@ -15,7 +20,7 @@ const nMenuProps = computed(() => {
     ...rest
   } = props
 
-  if (!collapsedShowTitle || !props.collapsed) {
+  if (!collapsedShowTitle || !mergedCollapsed.value) {
     return rest
   }
 
@@ -33,7 +38,7 @@ const nMenuProps = computed(() => {
 <template>
   <n-menu
     class="pro-menu" :class="[
-      collapsed && collapsedShowTitle && 'pro-menu--collapsed-show-title',
+      mergedCollapsed && collapsedShowTitle && 'pro-menu--collapsed-show-title',
     ]" v-bind="nMenuProps"
   />
 </template>
@@ -50,6 +55,7 @@ const nMenuProps = computed(() => {
   :deep(.n-menu-item-content){
     padding-left: 0 !important;
     padding-right: 0;
+    transition: height .3s var(--n-bezier);
   }
 
   :deep(.n-menu-item-content__icon) {
@@ -67,8 +73,11 @@ const nMenuProps = computed(() => {
 }
 
 .pro-menu.n-menu.n-menu--collapsed {
-  :deep(.n-menu-item-content-header) {
-    transition: color .3s var(--n-bezier);
+   * {
+    transition: none;
+  }
+  :deep(.n-menu-item-content) {
+    transition: height .3s var(--n-bezier);
   }
 }
 </style>

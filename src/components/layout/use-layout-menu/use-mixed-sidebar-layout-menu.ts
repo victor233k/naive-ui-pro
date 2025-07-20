@@ -6,7 +6,6 @@ import { splitMenuData } from './utils/split-menu-data'
 
 export function useMixedSidebarLayoutMenu({
   menus,
-  collapsed,
   activeKey,
   expandedKeys,
   childrenField,
@@ -35,6 +34,7 @@ export function useMixedSidebarLayoutMenu({
       horizontalMenuProps: {
         mode: 'horizontal',
         responsive: true,
+        collapsed: false,
         options: horizontalMenuData.value,
         value: horizontalMenuActiveKey.value,
         onUpdateValue: activeRelatedMenuKey,
@@ -42,7 +42,6 @@ export function useMixedSidebarLayoutMenu({
       verticalMenuProps: {
         mode: 'vertical',
         value: activeKey.value,
-        collapsed: collapsed.value,
         options: verticalMenuData.value,
         expandedKeys: expandedKeys.value,
         onUpdateExpandedKeys: expand,

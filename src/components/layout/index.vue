@@ -46,7 +46,6 @@ const {
   activeKey,
 } = useLayoutMenu({
   mode,
-  collapsed,
   autoActiveDetachedSubMenu: false,
   menus: computed(() => router.buildMenus()),
 })
