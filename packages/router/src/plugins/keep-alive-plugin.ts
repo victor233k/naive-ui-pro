@@ -55,7 +55,7 @@ function remove(router: Router, name: string): void {
 export function keepAlivePlugin({
   defaultKeepAlive = false,
 }: KeepAlivePluginOptions = {}): ProRouterPlugin {
-  return ({ router }) => {
+  return ({ router, onUnmount }) => {
     if (!router.keepAliveList) {
       router.keepAliveList = ref([])
     }
@@ -82,6 +82,10 @@ export function keepAlivePlugin({
       isExcluded
         ? remove(router, normalizedName)
         : add(router, normalizedName)
+    })
+
+    onUnmount(() => {
+      delete router.keepAliveList
     })
   }
 }
