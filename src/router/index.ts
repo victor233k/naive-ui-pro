@@ -1,5 +1,6 @@
 import type { App } from 'vue'
 import {
+  autoRedirectToFirstChild,
   breadcrumbPlugin,
   createRouter,
   documentTitlePlugin,
@@ -59,6 +60,10 @@ export async function setupRouter(app: App) {
        * 路由过渡插件
        */
       transitionPlugin(),
+      /**
+       * 自动重定向到第一个子路由插件
+       */
+      autoRedirectToFirstChild(),
       /**
        * 权限插件
        */

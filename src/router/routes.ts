@@ -58,6 +58,146 @@ const accessRoutes: RouteRecordRaw[] = [
       keepAlive: true,
       hideInBreadcrumb: false,
     },
+    // children: [
+    //   {
+    //     name: 'User22',
+    //     path: 'user',
+    //     component: () => import('@/views/system/user/index.vue'),
+    //     meta: {
+    //       title: '用户管理',
+    //       icon: 'ant-design:user-outlined',
+    //       keepAlive: true,
+    //       hideInBreadcrumb: false,
+    //     },
+    //   },
+    //   {
+    //     name: 'Role222222',
+    //     path: 'role',
+    //     component: () => import('@/views/system/role/index.vue'),
+    //     meta: {
+    //       title: '角色管理',
+    //       icon: 'carbon:user-role',
+    //       keepAlive: true,
+    //       hideInBreadcrumb: false,
+    //     },
+    //   },
+    //   {
+    //     name: 'Menu2222222',
+    //     path: 'menu',
+    //     component: () => import('@/views/system/menu/index.vue'),
+    //     meta: {
+    //       title: '菜单管理',
+    //       icon: 'ant-design:menu-outlined',
+    //       keepAlive: true,
+    //       hideInBreadcrumb: false,
+    //     },
+    //     children: [
+    //       {
+    //         name: 'User22',
+    //         path: 'user',
+    //         component: () => import('@/views/system/user/index.vue'),
+    //         meta: {
+    //           title: '用户管理',
+    //           icon: 'ant-design:user-outlined',
+    //           keepAlive: true,
+    //           hideInBreadcrumb: false,
+    //         },
+    //       },
+    //       {
+    //         name: 'Role22',
+    //         path: 'role',
+    //         component: () => import('@/views/system/role/index.vue'),
+    //         meta: {
+    //           title: '角色管理',
+    //           icon: 'carbon:user-role',
+    //           keepAlive: true,
+    //           hideInBreadcrumb: false,
+    //         },
+    //       },
+    //       {
+    //         name: 'Menu22',
+    //         path: 'menu',
+    //         component: () => import('@/views/system/menu/index.vue'),
+    //         meta: {
+    //           title: '菜单管理',
+    //           icon: 'ant-design:menu-outlined',
+    //           keepAlive: true,
+    //           hideInBreadcrumb: false,
+    //         },
+    //         children: [
+    //           {
+    //             name: 'User33',
+    //             path: 'user',
+    //             component: () => import('@/views/system/user/index.vue'),
+    //             meta: {
+    //               title: '用户管理',
+    //               icon: 'ant-design:user-outlined',
+    //               keepAlive: true,
+    //               hideInBreadcrumb: false,
+    //             },
+    //           },
+    //           {
+    //             name: 'Role33',
+    //             path: 'role',
+    //             component: () => import('@/views/system/role/index.vue'),
+    //             meta: {
+    //               title: '角色管理',
+    //               icon: 'carbon:user-role',
+    //               keepAlive: true,
+    //               hideInBreadcrumb: false,
+    //             },
+    //           },
+    //           {
+    //             name: 'Menu33',
+    //             path: 'menu',
+    //             component: () => import('@/views/system/menu/index.vue'),
+    //             meta: {
+    //               title: '菜单管理',
+    //               icon: 'ant-design:menu-outlined',
+    //               keepAlive: true,
+    //               hideInBreadcrumb: false,
+    //             },
+    //             children: [
+    //               {
+    //                 name: 'User333',
+    //                 path: 'user',
+    //                 component: () => import('@/views/system/user/index.vue'),
+    //                 meta: {
+    //                   title: '用户管理',
+    //                   icon: 'ant-design:user-outlined',
+    //                   keepAlive: true,
+    //                   hideInBreadcrumb: false,
+    //                 },
+    //               },
+    //               {
+    //                 name: 'Role333',
+    //                 path: 'role',
+    //                 component: () => import('@/views/system/role/index.vue'),
+    //                 meta: {
+    //                   title: '角色管理',
+    //                   icon: 'carbon:user-role',
+    //                   keepAlive: true,
+    //                   hideInBreadcrumb: false,
+    //                 },
+    //               },
+    //               {
+    //                 name: 'Menu3333',
+    //                 path: 'menu',
+    //                 component: () => import('@/views/system/menu/index.vue'),
+    //                 meta: {
+    //                   title: '菜单管理',
+    //                   icon: 'ant-design:menu-outlined',
+    //                   keepAlive: true,
+    //                   hideInBreadcrumb: false,
+    //                 },
+    //               },
+    //             ],
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   },
+    // ],
   },
   {
     name: 'System',
