@@ -16,6 +16,9 @@ interface DocumentTitlePluginOptions {
 export function documentTitlePlugin({ titleTemplate }: DocumentTitlePluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
     router.afterEach((to, from, failure) => {
+      if (failure) {
+        return
+      }
       const title = to.meta.title ?? (isSymbol(to.name) ? to.name.toString() : to.name)
       useTitle(title, {
         titleTemplate: () => {
