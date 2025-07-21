@@ -1,13 +1,9 @@
-import type { RouteLocationNormalizedGeneric, Router } from 'vue-router'
+import type { RouteLocationNormalizedGeneric } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { isString, isSymbol } from 'lodash-es'
 
 export function normalizeRoutesPlugin(): ProRouterPlugin {
   return ({ router }) => {
-    router.beforeResolve((to) => {
-      return tryRedirectToFirstChild(router, to)
-    })
-
     router.afterEach((to) => {
       tryUpdateComponentName(to)
     })
@@ -48,21 +44,5 @@ function tryUpdateComponentName(to: RouteLocationNormalizedGeneric) {
     currentRoute.components.default.__name = isSymbol(currentRouteName)
       ? currentRouteName.toString()
       : currentRouteName
-  }
-}
-
-function tryRedirectToFirstChild(router: Router, to: RouteLocationNormalizedGeneric) {
-  const currentRoute = to.matched[to.matched.length - 1]
-  if (
-    !currentRoute.redirect
-    && currentRoute.children
-    && currentRoute.children.length > 0
-  ) {
-    const firstChildRoute = currentRoute.children[0]
-    const resolved = router.resolve(firstChildRoute)
-    return {
-      ...resolved,
-      replace: true,
-    }
   }
 }
