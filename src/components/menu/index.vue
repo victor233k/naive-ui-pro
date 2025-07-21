@@ -65,6 +65,11 @@ const nMenuProps = computed(() => {
   :deep(.n-menu-item-content-header) {
     opacity: 1;
     font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+    text-align: center;
   }
 
   :deep(.n-menu-item-content__arrow) {
