@@ -1,4 +1,3 @@
-import type { ComputedRef } from 'vue'
 import type { ProRouterPlugin } from '../plugin'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -26,9 +25,9 @@ declare module 'vue-router' {
 
   interface Router {
     /**
-     * 面包屑数据
+     * 根据路由数据构建面包屑数据
      */
-    breadcrumbs: ComputedRef<BreadcrumbItem[]>
+    buildBreadcrumbs: () => BreadcrumbItem[]
   }
 }
 
@@ -40,11 +39,11 @@ interface BreadcrumbItem {
 }
 
 export function breadcrumbPlugin(): ProRouterPlugin {
-  return ({ router }) => {
+  return ({ router, onUnmount }) => {
     router.afterEach(() => {
-      if (!router.breadcrumbs) {
+      if (!router.buildBreadcrumbs) {
         const route = useRoute()
-        router.breadcrumbs = computed(() => {
+        const breadcrumbs = computed(() => {
           const breadcrumbs: BreadcrumbItem[] = []
           route.matched.forEach(({ meta, path, name }) => {
             const { title, icon, iconColor, hideInBreadcrumb } = meta
@@ -59,7 +58,15 @@ export function breadcrumbPlugin(): ProRouterPlugin {
           })
           return breadcrumbs
         })
+
+        router.buildBreadcrumbs = () => {
+          return breadcrumbs.value
+        }
       }
+    })
+
+    onUnmount(() => {
+      delete router.buildBreadcrumbs
     })
   }
 }
