@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       vue(),
-      vueJsx(),
+      (vueJsx as any)(),
       createHtmlPlugin({
         inject: {
           data: {

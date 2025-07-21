@@ -1,30 +1,31 @@
 <script setup lang='ts'>
 import { storeToRefs } from 'pinia'
+import { useLayoutMenu } from 'pro-naive-ui'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAppStore } from '@/store/use-app-store'
 import { useLayoutStore } from '@/store/use-layout-store'
 import { ProMenu } from '../menu'
 import Content from './content.vue'
 import Footer from './footer.vue'
-import HeaderLeft from './header-left.vue'
-import HeaderRight from './header-right.vue'
-import { ProLayout as IProLayout } from './layout'
 import Logo from './logo.vue'
+import NavLeft from './nav-left.vue'
+import NavRight from './nav-right.vue'
 import Tabbar from './tabbar.vue'
-import { useLayoutMenu } from './use-layout-menu'
+
+const route = useRoute()
+const router = useRouter()
 
 const {
   mode,
-  collapsed,
   mobile,
   showNav,
   showLogo,
   navFixed,
   navHeight,
+  collapsed,
   showFooter,
   showTabbar,
-  showSidebar: _,
+  showSidebar,
   footerFixed,
   footerHeight,
   sidebarWidth,
@@ -35,27 +36,21 @@ const {
 } = storeToRefs(useLayoutStore())
 
 const {
-  title,
-} = storeToRefs(useAppStore())
-
-const route = useRoute()
-const router = useRouter()
-
-const {
   layout,
   activeKey,
 } = useLayoutMenu({
   mode,
-  autoActiveDetachedSubMenu: false,
   menus: computed(() => router.buildMenus()),
 })
 
-const showSidebar = computed(() => {
-  return _.value && (layout.value.verticalMenuProps.options ?? []).length > 0
+const finalShowSidebar = computed(() => {
+  const verticalMenuOptions = layout.value.verticalMenuProps.options ?? []
+  return showSidebar.value && verticalMenuOptions.length > 0
 })
 
 const showSidebarExtra = computed(() => {
-  return (layout.value.verticalExtraMenuProps.options ?? []).length > 0
+  const verticalExtraMenuOptions = layout.value.verticalExtraMenuProps.options ?? []
+  return verticalExtraMenuOptions.length > 0
 })
 
 const finalSidebarCollapsedWidth = computed(() => {
@@ -68,16 +63,17 @@ watch(() => route.path, (value) => {
   activeKey.value = value
 }, { immediate: true })
 
-watch(() => activeKey.value, async (path) => {
+async function pushTo(path: string) {
   const failure = await router.push(path as string)
   if (failure) {
+    // 跳转失败回退
     activeKey.value = route.path
   }
-})
+}
 </script>
 
 <template>
-  <IProLayout
+  <pro-layout
     v-model:collapsed="collapsed"
     :mode="mode"
     :is-mobile="mobile"
@@ -87,11 +83,11 @@ watch(() => activeKey.value, async (path) => {
     :nav-height="navHeight"
     :show-footer="showFooter"
     :show-tabbar="showTabbar"
-    :show-sidebar="showSidebar"
     :footer-fixed="footerFixed"
     :footer-height="footerHeight"
     :sidebar-width="sidebarWidth"
     :tabbar-height="tabbarHeight"
+    :show-sidebar="finalShowSidebar"
     :show-sidebar-extra="showSidebarExtra"
     :sidebar-collapsed-width="finalSidebarCollapsedWidth"
   >
@@ -99,41 +95,47 @@ watch(() => activeKey.value, async (path) => {
       <Logo />
     </template>
     <template #nav-left>
-      <HeaderLeft />
+      <NavLeft />
     </template>
     <template #nav-center>
       <div class="flex items-center h-full">
         <ProMenu
           v-bind="layout.horizontalMenuProps"
           :indent="18"
+          @update:value="pushTo"
         />
       </div>
-      <!-- <HeaderCenter /> -->
     </template>
     <template #nav-right>
-      <HeaderRight />
+      <NavRight />
     </template>
     <template #tabbar>
       <Tabbar />
     </template>
     <template #sidebar>
-      <ProMenu
-        v-bind="layout.verticalMenuProps"
-        :indent="18"
-        :collapsed-width="finalSidebarCollapsedWidth"
-        :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
-      />
+      <n-scrollbar class="flex-[1_0_0]">
+        <ProMenu
+          v-bind="layout.verticalMenuProps"
+          :indent="18"
+          :collapsed-width="finalSidebarCollapsedWidth"
+          :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
+          @update:value="pushTo"
+        />
+      </n-scrollbar>
     </template>
     <template #sidebar-extra>
       <!-- <div :style="{ height: navHeight }">
         {{ title }}
       </div> -->
-      <ProMenu
-        v-bind="layout.verticalExtraMenuProps"
-        :indent="18"
-        :collapsed-width="finalSidebarCollapsedWidth"
-        :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
-      />
+      <n-scrollbar class="flex-[1_0_0]">
+        <ProMenu
+          v-bind="layout.verticalExtraMenuProps"
+          :indent="18"
+          :collapsed-width="finalSidebarCollapsedWidth"
+          :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
+          @update:value="pushTo"
+        />
+      </n-scrollbar>
     </template>
     <template #default>
       <Content />
@@ -141,5 +143,5 @@ watch(() => activeKey.value, async (path) => {
     <template #footer>
       <Footer />
     </template>
-  </IProLayout>
+  </pro-layout>
 </template>
