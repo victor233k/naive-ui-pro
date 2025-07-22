@@ -25,6 +25,7 @@ const {
     <pro-button
       quaternary
       size="small"
+      @click="themeStore.toggleThemeModeWithAnimation"
     >
       <template #icon>
         <n-icon>

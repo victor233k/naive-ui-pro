@@ -4,7 +4,7 @@ import { preferenceConfig } from '@root/preference'
 import { usePreferredDark } from '@vueuse/core'
 import { darkTheme } from 'naive-ui'
 import { defineStore } from 'pinia'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, nextTick, ref, watchEffect } from 'vue'
 
 export const useThemeStore = defineStore('theme', () => {
   const systemThemeIsDark = usePreferredDark()
@@ -38,6 +38,46 @@ export const useThemeStore = defineStore('theme', () => {
     themeMode.value = isDark.value ? 'light' : 'dark'
   }
 
+  function toggleThemeModeWithAnimation(event: MouseEvent) {
+    if (
+      !('startViewTransition' in document)
+      || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      toggleThemeMode()
+      return
+    }
+    const x = event.clientX
+    const y = event.clientY
+    const endRadius = Math.hypot(
+      Math.max(x, innerWidth - x),
+      Math.max(y, innerHeight - y),
+    )
+    
+    const transition = document.startViewTransition(async () => {
+      toggleThemeMode()
+      return nextTick()
+    })
+    
+    transition.ready.then(() => {
+      const clipPath = [
+        `circle(0 at ${x}px ${y}px)`,
+        `circle(${endRadius}px at ${x}px ${y}px)`,
+      ]
+      document.documentElement.animate(
+        {
+          clipPath: isDark.value ? clipPath : [...clipPath].reverse(),
+        },
+        {
+          duration: 400,
+          easing: 'ease-in',
+          pseudoElement: isDark.value
+            ? '::view-transition-new(root)'
+            : '::view-transition-old(root)',
+        }
+      )
+    })
+  }
+
   function $reset() {
     grayscale.value = preferenceConfig.theme.grayscale
     themeMode.value = preferenceConfig.theme.mode as any
@@ -51,6 +91,10 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.style.filter = `${grayscaleStyle} ${colorWeaknessStyle}`
   })
 
+  watchEffect(() =>{
+    document.documentElement.classList.toggle('dark', isDark.value)
+  })
+
   return {
     $reset,
     isDark,
@@ -60,5 +104,6 @@ export const useThemeStore = defineStore('theme', () => {
     primaryColor,
     colorWeakness,
     toggleThemeMode,
+    toggleThemeModeWithAnimation,
   }
 })
