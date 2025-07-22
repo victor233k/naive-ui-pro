@@ -18,21 +18,21 @@ const {
       <n-tab-pane name="light">
         <template #tab>
           <n-icon size="20">
-            <Sunny />
+            <sunny />
           </n-icon>
         </template>
       </n-tab-pane>
       <n-tab-pane name="dark">
         <template #tab>
           <n-icon size="20">
-            <Moon />
+            <moon />
           </n-icon>
         </template>
       </n-tab-pane>
       <n-tab-pane name="auto">
         <template #tab>
           <n-icon size="20">
-            <Autocorrect20Filled />
+            <autocorrect20-filled />
           </n-icon>
         </template>
       </n-tab-pane>

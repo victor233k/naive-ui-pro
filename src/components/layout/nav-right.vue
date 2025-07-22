@@ -20,7 +20,7 @@ const {
     <pro-button quaternary size="small" @click="appStore.showPreferenceDrawer = true">
       <template #icon>
         <n-icon>
-          <SettingOutlined />
+          <setting-outlined />
         </n-icon>
       </template>
     </pro-button>
@@ -32,8 +32,8 @@ const {
     >
       <template #icon>
         <n-icon>
-          <FullScreenMaximize24Regular v-if="!isFullscreen" />
-          <FullScreenMinimize24Regular v-else />
+          <full-screen-maximize24-regular v-if="!isFullscreen" />
+          <full-screen-minimize24-regular v-else />
         </n-icon>
       </template>
     </pro-button>

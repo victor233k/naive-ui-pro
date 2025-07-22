@@ -32,13 +32,13 @@ function resetConfig() {
     >
       <n-tabs type="segment" animated>
         <n-tab-pane name="theme" tab="主题">
-          <ThemePreference />
+          <theme-preference />
         </n-tab-pane>
         <n-tab-pane name="layout" tab="布局">
-          <LayoutPreference />
+          <layout-preference />
         </n-tab-pane>
         <n-tab-pane name="other" tab="其他">
-          <ThemePreference />
+          <theme-preference />
         </n-tab-pane>
       </n-tabs>
       <template #footer>

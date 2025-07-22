@@ -1,12 +1,13 @@
 <script setup lang='ts'>
+import type { ProLayoutMode } from 'pro-naive-ui'
 import { storeToRefs } from 'pinia'
 import { useLayoutMenu } from 'pro-naive-ui'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLayoutStore } from '@/store/use-layout-store'
 import { ProMenu } from '../menu'
+import CollapseSidebarButton from './collapse-sidebar-button.vue'
 import Content from './content.vue'
-import Footer from './footer.vue'
 import Logo from './logo.vue'
 import NavLeft from './nav-left.vue'
 import NavRight from './nav-right.vue'
@@ -59,12 +60,25 @@ const finalSidebarCollapsedWidth = computed(() => {
     : sidebarCollapsedWidthWhenShowMenuTitle.value
 })
 
+const showSidebarCollapseButton = computed(() => {
+  const layoutMode = mode.value as ProLayoutMode
+  return layoutMode === 'vertical'
+    || layoutMode === 'sidebar'
+    || layoutMode === 'mixed-sidebar'
+})
+
+const showSidebarExtraCollapseButton = computed(() => {
+  const layoutMode = mode.value as ProLayoutMode
+  return layoutMode === 'two-column'
+    || layoutMode === 'mixed-two-column'
+})
+
 watch(() => route.path, (value) => {
   activeKey.value = value
 }, { immediate: true })
 
 async function pushTo(path: string) {
-  const failure = await router.push(path as string)
+  const failure = await router.push(path)
   if (failure) {
     // 跳转失败回退
     activeKey.value = route.path
@@ -92,14 +106,14 @@ async function pushTo(path: string) {
     :sidebar-collapsed-width="finalSidebarCollapsedWidth"
   >
     <template #logo>
-      <Logo />
+      <logo />
     </template>
     <template #nav-left>
-      <NavLeft />
+      <nav-left />
     </template>
     <template #nav-center>
       <div class="flex items-center h-full">
-        <ProMenu
+        <pro-menu
           v-bind="layout.horizontalMenuProps"
           :indent="18"
           @update:value="pushTo"
@@ -107,41 +121,51 @@ async function pushTo(path: string) {
       </div>
     </template>
     <template #nav-right>
-      <NavRight />
+      <nav-right />
     </template>
     <template #tabbar>
-      <Tabbar />
+      <tabbar />
     </template>
     <template #sidebar>
-      <n-scrollbar class="flex-[1_0_0]">
-        <ProMenu
-          v-bind="layout.verticalMenuProps"
-          :indent="18"
-          :collapsed-width="finalSidebarCollapsedWidth"
-          :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
-          @update:value="pushTo"
-        />
-      </n-scrollbar>
+      <div class="flex flex-col h-full">
+        <n-scrollbar class="flex-[1_0_0]">
+          <pro-menu
+            v-bind="layout.verticalMenuProps"
+            :indent="18"
+            :collapsed-width="finalSidebarCollapsedWidth"
+            :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
+            @update:value="pushTo"
+          />
+        </n-scrollbar>
+        <div v-if="showSidebarCollapseButton" class="flex p-8px">
+          <collapse-sidebar-button />
+        </div>
+      </div>
     </template>
     <template #sidebar-extra>
       <!-- <div :style="{ height: navHeight }">
         {{ title }}
       </div> -->
-      <n-scrollbar class="flex-[1_0_0]">
-        <ProMenu
-          v-bind="layout.verticalExtraMenuProps"
-          :indent="18"
-          :collapsed-width="finalSidebarCollapsedWidth"
-          :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
-          @update:value="pushTo"
-        />
-      </n-scrollbar>
+      <div class="flex flex-col h-full">
+        <n-scrollbar class="flex-[1_0_0]">
+          <pro-menu
+            v-bind="layout.verticalExtraMenuProps"
+            :indent="18"
+            :collapsed-width="finalSidebarCollapsedWidth"
+            :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
+            @update:value="pushTo"
+          />
+        </n-scrollbar>
+        <div v-if="showSidebarExtraCollapseButton" class="flex p-8px">
+          <collapse-sidebar-button />
+        </div>
+      </div>
     </template>
     <template #default>
-      <Content />
+      <content />
     </template>
     <template #footer>
-      <Footer />
+      <footer />
     </template>
   </pro-layout>
 </template>

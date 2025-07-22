@@ -4,8 +4,8 @@ import PreferenceDrawer from '@/components/preference-drawer/index.vue'
 </script>
 
 <template>
-  <AppProvider>
-    <RouterView />
-    <PreferenceDrawer />
-  </AppProvider>
+  <app-provider>
+    <router-view />
+    <preference-drawer />
+  </app-provider>
 </template>

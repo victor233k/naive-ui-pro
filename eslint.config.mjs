@@ -5,5 +5,6 @@ export default antfu({
     'no-console': 'off',
     'no-useless-call': 'off',
     'perfectionist/sort-exports': 'off',
+    'vue/component-name-in-template-casing': ['error', 'kebab-case'],
   },
 })

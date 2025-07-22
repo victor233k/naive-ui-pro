@@ -68,7 +68,7 @@ const form = createProForm({
           <div class="w-[85%] max-w-[480px] mt-[-100px]">
             <div class="login-illustration relative">
               <div class="relative z-10">
-                <IKun />
+                <i-kun />
               </div>
             </div>
           </div>

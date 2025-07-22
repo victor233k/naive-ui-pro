@@ -41,6 +41,8 @@ export default defineConfig(({ mode }) => {
           NaiveUiResolver(),
           ProNaiveUIResolver(),
         ],
+        dirs: [],
+        dts: 'typings/components.d.ts',
       }),
       UnoCSS(),
       viteMockServe({

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 
 export const useMenuStore = defineStore('menu', () => {
   const menus = ref<any[]>([
