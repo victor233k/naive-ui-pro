@@ -143,9 +143,6 @@ async function pushTo(path: string) {
       </div>
     </template>
     <template #sidebar-extra>
-      <!-- <div :style="{ height: navHeight }">
-        {{ title }}
-      </div> -->
       <div class="flex flex-col h-full">
         <n-scrollbar class="flex-[1_0_0]">
           <pro-menu
