@@ -112,7 +112,7 @@ async function pushTo(path: string) {
       <nav-left />
     </template>
     <template #nav-center>
-      <div class="flex items-center h-full">
+      <div v-show="!mobile" class="flex items-center h-full">
         <pro-menu
           v-bind="layout.horizontalMenuProps"
           :indent="18"

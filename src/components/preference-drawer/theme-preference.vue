@@ -1,6 +1,5 @@
 <script setup lang='tsx'>
-import { Autocorrect20Filled } from '@vicons/fluent'
-import { Moon, Sunny } from '@vicons/ionicons5'
+import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 import { useThemeStore } from '@/store/use-theme-store'
 
@@ -18,21 +17,21 @@ const {
       <n-tab-pane name="light">
         <template #tab>
           <n-icon size="20">
-            <sunny />
+            <icon icon="ri:sun-fill" />
           </n-icon>
         </template>
       </n-tab-pane>
       <n-tab-pane name="dark">
         <template #tab>
           <n-icon size="20">
-            <moon />
+            <icon icon="fa6-solid:moon" />
           </n-icon>
         </template>
       </n-tab-pane>
       <n-tab-pane name="auto">
         <template #tab>
           <n-icon size="20">
-            <autocorrect20-filled />
+            <icon icon="fluent:autocorrect-20-filled" />
           </n-icon>
         </template>
       </n-tab-pane>
