@@ -1,23 +1,36 @@
 <script setup lang='tsx'>
-import { MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined, ReloadOutlined } from '@vicons/antd'
+import type { ProLayoutMode } from 'pro-naive-ui'
+import { MenuOutlined, ReloadOutlined } from '@vicons/antd'
 import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 import { useLayoutStore } from '@/store/use-layout-store'
 
-const { collapsed, showSidebar } = storeToRefs(useLayoutStore())
+const {
+  mode,
+  mobile,
+  showSidebar,
+} = storeToRefs(useLayoutStore())
+
+const showSidebarHiddenButton = computed(() => {
+  const layoutMode = mode.value as ProLayoutMode
+  if (mobile.value) {
+    return false
+  }
+  return layoutMode !== 'horizontal'
+})
 </script>
 
 <template>
   <div class="pl-8px flex items-center h-full">
     <pro-button
+      v-if="showSidebarHiddenButton"
       quaternary
       size="small"
-      :tooltip="collapsed ? '展开侧边栏' : '收起侧边栏'"
-      @click="collapsed = !collapsed"
+      @click="showSidebar = !showSidebar"
     >
       <template #icon>
         <n-icon>
-          <MenuUnfoldOutlined v-if="collapsed" />
-          <MenuFoldOutlined v-else />
+          <menu-outlined />
         </n-icon>
       </template>
     </pro-button>
@@ -28,19 +41,7 @@ const { collapsed, showSidebar } = storeToRefs(useLayoutStore())
     >
       <template #icon>
         <n-icon>
-          <ReloadOutlined />
-        </n-icon>
-      </template>
-    </pro-button>
-    <pro-button
-      quaternary
-      size="small"
-      :tooltip="showSidebar ? '隐藏侧边栏' : '显示侧边栏'"
-      @click="showSidebar = !showSidebar"
-    >
-      <template #icon>
-        <n-icon>
-          <MenuOutlined />
+          <reload-outlined />
         </n-icon>
       </template>
     </pro-button>
