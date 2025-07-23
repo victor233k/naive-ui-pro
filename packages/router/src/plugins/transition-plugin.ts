@@ -1,12 +1,22 @@
-import type { ComputedRef, Ref, TransitionProps } from 'vue'
+import type { ComputedRef, MaybeRefOrGetter, TransitionProps } from 'vue'
+import type { Router } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
-import { computed, ref } from 'vue'
+import { has } from 'lodash-es'
+import { computed, toValue } from 'vue'
 
 declare module 'vue-router' {
+  interface RouteMeta {
+    /**
+     * 当前路由的过渡名称
+     * @default 'fade'
+     */
+    transitionName?: RouteTransitionName
+  }
   interface Router {
-    transitionProps: ComputedRef<TransitionProps>
-    transitionName: Ref<NonNullable<TransitionPluginOptions['defaultTransitionName']>>
-    transitionNameToTransitionPropsRecord: NonNullable<TransitionPluginOptions['transitionNameToTransitionPropsRecord']>
+    /**
+     * 当前路由的过渡属性
+     */
+    currentRouteTransitionProps: ComputedRef<TransitionProps>
   }
 }
 
@@ -15,6 +25,7 @@ export type RouteTransitionName
   | 'fade-down'
   | 'fade-slide'
   | 'fade-up'
+  | 'none'
   | (string & {})
 
 /**
@@ -23,82 +34,74 @@ export type RouteTransitionName
 
 interface TransitionPluginOptions {
   /**
-   * 默认过渡名称
+   * 过渡名称
    * @default 'fade'
    */
-  defaultTransitionName?: RouteTransitionName
-  /**
-   * 过渡名称到 transition 的 props 的映射
-   */
-  transitionNameToTransitionPropsRecord?: Partial<Record<RouteTransitionName, TransitionProps>>
+  transitionName?: MaybeRefOrGetter<RouteTransitionName>
 }
 
 // TODO
-const builtinTransitionNameToTransitionPropsRecord: TransitionPluginOptions['transitionNameToTransitionPropsRecord'] = {
-  // 'fade': {
-  //   enterActiveClass: 'transition-all duration-300 ease-in-out',
-  //   enterFromClass: 'opacity-0',
-  //   enterToClass: 'opacity-100',
-  //   leaveActiveClass: 'transition-all duration-300 ease-in-out',
-  //   leaveFromClass: 'opacity-100',
-  //   leaveToClass: 'opacity-0',
-  // },
-  // 'fade-up': {
-  //   enterActiveClass: 'transition-all duration-300 ease-in-out',
-  //   enterFromClass: 'opacity-0 translate-y-40px',
-  //   enterToClass: 'opacity-100 translate-y-0',
-  //   leaveActiveClass: 'transition-all duration-300 ease-in-out',
-  //   leaveFromClass: 'opacity-100 translate-y-0',
-  //   leaveToClass: 'opacity-0 translate-y-40px',
-  // },
-  'fade-down': {
-    enterActiveClass: 'transition-all duration-300 ease-in-out',
-    enterFromClass: 'opacity-0 translate-y-400px bg-red',
-    enterToClass: 'opacity-100 translate-y-0 bg-red-500',
-    leaveActiveClass: 'transition-all duration-300 ease-in-out',
-    leaveFromClass: 'opacity-100 translate-y-0',
-    leaveToClass: 'opacity-0 translate-y-400px',
+const builtinTransitionNameToTransitionPropsRecord: Partial<Record<RouteTransitionName, TransitionProps>> = {
+  'fade': {
+    leaveToClass: 'opacity-0',
+    enterFromClass: 'opacity-0',
+    enterActiveClass: 'transition-opacity duration-300 ease-in-out',
+    leaveActiveClass: 'transition-opacity duration-300 ease-in-out',
   },
-  // 'fade-slide': {
-  //   enterActiveClass: 'transition-all duration-300 ease-in-out',
-  //   enterFromClass: 'opacity-0 translate-x-40px',
-  //   enterToClass: 'opacity-100 translate-x-0',
-  //   leaveActiveClass: 'transition-all duration-300 ease-in-out',
-  //   leaveFromClass: 'opacity-100 translate-x-0',
-  //   leaveToClass: 'opacity-0 translate-x-40px',
-  // },
+  'fade-down': {
+    enterFromClass: 'opacity-0 transform -translate-y-4',
+    leaveToClass: 'opacity-0 transform -translate-y-4',
+    enterActiveClass: 'transition duration-300 ease-in-out',
+    leaveActiveClass: 'transition duration-300 ease-in-out',
+  },
+  'fade-up': {
+    enterFromClass: 'opacity-0 transform translate-y-4',
+    leaveToClass: 'opacity-0 transform translate-y-4',
+    enterActiveClass: 'transition duration-300 ease-in-out',
+    leaveActiveClass: 'transition duration-300 ease-in-out',
+  },
+  'fade-slide': {
+    enterFromClass: 'opacity-0 transform translate-x-4',
+    leaveToClass: 'opacity-0 transform -translate-x-4',
+    enterActiveClass: 'transition duration-300 ease-in-out',
+    leaveActiveClass: 'transition duration-300 ease-in-out',
+  },
+  'none': {},
 }
 
 export function transitionPlugin({
-  defaultTransitionName = 'fade',
-  transitionNameToTransitionPropsRecord = builtinTransitionNameToTransitionPropsRecord,
+  transitionName = 'fade-slide',
 }: TransitionPluginOptions = {}): ProRouterPlugin {
-  return ({ router }) => {
-    if (!router.transitionName) {
-      router.transitionName = ref(defaultTransitionName)
-    }
-    if (!router.transitionNameToTransitionPropsRecord) {
-      router.transitionNameToTransitionPropsRecord = transitionNameToTransitionPropsRecord
-    }
-    if (!router.transitionProps) {
-      router.transitionProps = computed(() => {
-        const props = transitionNameToTransitionPropsRecord[router.transitionName.value]
-        if (!props) {
-          if (__DEV__) {
-            console.warn(`[ProRouter] transition name ${router.transitionName.value} is not found, fallback to default transition name ${defaultTransitionName}`)
-          }
-          return {
-            ...transitionNameToTransitionPropsRecord[defaultTransitionName],
-            appear: true,
-            mode: 'out-in',
-          }
-        }
+  return ({ router, onUnmount }) => {
+    if (!router.currentRouteTransitionProps) {
+      router.currentRouteTransitionProps = computed(() => {
+        const mergedTransitionName = resolveTransitionName(router, transitionName)
+        const transitionProps = builtinTransitionNameToTransitionPropsRecord[mergedTransitionName]
         return {
-          ...props,
+          ...transitionProps,
           appear: true,
           mode: 'out-in',
         }
       })
     }
+
+    onUnmount(() => {
+      delete router.currentRouteTransitionProps
+    })
   }
+}
+
+function resolveTransitionName(router: Router, transitionName: MaybeRefOrGetter<RouteTransitionName>) {
+  transitionName = toValue(transitionName)
+  const mergedTransitioName = router.currentRoute.value.meta.transitionName ?? transitionName
+  if (!has(builtinTransitionNameToTransitionPropsRecord, mergedTransitioName)) {
+    const finalTransitioName = has(builtinTransitionNameToTransitionPropsRecord, transitionName)
+      ? transitionName
+      : 'fade-slide'
+    if (__DEV__) {
+      console.warn(`[@pro/router] transition name ${mergedTransitioName} is not found, fallback to default transition name ${finalTransitioName}`)
+    }
+    return finalTransitioName
+  }
+  return mergedTransitioName
 }

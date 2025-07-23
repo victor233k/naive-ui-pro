@@ -8,6 +8,4 @@ export { breadcrumbPlugin } from './plugins/breadcrumb-plugin'
 export { rbacAccessPlugin } from './plugins/rbac-access-plugin'
 export { documentTitlePlugin } from './plugins/document-title-plugin'
 export { autoRedirectToFirstChild } from './plugins/auto-redirect-to-first-child'
-
-export type { ProRouterPlugin } from './plugin'
-export type { ProRouterOptions } from './create-router'
+export * from './types'
