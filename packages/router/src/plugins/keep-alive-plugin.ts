@@ -52,19 +52,14 @@ function remove(router: Router, name: string): void {
   router.keepAliveList.value = router.keepAliveList.value.filter(item => item !== name)
 }
 
-export function keepAlivePlugin({
-  defaultKeepAlive = false,
-}: KeepAlivePluginOptions = {}): ProRouterPlugin {
+export function keepAlivePlugin({ defaultKeepAlive = false }: KeepAlivePluginOptions = {}): ProRouterPlugin {
   return ({ router, onUnmount }) => {
-    if (!router.keepAliveList) {
-      router.keepAliveList = ref([])
-    }
+    router.keepAliveList = ref([])
 
-    router.afterEach((to, from) => {
+    router.beforeEach((to, from) => {
       if (!from.name) {
         return
       }
-
       const { keepAlive = defaultKeepAlive } = from.meta
       const normalizedName = normalizeRouteName(from.name)
       if (isBoolean(keepAlive)) {
@@ -73,12 +68,9 @@ export function keepAlivePlugin({
           : remove(router, normalizedName)
         return
       }
-
-      // 处理对象类型的keepAlive配置
       const isExcluded = keepAlive.exclude
         .map(normalizeRouteName)
         .includes(normalizeRouteName(to.name))
-
       isExcluded
         ? remove(router, normalizedName)
         : add(router, normalizedName)

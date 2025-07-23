@@ -5,7 +5,10 @@
   <router-view v-slot="{ Component }">
     <transition v-bind="$router.currentRouteTransitionProps.value">
       <keep-alive :include="$router.keepAliveList.value">
-        <component :is="Component" />
+        <component
+          :is="Component"
+          :key="$router.getRouteKey()"
+        />
       </keep-alive>
     </transition>
   </router-view>

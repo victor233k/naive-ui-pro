@@ -1,5 +1,6 @@
 import type { ProRouterPlugin } from '../plugin'
 import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 export function progressPlugin(): ProRouterPlugin {
   return ({ router }) => {
