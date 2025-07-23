@@ -16,7 +16,11 @@ const {
 
 <template>
   <div class="pr-8px flex items-center h-full">
-    <pro-button quaternary size="small" @click="appStore.showPreferenceDrawer = true">
+    <pro-button
+      quaternary
+      size="small"
+      @click="appStore.showPreferenceDrawer = true"
+    >
       <template #icon>
         <n-icon>
           <icon icon="uil:setting" />

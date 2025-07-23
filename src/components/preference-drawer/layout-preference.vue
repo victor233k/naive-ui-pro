@@ -33,7 +33,11 @@ const layoutOptions: Array<{ label: string, value: ProLayoutMode }> = [
 </script>
 
 <template>
-  <n-flex vertical :size="12" class="my-24px">
+  <n-flex
+    vertical
+    :size="12"
+    class="my-24px"
+  >
     <div class="preference-item">
       <span>显示logo</span>
       <n-switch v-model:value="showLogo" />
@@ -48,11 +52,19 @@ const layoutOptions: Array<{ label: string, value: ProLayoutMode }> = [
     </div>
   </n-flex>
 
-  <n-flex vertical :size="12" class="my-24px">
+  <n-flex
+    vertical
+    :size="12"
+    class="my-24px"
+  >
     <div class="font-bold text-16px">
       顶栏
     </div>
-    <n-flex vertical :size="12" class="pl-8px">
+    <n-flex
+      vertical
+      :size="12"
+      class="pl-8px"
+    >
       <div class="preference-item">
         <span>显示顶栏</span>
         <n-switch v-model:value="showNav" />
@@ -63,32 +75,56 @@ const layoutOptions: Array<{ label: string, value: ProLayoutMode }> = [
       </div>
       <div class="preference-item">
         <span>顶栏高度</span>
-        <n-input-number v-model:value="navHeight" class="w-120px" placeholder="请输入" />
+        <n-input-number
+          v-model:value="navHeight"
+          class="w-120px"
+          placeholder="请输入"
+        />
       </div>
     </n-flex>
   </n-flex>
 
-  <n-flex vertical :size="12" class="my-24px">
+  <n-flex
+    vertical
+    :size="12"
+    class="my-24px"
+  >
     <div class="font-bold text-16px">
       标签栏
     </div>
-    <n-flex vertical :size="12" class="pl-8px">
+    <n-flex
+      vertical
+      :size="12"
+      class="pl-8px"
+    >
       <div class="preference-item">
         <span>显示标签栏</span>
         <n-switch v-model:value="showTabbar" />
       </div>
       <div class="preference-item">
         <span>标签栏高度</span>
-        <n-input-number v-model:value="tabbarHeight" class="w-120px" placeholder="请输入" />
+        <n-input-number
+          v-model:value="tabbarHeight"
+          class="w-120px"
+          placeholder="请输入"
+        />
       </div>
     </n-flex>
   </n-flex>
 
-  <n-flex vertical :size="12" class="my-24px">
+  <n-flex
+    vertical
+    :size="12"
+    class="my-24px"
+  >
     <div class="font-bold text-16px">
       侧边栏
     </div>
-    <n-flex vertical :size="12" class="pl-8px">
+    <n-flex
+      vertical
+      :size="12"
+      class="pl-8px"
+    >
       <div class="preference-item">
         <span>显示侧边栏</span>
         <n-switch v-model:value="showSidebar" />
@@ -103,20 +139,36 @@ const layoutOptions: Array<{ label: string, value: ProLayoutMode }> = [
       </div>
       <div class="preference-item">
         <span>侧边栏宽度</span>
-        <n-input-number v-model:value="sidebarWidth" class="w-120px" placeholder="请输入" />
+        <n-input-number
+          v-model:value="sidebarWidth"
+          class="w-120px"
+          placeholder="请输入"
+        />
       </div>
       <div class="preference-item">
         <span>折叠后宽度</span>
-        <n-input-number v-model:value="sidebarCollapsedWidth" class="w-120px" placeholder="请输入" />
+        <n-input-number
+          v-model:value="sidebarCollapsedWidth"
+          class="w-120px"
+          placeholder="请输入"
+        />
       </div>
     </n-flex>
   </n-flex>
 
-  <n-flex vertical :size="12" class="my-24px">
+  <n-flex
+    vertical
+    :size="12"
+    class="my-24px"
+  >
     <div class="font-bold text-16px">
       底部
     </div>
-    <n-flex vertical :size="12" class="pl-8px">
+    <n-flex
+      vertical
+      :size="12"
+      class="pl-8px"
+    >
       <div class="preference-item">
         <span>显示底部</span>
         <n-switch v-model:value="showFooter" />
@@ -127,7 +179,11 @@ const layoutOptions: Array<{ label: string, value: ProLayoutMode }> = [
       </div>
       <div class="preference-item">
         <span>底部高度</span>
-        <n-input-number v-model:value="footerHeight" class="w-120px" placeholder="请输入" />
+        <n-input-number
+          v-model:value="footerHeight"
+          class="w-120px"
+          placeholder="请输入"
+        />
       </div>
     </n-flex>
   </n-flex>

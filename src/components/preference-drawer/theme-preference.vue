@@ -13,7 +13,11 @@ const {
 
 <template>
   <div class="px-32px my-24px">
-    <n-tabs v-model:value="themeMode" type="segment" animated>
+    <n-tabs
+      v-model:value="themeMode"
+      type="segment"
+      animated
+    >
       <n-tab-pane name="light">
         <template #tab>
           <n-icon size="20">
@@ -37,7 +41,10 @@ const {
       </n-tab-pane>
     </n-tabs>
   </div>
-  <n-flex vertical :size="12">
+  <n-flex
+    vertical
+    :size="12"
+  >
     <div class="preference-item">
       <span>色弱模式</span>
       <n-switch v-model:value="colorWeakness" />
@@ -48,7 +55,10 @@ const {
     </div>
     <div class="preference-item">
       <span>主色</span>
-      <n-color-picker v-model:value="primaryColor" class="w-90px" />
+      <n-color-picker
+        v-model:value="primaryColor"
+        class="w-90px"
+      />
     </div>
   </n-flex>
 </template>

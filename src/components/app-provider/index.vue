@@ -27,7 +27,10 @@ const configProviderProps = computed<ProConfigProviderProps>(() => {
 </script>
 
 <template>
-  <pro-config-provider v-bind="configProviderProps" abstract>
+  <pro-config-provider
+    v-bind="configProviderProps"
+    abstract
+  >
     <n-loading-bar-provider>
       <n-message-provider>
         <n-notification-provider>

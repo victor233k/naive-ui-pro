@@ -45,7 +45,13 @@ const showAppTitle = computed(() => {
       'justify-center': !enablePaddingLeft,
     }"
   >
-    <img :src="logo" class="size-32px truncate">
-    <h1 v-show="showAppTitle" class="truncate text-18px">{{ title }}</h1>
+    <img
+      :src="logo"
+      class="size-32px truncate"
+    >
+    <h1
+      v-show="showAppTitle"
+      class="truncate text-18px"
+    >{{ title }}</h1>
   </a>
 </template>

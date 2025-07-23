@@ -37,9 +37,11 @@ const nMenuProps = computed(() => {
 
 <template>
   <n-menu
-    class="pro-menu" :class="[
+    class="pro-menu"
+    :class="[
       mergedCollapsed && collapsedShowTitle && 'pro-menu--collapsed-show-title',
-    ]" v-bind="nMenuProps"
+    ]"
+    v-bind="nMenuProps"
   />
 </template>
 
@@ -52,7 +54,7 @@ const nMenuProps = computed(() => {
     gap: 2px;
   }
 
-  :deep(.n-menu-item-content){
+  :deep(.n-menu-item-content) {
     padding-left: 0 !important;
     padding-right: 0;
     transition: height .3s var(--n-bezier);
@@ -78,9 +80,10 @@ const nMenuProps = computed(() => {
 }
 
 .pro-menu.n-menu.n-menu--collapsed {
-   * {
+  * {
     transition: none;
   }
+
   :deep(.n-menu-item-content) {
     transition: height .3s var(--n-bezier);
   }

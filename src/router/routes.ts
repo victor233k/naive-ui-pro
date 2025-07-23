@@ -300,6 +300,17 @@ const accessRoutes: RouteRecordRaw[] = [
           link: 'https://www.baidu.com',
         },
       },
+      {
+        name: 'component',
+        path: 'menu',
+        component: () => import('@/views/system/menu/index.vue'),
+        meta: {
+          title: '菜单管理(外部打开)',
+          icon: 'ant-design:menu-outlined',
+          keepAlive: false,
+          openInNewWindow: true,
+        },
+      },
     ],
   },
 ]

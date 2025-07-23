@@ -73,7 +73,11 @@ function handleSelect(key: string) {
 </script>
 
 <template>
-  <n-dropdown trigger="hover" :options="options" @select="handleSelect">
+  <n-dropdown
+    trigger="hover"
+    :options="options"
+    @select="handleSelect"
+  >
     <pro-button quaternary>
       <template #icon>
         <n-icon>

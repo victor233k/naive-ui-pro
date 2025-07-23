@@ -17,7 +17,10 @@ const breadcrumbs = computed(() => {
       :key="breadcrumb.path"
     >
       <n-icon>
-        <icon v-if="breadcrumb.icon" :icon="breadcrumb.icon" />
+        <icon
+          v-if="breadcrumb.icon"
+          :icon="breadcrumb.icon"
+        />
       </n-icon>
       {{ breadcrumb.title }}
     </n-breadcrumb-item>

@@ -17,7 +17,11 @@ const transitionOptions: Array<{ label: string, value: RouteTransitionName }> = 
 </script>
 
 <template>
-  <n-flex vertical :size="12" class="my-24px">
+  <n-flex
+    vertical
+    :size="12"
+    class="my-24px"
+  >
     <div class="preference-item">
       <span>路由过渡动画</span>
       <n-select
