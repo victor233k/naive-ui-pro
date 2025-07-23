@@ -59,7 +59,11 @@ const form = createProForm({
       />
       <div class="relative z-10 w-full flex flex-col">
         <div class="flex items-center gap-3 p-8">
-          <img src="@/assets/logo.svg" alt="Logo" class="w-8 h-8">
+          <img
+            src="@/assets/logo.svg"
+            alt="Logo"
+            class="w-8 h-8"
+          >
           <span class="text-xl font-semibold text-gray-800 dark:text-gray-100">{{ title }}</span>
         </div>
         <div class="flex-grow flex items-center justify-center">
@@ -79,7 +83,11 @@ const form = createProForm({
       <div class="flex-grow flex items-center justify-center">
         <div class="w-full max-w-[420px] px-6 lg:px-12">
           <div class="lg:hidden flex items-center justify-center gap-2 mb-12">
-            <img src="@/assets/logo.svg" alt="Logo" class="w-8 h-8">
+            <img
+              src="@/assets/logo.svg"
+              alt="Logo"
+              class="w-8 h-8"
+            >
             <span class="text-xl font-semibold text-gray-900 dark:text-white">{{ title }}</span>
           </div>
 
@@ -119,22 +127,26 @@ const form = createProForm({
               >
                 记住我
               </pro-checkbox>
-              <n-button text type="primary">
+              <n-button
+                text
+                type="primary"
+              >
                 忘记密码？
               </n-button>
             </div>
 
             <n-button
+              type="primary"
               block
               size="large"
-              type="primary"
-              attr-type="submit"
-              :loading="loading" :disabled="loading"
+              :loading="loading"
+              @click="form.submit"
             >
               {{ loading ? '登录中...' : '登录' }}
             </n-button>
             <div class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-              还没有账号？ <n-button
+              还没有账号？
+              <n-button
                 text
                 type="primary"
                 class="font-medium"
