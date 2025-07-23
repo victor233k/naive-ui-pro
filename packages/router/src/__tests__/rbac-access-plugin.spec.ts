@@ -124,9 +124,9 @@ describe('rbac-access-plugin', () => {
 
     it('redirect to Login when navigation to not exsit path', async () => {
       const router = setupRouter({ ignoreAccessRouteNames: ignoreAccessRoutes.map(route => route.name).slice(0, -1) })
-      await router.push('/')
+      await router.push('/list?a=1')
       expect(router.currentRoute.value.name).toBe('Login')
-      expect(router.currentRoute.value.query.redirect).toBe('/list')
+      expect(router.currentRoute.value.fullPath).toBe('/login?redirect=/list?a=1')
       router.unmount()
     })
 
@@ -147,6 +147,13 @@ describe('rbac-access-plugin', () => {
       router.unmount()
     })
 
+    it('redirect to query redirect params when navigation to Login', async () => {
+      const router = setupRouter({ logined: true })
+      await router.push('/login?redirect=/list/basic-info?a=1')
+      expect(router.currentRoute.value.fullPath).toBe('/list/basic-info?a=1')
+      router.unmount()
+    })
+
     it('navigation to exsit path', async () => {
       const router = setupRouter({ logined: true })
       await router.push('/admin')
@@ -164,10 +171,10 @@ describe('rbac-access-plugin', () => {
       router.unmount()
     })
 
-    it('logout', async () => {
+    it('login and logout', async () => {
       const router = setupRouter({ logined: true })
-      await router.push('/list/basic-list')
-      expect(router.currentRoute.value.fullPath).toBe('/list/basic-list')
+      await router.push('/list/basic-list?b=2')
+      expect(router.currentRoute.value.fullPath).toBe('/list/basic-list?b=2')
       router.setOptions({ logined: false })
       await router.push('/list/basic-list?a=1')
       expect(router.currentRoute.value.name).toBe('Login')
@@ -175,6 +182,9 @@ describe('rbac-access-plugin', () => {
       await router.push('/login')
       expect(router.currentRoute.value.name).toBe('Login')
       expect(router.currentRoute.value.query.redirect).toBeUndefined()
+      router.setOptions({ logined: true })
+      await router.push('/list/basic-info?b=2')
+      expect(router.currentRoute.value.fullPath).toBe('/list/basic-info?b=2')
       router.unmount()
     })
   })

@@ -188,8 +188,9 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
 
       if (shouldRedirect) {
         return {
-          path: to.fullPath,
+          path: to.path,
           replace: true,
+          query: to.query,
         }
       }
 
@@ -202,9 +203,8 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
 
       // 已登录跳转 login 页面，重定向到 redirect 参数或者 homePath
       if (logined && to.path === loginPath) {
-        return {
-          path: homePath,
-        }
+        const path = to.query.redirect ?? homePath
+        return path as string
       }
 
       // 如果是不需要鉴权的路由则放行
@@ -217,7 +217,6 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
         return {
           path: loginPath,
           query: {
-            ...to.query,
             redirect: to.fullPath,
           },
         }
