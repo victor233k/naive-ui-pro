@@ -17,10 +17,6 @@ declare module 'vue-router' {
      */
     icon?: string
     /**
-     * 菜单图标颜色
-     */
-    iconColor?: string
-    /**
      * 是否不在菜单中显示
      * @default false
      */
@@ -44,7 +40,7 @@ type MaybePromise<T> = T | Promise<T>
 interface NMenuPluginOptions {
   service: () => MaybePromise<{
     routes: Omit<RouteRecordRaw, 'component'>[]
-    resolveIcon?: (icon: string, iconColor?: string) => VNodeChild
+    resolveIcon?: (icon: string) => VNodeChild
   }>
 }
 
@@ -75,7 +71,6 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
             const {
               icon,
               title,
-              iconColor,
               hideInMenu = false,
             } = meta
             const menu: MenuOption = {
@@ -86,8 +81,8 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
             if (icon) {
               menu.icon = () => {
                 return resolveIcon
-                  ? resolveIcon(icon, iconColor)
-                  : builtinResolveIcon(icon, iconColor)
+                  ? resolveIcon(icon)
+                  : builtinResolveIcon(icon)
               }
             }
             if (children.length > 0) {
@@ -109,10 +104,9 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
   }
 }
 
-function builtinResolveIcon(icon: string, iconColor?: string) {
+function builtinResolveIcon(icon: string) {
   return h(Icon, {
     icon,
-    color: iconColor,
     width: 18,
     height: 18,
   })

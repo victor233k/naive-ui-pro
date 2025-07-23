@@ -13,10 +13,6 @@ declare module 'vue-router' {
      */
     icon?: string
     /**
-     * 面包屑图标颜色
-     */
-    iconColor?: string
-    /**
      * 是否不在面包屑中显示
      * @default false
      */
@@ -35,7 +31,6 @@ interface BreadcrumbItem {
   path: string
   title: string
   icon?: string
-  iconColor?: string
 }
 
 export function breadcrumbPlugin(): ProRouterPlugin {
@@ -46,12 +41,11 @@ export function breadcrumbPlugin(): ProRouterPlugin {
         const breadcrumbs = computed(() => {
           const breadcrumbs: BreadcrumbItem[] = []
           route.matched.forEach(({ meta, path, name }) => {
-            const { title, icon, iconColor, hideInBreadcrumb } = meta
+            const { title, icon, hideInBreadcrumb } = meta
             if (title && !hideInBreadcrumb) {
               breadcrumbs.push({
                 path,
                 icon,
-                iconColor,
                 title: title ?? name.toString(),
               })
             }
