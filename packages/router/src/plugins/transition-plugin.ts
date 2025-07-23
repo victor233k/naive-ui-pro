@@ -1,4 +1,4 @@
-import type { ComputedRef, MaybeRefOrGetter, TransitionProps } from 'vue'
+import type { ComputedRef, MaybeRefOrGetter, RendererElement, TransitionProps } from 'vue'
 import type { Router } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { has } from 'lodash-es'
@@ -40,7 +40,6 @@ interface TransitionPluginOptions {
   transitionName?: MaybeRefOrGetter<RouteTransitionName>
 }
 
-// TODO
 const builtinTransitionNameToTransitionPropsRecord: Partial<Record<RouteTransitionName, TransitionProps>> = {
   'fade': {
     leaveToClass: 'opacity-0',
@@ -81,6 +80,12 @@ export function transitionPlugin({
           ...transitionProps,
           appear: true,
           mode: 'out-in',
+          onEnter: (el) => {
+            lockScroll(el.parentElement)
+          },
+          onAfterEnter: (el) => {
+            unlockScroll(el.parentElement)
+          },
         }
       })
     }
@@ -104,4 +109,14 @@ function resolveTransitionName(router: Router, transitionName: MaybeRefOrGetter<
     return finalTransitioName
   }
   return mergedTransitioName
+}
+
+let initialOverflow: CSSStyleDeclaration['overflow'] = ''
+function lockScroll(el: RendererElement) {
+  initialOverflow = el.style.overflow
+  el.style.overflow = 'hidden'
+}
+
+function unlockScroll(el: RendererElement) {
+  el.style.overflow = initialOverflow
 }
