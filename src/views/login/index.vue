@@ -27,9 +27,7 @@ const form = createProForm({
       loading.value = true
       const user = await userStore.login(values)
       const redirect = route.query.redirect as string ?? HOME_ROUTE_PATH
-      await router.push({
-        path: redirect,
-      })
+      await router.push(redirect)
       notification.success({
         title: '登录成功',
         content: `欢迎回来，${user.name}`,
