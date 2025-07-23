@@ -2,6 +2,7 @@
 import { useAppStore } from '@/store/use-app-store'
 import { useLayoutStore } from '@/store/use-layout-store'
 import { useThemeStore } from '@/store/use-theme-store'
+import AppPreference from './app-preference.vue'
 import LayoutPreference from './layout-preference.vue'
 import ThemePreference from './theme-preference.vue'
 
@@ -38,7 +39,7 @@ function resetConfig() {
           <layout-preference />
         </n-tab-pane>
         <n-tab-pane name="other" tab="其他">
-          <theme-preference />
+          <app-preference />
         </n-tab-pane>
       </n-tabs>
       <template #footer>

@@ -5,7 +5,11 @@ import PreferenceDrawer from '@/components/preference-drawer/index.vue'
 
 <template>
   <app-provider>
-    <router-view />
+    <router-view v-slot="{ Component }">
+      <transition v-bind="$router.currentRouteTransitionProps.value">
+        <component :is="Component" />
+      </transition>
+    </router-view>
     <preference-drawer />
   </app-provider>
 </template>

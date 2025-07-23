@@ -21,7 +21,7 @@ const {
   sidebarCollapsedShowMenuTitle,
 } = storeToRefs(useLayoutStore())
 
-const layoutOptions: Array<Record<string, ProLayoutMode>> = [
+const layoutOptions: Array<{ label: string, value: ProLayoutMode }> = [
   { label: '垂直布局', value: 'vertical' },
   { label: '水平布局', value: 'horizontal' },
   { label: '混合双栏布局', value: 'mixed-two-column' },

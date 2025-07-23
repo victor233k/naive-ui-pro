@@ -16,10 +16,11 @@ import {
   createWebHistory,
 } from 'vue-router'
 
+import { useAppStore } from '@/store/use-app-store'
+
 import {
   useUserStore,
 } from '@/store/use-user-store'
-
 import {
   accessRoutes,
   HOME_ROUTE_PATH,
@@ -59,7 +60,11 @@ export async function setupRouter(app: App) {
       /**
        * 路由过渡插件
        */
-      transitionPlugin(),
+      transitionPlugin({
+        transitionName: () => {
+          return useAppStore().transitionName
+        },
+      }),
       /**
        * 自动重定向到第一个子路由插件
        */

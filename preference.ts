@@ -4,6 +4,10 @@ export const preferenceConfig = {
      * 应用标题
      */
     title: 'Naive UI Pro',
+    /**
+     * 路由过渡动画名称
+     */
+    transitionName: 'fade-slide',
   },
   layout: {
     /**

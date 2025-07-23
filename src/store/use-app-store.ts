@@ -1,13 +1,18 @@
 import { preferenceConfig } from '@root/preference'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { reactive, ref, toRefs } from 'vue'
 
 export const useAppStore = defineStore('app', () => {
   const showPreferenceDrawer = ref(false)
-  const title = ref(preferenceConfig.app.title)
+  const app = reactive({ ...preferenceConfig.app })
+
+  function $reset() {
+    Object.assign(app, preferenceConfig.app)
+  }
 
   return {
-    title,
+    $reset,
+    ...toRefs(app),
     showPreferenceDrawer,
   }
 })
