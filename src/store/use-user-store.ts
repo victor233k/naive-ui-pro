@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { apiLogin, apiQueryUserInfo } from '@/api/user'
+import { LOGIN_ROUTE_PATH } from '@/router/routes'
 
 export interface UserInfo {
   name: string
@@ -16,6 +18,8 @@ export interface UserLoginPayload {
 }
 
 export const useUserStore = defineStore('user', () => {
+  const router = useRouter()
+
   const user = ref<UserInfo>({
     name: '',
     roles: [],
@@ -64,8 +68,14 @@ export const useUserStore = defineStore('user', () => {
     localStorage.removeItem('token')
   }
 
+  function logout() {
+    $reset()
+    router.push(LOGIN_ROUTE_PATH)
+  }
+
   return {
     login,
+    logout,
     $reset,
     fetchUpdateUserInfo,
     loginLoading: loading,

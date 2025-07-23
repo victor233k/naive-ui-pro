@@ -3,6 +3,7 @@ import { Icon } from '@iconify/vue'
 import { useFullscreen } from '@vueuse/core'
 import { useAppStore } from '@/store/use-app-store'
 import { useThemeStore } from '@/store/use-theme-store'
+import UserAvatar from './user-avatar.vue'
 
 const appStore = useAppStore()
 const themeStore = useThemeStore()
@@ -44,5 +45,6 @@ const {
         </n-icon>
       </template>
     </pro-button>
+    <user-avatar />
   </div>
 </template>
