@@ -52,12 +52,10 @@ export const useThemeStore = defineStore('theme', () => {
       Math.max(x, innerWidth - x),
       Math.max(y, innerHeight - y),
     )
-    
     const transition = document.startViewTransition(async () => {
       toggleThemeMode()
       return nextTick()
     })
-    
     transition.ready.then(() => {
       const clipPath = [
         `circle(0 at ${x}px ${y}px)`,
@@ -73,7 +71,7 @@ export const useThemeStore = defineStore('theme', () => {
           pseudoElement: isDark.value
             ? '::view-transition-new(root)'
             : '::view-transition-old(root)',
-        }
+        },
       )
     })
   }
@@ -91,7 +89,7 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.style.filter = `${grayscaleStyle} ${colorWeaknessStyle}`
   })
 
-  watchEffect(() =>{
+  watchEffect(() => {
     document.documentElement.classList.toggle('dark', isDark.value)
   })
 

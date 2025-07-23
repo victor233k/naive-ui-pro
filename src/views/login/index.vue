@@ -92,15 +92,31 @@ const form = createProForm({
             </p>
           </div>
 
-          <pro-form :form="form" size="large" :loading="loading" label-placement="left">
-            <pro-input required path="username" placeholder="请输入用户名" />
+          <pro-form
+            :form="form"
+            size="large"
+            :loading="loading"
+            label-placement="left"
+          >
+            <pro-input
+              required
+              path="username"
+              placeholder="请输入用户名"
+            />
             <pro-password
-              required path="password" placeholder="请输入密码" :field-props="{
+              required
+              path="password"
+              placeholder="请输入密码"
+              :field-props="{
                 showPasswordOn: 'click',
               }"
             />
             <div class="flex justify-between items-center mb-6">
-              <pro-checkbox path="rememberMe" size="small" :show-feedback="false">
+              <pro-checkbox
+                path="rememberMe"
+                size="small"
+                :show-feedback="false"
+              >
                 记住我
               </pro-checkbox>
               <n-button text type="primary">
@@ -108,11 +124,21 @@ const form = createProForm({
               </n-button>
             </div>
 
-            <n-button type="primary" block size="large" :loading="loading" :disabled="loading" attr-type="submit">
+            <n-button
+              block
+              size="large"
+              type="primary"
+              attr-type="submit"
+              :loading="loading" :disabled="loading"
+            >
               {{ loading ? '登录中...' : '登录' }}
             </n-button>
             <div class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-              还没有账号？ <n-button text type="primary" class="font-medium">
+              还没有账号？ <n-button
+                text
+                type="primary"
+                class="font-medium"
+              >
                 立即注册
               </n-button>
             </div>
