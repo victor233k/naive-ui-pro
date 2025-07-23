@@ -65,7 +65,7 @@ export const preferenceConfig = {
     /**
      * 侧边栏折叠后是否显示菜单名
      */
-    showMenuTitleWhenSidebarCollapsed: true,
+    sidebarCollapsedShowMenuTitle: true,
     /**
      * 当展示菜单标题时，侧边栏折叠后的宽度
      */

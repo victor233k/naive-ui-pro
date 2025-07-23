@@ -18,7 +18,7 @@ const {
   tabbarHeight,
   sidebarWidth,
   sidebarCollapsedWidth,
-  showMenuTitleWhenSidebarCollapsed,
+  sidebarCollapsedShowMenuTitle,
 } = storeToRefs(useLayoutStore())
 
 const layoutOptions: Array<Record<string, ProLayoutMode>> = [
@@ -99,7 +99,7 @@ const layoutOptions: Array<Record<string, ProLayoutMode>> = [
       </div>
       <div class="preference-item">
         <span>折叠后显示菜单名</span>
-        <n-switch v-model:value="showMenuTitleWhenSidebarCollapsed" />
+        <n-switch v-model:value="sidebarCollapsedShowMenuTitle" />
       </div>
       <div class="preference-item">
         <span>侧边栏宽度</span>

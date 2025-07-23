@@ -32,7 +32,7 @@ const {
   sidebarWidth,
   tabbarHeight,
   sidebarCollapsedWidth,
-  showMenuTitleWhenSidebarCollapsed,
+  sidebarCollapsedShowMenuTitle,
   sidebarCollapsedWidthWhenShowMenuTitle,
 } = storeToRefs(useLayoutStore())
 
@@ -55,7 +55,7 @@ const showSidebarExtra = computed(() => {
 })
 
 const finalSidebarCollapsedWidth = computed(() => {
-  return !showMenuTitleWhenSidebarCollapsed.value
+  return !sidebarCollapsedShowMenuTitle.value
     ? sidebarCollapsedWidth.value
     : sidebarCollapsedWidthWhenShowMenuTitle.value
 })
@@ -133,7 +133,7 @@ async function pushTo(path: string) {
             v-bind="layout.verticalMenuProps"
             :indent="18"
             :collapsed-width="finalSidebarCollapsedWidth"
-            :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
+            :collapsed-show-title="sidebarCollapsedShowMenuTitle"
             @update:value="pushTo"
           />
         </n-scrollbar>
@@ -149,7 +149,7 @@ async function pushTo(path: string) {
             v-bind="layout.verticalExtraMenuProps"
             :indent="18"
             :collapsed-width="finalSidebarCollapsedWidth"
-            :collapsed-show-title="showMenuTitleWhenSidebarCollapsed"
+            :collapsed-show-title="sidebarCollapsedShowMenuTitle"
             @update:value="pushTo"
           />
         </n-scrollbar>
