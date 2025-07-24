@@ -1,19 +1,16 @@
 import { createProdMockServer } from 'vite-plugin-mock/client'
 import { createApp } from 'vue'
-import { setupPinia } from '@/store'
 import mockList from '../mock/index'
 import App from './App.vue'
-import { setupRouter } from './router'
-import 'virtual:uno.css'
-import './assets/reset.css'
+import { prepareCreateApp, prepareMount } from './prepare'
 
 async function bootstrap() {
   if (!__DEV__) {
     createProdMockServer(mockList)
   }
+  prepareCreateApp()
   const app = createApp(App)
-  await setupPinia(app)
-  await setupRouter(app)
+  await prepareMount(app)
   app.mount('#app')
 }
 
