@@ -2,10 +2,11 @@
 import { useNotification } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { createProForm } from 'pro-naive-ui'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { HOME_ROUTE_PATH } from '@/router/routes'
 import { useAppStore } from '@/store/use-app-store'
+import { useThemeStore } from '@/store/use-theme-store'
 import { useUserStore } from '@/store/use-user-store'
 import IKun from './ikun.vue'
 
@@ -15,6 +16,11 @@ const loading = ref(false)
 const userStore = useUserStore()
 const notification = useNotification()
 const { title } = storeToRefs(useAppStore())
+const { isDark } = storeToRefs(useThemeStore())
+
+const via = computed(() => {
+  return isDark.value ? '#07070915' : '#D5E6FF'
+})
 
 const form = createProForm({
   initialValues: {
@@ -55,7 +61,9 @@ const form = createProForm({
       <!-- 主背景 -->
       <div
         class="absolute inset-0 blur-2xl"
-        style="background: linear-gradient(154deg,#07070915 30%,#D5E6FF 60%,#07070915 10%)"
+        :style="{
+          background: `linear-gradient(154deg,#07070915 30%,${via} 60%,#07070915 10%)`,
+        }"
       />
       <div class="relative z-10 w-full flex flex-col">
         <div class="flex items-center gap-3 p-8">
