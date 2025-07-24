@@ -5,6 +5,7 @@ import type { ProRouterPlugin } from '../plugin'
 import { Icon } from '@iconify/vue'
 import { mapTree } from 'pro-composables'
 import { computed, h } from 'vue'
+import { normalizeRouteName } from '../utils/normalize-route-name'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -56,8 +57,8 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
         const routeNameToPathMap = computed(() => {
           return router
             .getRoutes()
-            .reduce<Map<PropertyKey, string>>((p, { name, path }) => {
-              p.set(name, path)
+            .reduce<Map<string, string>>((p, { name, path }) => {
+              p.set(normalizeRouteName(name), path)
               return p
             }, new Map())
         })
@@ -73,10 +74,11 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
               title,
               hideInMenu = false,
             } = meta
+            const normalizedName = normalizeRouteName(name)
             const menu: MenuOption = {
               show: !hideInMenu,
-              label: title ?? name,
-              key: routeNameToPathMap.value.get(name),
+              label: title ?? normalizedName,
+              key: routeNameToPathMap.value.get(normalizedName),
             }
             if (icon) {
               menu.icon = () => {
@@ -112,8 +114,8 @@ function builtinResolveIcon(icon: string) {
   })
 }
 
-function sortRoutesByMetaOrder(routes:Omit<RouteRecordRaw, 'component'>[]){
-  return routes.sort((a,b) =>{
+function sortRoutesByMetaOrder(routes: Omit<RouteRecordRaw, 'component'>[]) {
+  return routes.sort((a, b) => {
     return (a.meta.order ?? Number.MAX_SAFE_INTEGER) - (b.meta.order ?? Number.MAX_SAFE_INTEGER)
   })
 }

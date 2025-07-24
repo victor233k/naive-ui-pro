@@ -1,7 +1,7 @@
 import type { NavigationFailure, RouteLocationNormalized } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { useTitle } from '@vueuse/core'
-import { isSymbol } from 'lodash-es'
+import { normalizeRouteName } from '../utils/normalize-route-name'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -19,7 +19,7 @@ export function documentTitlePlugin({ titleTemplate }: DocumentTitlePluginOption
       if (failure) {
         return
       }
-      const title = to.meta.title ?? (isSymbol(to.name) ? to.name.toString() : to.name)
+      const title = to.meta.title ?? normalizeRouteName(to.name)
       useTitle(title, {
         titleTemplate: () => {
           return titleTemplate

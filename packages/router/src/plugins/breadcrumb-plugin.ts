@@ -1,5 +1,6 @@
 import type { ProRouterPlugin } from '../plugin'
 import { computed } from 'vue'
+import { normalizeRouteName } from '../utils/normalize-route-name'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -44,7 +45,7 @@ export function breadcrumbPlugin(): ProRouterPlugin {
               breadcrumbs.push({
                 path,
                 icon,
-                title: title ?? name.toString(),
+                title: title ?? normalizeRouteName(name),
               })
             }
           })

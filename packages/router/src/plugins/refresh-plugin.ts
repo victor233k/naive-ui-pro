@@ -1,8 +1,7 @@
-import type { RouteRecordNameGeneric } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
-import { isSymbol } from 'lodash-es'
 import NProgress from 'nprogress'
 import { ref } from 'vue'
+import { normalizeRouteName } from '../utils/normalize-route-name'
 import 'nprogress/nprogress.css'
 
 interface RouteKeyInfo {
@@ -28,16 +27,6 @@ declare module 'vue-router' {
      */
     refresh: (routeName?: string) => Promise<void>
   }
-}
-
-function normalizeRouteName(name: RouteRecordNameGeneric): string {
-  if (!name) {
-    return ''
-  }
-  if (isSymbol(name)) {
-    return new RegExp(String(name)).toString()
-  }
-  return String(name)
 }
 
 export function refreshPlugin(): ProRouterPlugin {

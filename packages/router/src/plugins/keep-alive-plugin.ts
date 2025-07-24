@@ -1,8 +1,9 @@
 import type { Ref } from 'vue'
-import type { Router, RouteRecordNameGeneric } from 'vue-router'
+import type { Router } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
-import { isBoolean, isSymbol } from 'lodash-es'
+import { isBoolean } from 'lodash-es'
 import { ref } from 'vue'
+import { normalizeRouteName } from '../utils/normalize-route-name'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -30,16 +31,6 @@ interface KeepAlivePluginOptions {
    * @default false
    */
   defaultKeepAlive?: boolean
-}
-
-function normalizeRouteName(name: RouteRecordNameGeneric): string {
-  if (!name) {
-    return ''
-  }
-  if (isSymbol(name)) {
-    return new RegExp(String(name)).toString()
-  }
-  return String(name)
 }
 
 function add(router: Router, name: string) {

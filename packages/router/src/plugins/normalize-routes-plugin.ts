@@ -1,6 +1,6 @@
 import type { RouteLocationNormalizedGeneric } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
-import { isString, isSymbol } from 'lodash-es'
+import { normalizeRouteName } from '../utils/normalize-route-name'
 
 export function normalizeRoutesPlugin(): ProRouterPlugin {
   return ({ router }) => {
@@ -19,11 +19,11 @@ function tryUpdateComponentName(to: RouteLocationNormalizedGeneric) {
   const currentRouteComponentName = currentRoute.components.default.name
   if (__DEV__) {
     if (
-      isString(currentRouteName)
+      currentRouteName
       && currentRouteComponentName
       && currentRouteName !== currentRouteComponentName
     ) {
-      console.warn(`[@pro/router] Route name "${currentRouteName}" is not equal to component name "${currentRouteComponentName}"`)
+      console.warn(`[@pro/router] Route name "${normalizeRouteName(currentRouteName)}" is not equal to component name "${currentRouteComponentName}"`)
       return
     }
     if (
@@ -41,8 +41,6 @@ function tryUpdateComponentName(to: RouteLocationNormalizedGeneric) {
   ) {
     // eslint-disable-next-line ts/ban-ts-comment
     // @ts-expect-error
-    currentRoute.components.default.__name = isSymbol(currentRouteName)
-      ? currentRouteName.toString()
-      : currentRouteName
+    currentRoute.components.default.__name = normalizeRouteName(currentRouteName)
   }
 }
