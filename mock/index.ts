@@ -1,11 +1,10 @@
-import type { MockMethod } from 'vite-plugin-mock'
-import { faker } from '@faker-js/faker'
+import { defineFakeRoute } from 'vite-plugin-fake-server/client'
 
 const users = [
   {
     username: 'super',
     password: '123456',
-    token: faker.string.uuid(),
+    token: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdXBlciIsImV4cCI6MTczMjI0MzYyNn0.super',
     roles: ['super'],
     name: 'Super',
     codes: ['1001', '1002', '1003', '1004'],
@@ -13,7 +12,7 @@ const users = [
   {
     username: 'admin',
     password: '123456',
-    token: faker.string.uuid(),
+    token: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczMjI0MzYyNn0.admin',
     roles: ['admin'],
     name: 'Admin',
     codes: ['1003'],
@@ -21,7 +20,7 @@ const users = [
   {
     username: 'user',
     password: '123456',
-    token: faker.string.uuid(),
+    token: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiZXhwIjoxNzMyMjQzNjI2fQ.user',
     roles: ['user'],
     name: 'User',
     codes: [],
@@ -48,7 +47,7 @@ function isInvalidToken(token: string) {
   return !token || !users.some(user => user.token === token)
 }
 
-export default [
+export default defineFakeRoute([
   {
     url: '/user/login',
     method: 'post',
@@ -79,4 +78,4 @@ export default [
       })
     },
   },
-] as MockMethod[]
+])

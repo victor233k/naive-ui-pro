@@ -4,7 +4,6 @@
     "lib": ["ES2023"],
     "moduleDetection": "force",
     "module": "ESNext",
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -15,6 +14,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noEmit": true,
+    "esModuleInterop": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "noUncheckedSideEffectImports": true

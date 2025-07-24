@@ -38,8 +38,8 @@ export const useUserStore = defineStore('user', () => {
       }
       return user.value
     }
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    catch (_) {
+    catch (error) {
+      console.error(error)
       $reset()
       return user.value
     }
