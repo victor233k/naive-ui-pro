@@ -7,6 +7,9 @@ import './assets/reset.css'
 
 export async function prepareCreateApp() {
   setupAppLoading()
+  if (!__DEV__) {
+    await setupProdMockServer()
+  }
 }
 
 export async function prepareMount(app: App) {
@@ -50,4 +53,15 @@ function setupAppLoading() {
   if (app) {
     app.innerHTML = loadingHtml
   }
+}
+
+function setupProdMockServer() {
+  return new Promise<void>((resolve) => {
+    import('vite-plugin-mock/client').then(({ createProdMockServer }) => {
+      import('@root/mock/index').then(({ default: mockList }) => {
+        createProdMockServer(mockList)
+        resolve()
+      })
+    })
+  })
 }
