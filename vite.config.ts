@@ -15,9 +15,10 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       include: [
         'vue',
-        'vue-router',
         'pinia',
         'naive-ui',
+        'lodash-es',
+        'vue-router',
         'pro-naive-ui',
         '@vueuse/core',
       ],
@@ -32,7 +33,6 @@ export default defineConfig(({ mode }) => {
         inject: {
           data: {
             title: preferenceConfig.app.title,
-            primaryColor: preferenceConfig.theme.primaryColor,
           },
         },
       }),
