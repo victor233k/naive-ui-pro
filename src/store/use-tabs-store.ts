@@ -1,4 +1,3 @@
-import { isNumber } from 'lodash-es'
 import { defineStore } from 'pinia'
 import { move } from 'pro-naive-ui'
 import { ref } from 'vue'

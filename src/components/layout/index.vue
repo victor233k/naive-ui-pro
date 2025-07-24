@@ -112,7 +112,10 @@ async function pushTo(path: string) {
       <nav-left />
     </template>
     <template #nav-center>
-      <div v-show="!mobile" class="flex items-center h-full">
+      <div
+        v-show="!mobile"
+        class="flex items-center h-full"
+      >
         <pro-menu
           v-bind="layout.horizontalMenuProps"
           :indent="18"
@@ -137,7 +140,10 @@ async function pushTo(path: string) {
             @update:value="pushTo"
           />
         </n-scrollbar>
-        <div v-if="showSidebarCollapseButton" class="flex p-8px">
+        <div
+          v-if="showSidebarCollapseButton"
+          class="flex p-8px"
+        >
           <collapse-sidebar-button />
         </div>
       </div>
@@ -153,7 +159,10 @@ async function pushTo(path: string) {
             @update:value="pushTo"
           />
         </n-scrollbar>
-        <div v-if="showSidebarExtraCollapseButton" class="flex p-8px">
+        <div
+          v-if="showSidebarExtraCollapseButton"
+          class="flex p-8px"
+        >
           <collapse-sidebar-button />
         </div>
       </div>

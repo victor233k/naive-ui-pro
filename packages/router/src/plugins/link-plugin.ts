@@ -6,6 +6,10 @@ declare module 'vue-router' {
      * 外链跳转地址
      */
     link?: string
+    /**
+     * 是否在新窗口打开系统内部菜单
+     */
+    openInNewWindow?: boolean
   }
 }
 
@@ -26,9 +30,13 @@ export function linkPlugin({
 }: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
     router.beforeEach((to) => {
-      const link = to.meta?.link
+      const { link, openInNewWindow = false } = to.meta || {}
       if (isExternalUrl(link)) {
         open(link)
+        return false
+      }
+      else if (openInNewWindow && !to.query.opened) {
+        open(buildUrl(to.fullPath, true))
         return false
       }
     })
@@ -45,4 +53,15 @@ function builtinIsExternalUrl(url?: string) {
   }
   const httpRegex = /^https?:\/\/.*$/
   return httpRegex.test(url)
+}
+
+function buildUrl(path: string, markOpened = false) {
+  const { hash, origin } = window.location || {}
+  let fullPath = path.startsWith('/') ? path : `/${path}`
+  if (markOpened) {
+    // 添加opened标记，避免死循环
+    fullPath += fullPath.includes('?') ? '&opened=true' : '?opened=true'
+  }
+  const url = `${origin}${hash ? '/#' : ''}${fullPath}`
+  return url
 }

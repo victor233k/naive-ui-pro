@@ -31,19 +31,34 @@ function resetConfig() {
       closable
       :native-scrollbar="false"
     >
-      <n-tabs type="segment" animated>
-        <n-tab-pane name="theme" tab="主题">
+      <n-tabs
+        type="segment"
+        animated
+      >
+        <n-tab-pane
+          name="theme"
+          tab="主题"
+        >
           <theme-preference />
         </n-tab-pane>
-        <n-tab-pane name="layout" tab="布局">
+        <n-tab-pane
+          name="layout"
+          tab="布局"
+        >
           <layout-preference />
         </n-tab-pane>
-        <n-tab-pane name="other" tab="其他">
+        <n-tab-pane
+          name="other"
+          tab="其他"
+        >
           <app-preference />
         </n-tab-pane>
       </n-tabs>
       <template #footer>
-        <n-flex justify="space-between" class="w-full">
+        <n-flex
+          justify="space-between"
+          class="w-full"
+        >
           <n-button @click="resetConfig">
             重置配置
           </n-button>
