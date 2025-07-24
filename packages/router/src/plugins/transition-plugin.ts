@@ -3,6 +3,7 @@ import type { Router } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { has } from 'lodash-es'
 import { computed, toValue } from 'vue'
+import { warn } from '../utils/warn'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -104,7 +105,7 @@ function resolveTransitionName(router: Router, transitionName: MaybeRefOrGetter<
       ? transitionName
       : 'fade-slide'
     if (__DEV__) {
-      console.warn(`[@pro/router] transition name ${mergedTransitioName} is not found, fallback to default transition name ${finalTransitioName}`)
+      warn(`transition name ${mergedTransitioName} is not found, fallback to default transition name ${finalTransitioName}`)
     }
     return finalTransitioName
   }

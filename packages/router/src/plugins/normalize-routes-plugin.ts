@@ -1,6 +1,7 @@
 import type { RouteLocationNormalizedGeneric } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { normalizeRouteName } from '../utils/normalize-route-name'
+import { warn } from '../utils/warn'
 
 export function normalizeRoutesPlugin(): ProRouterPlugin {
   return ({ router }) => {
@@ -23,14 +24,14 @@ function tryUpdateComponentName(to: RouteLocationNormalizedGeneric) {
       && currentRouteComponentName
       && currentRouteName !== currentRouteComponentName
     ) {
-      console.warn(`[@pro/router] Route name "${normalizeRouteName(currentRouteName)}" is not equal to component name "${currentRouteComponentName}"`)
+      warn(`Route name "${normalizeRouteName(currentRouteName)}" is not equal to component name "${currentRouteComponentName}"`)
       return
     }
     if (
       !currentRouteName
       && currentRouteComponentName
     ) {
-      console.log(`[@pro/router] Route name is not set, maybe you should set it to "${currentRouteComponentName}"`)
+      warn(`Route name is not set, maybe you should set it to "${currentRouteComponentName}"`)
       return
     }
   }
