@@ -4,21 +4,18 @@ import { preferenceConfig } from '@root/preference'
 import { usePreferredDark } from '@vueuse/core'
 import { darkTheme } from 'naive-ui'
 import { defineStore } from 'pinia'
-import { computed, nextTick, ref, watchEffect } from 'vue'
+import { computed, nextTick, reactive, toRefs, watchEffect } from 'vue'
 
 export const useThemeStore = defineStore('theme', () => {
   const systemThemeIsDark = usePreferredDark()
-  const grayscale = ref(preferenceConfig.theme.grayscale)
-  const primaryColor = ref(preferenceConfig.theme.primaryColor)
-  const colorWeakness = ref(preferenceConfig.theme.colorWeakness)
-  const themeMode = ref<'light' | 'dark' | 'auto'>(preferenceConfig.theme.mode as any)
+  const theme = reactive({ ...preferenceConfig.theme })
 
   const isDark = computed(() => {
-    return themeMode.value === 'dark' || (themeMode.value === 'auto' && systemThemeIsDark.value)
+    return theme.mode === 'dark' || (theme.mode === 'auto' && systemThemeIsDark.value)
   })
 
   const themeProps = computed<ProConfigProviderProps>(() => {
-    const colors = generate(primaryColor.value, {
+    const colors = generate(theme.primaryColor, {
       theme: isDark.value ? 'dark' : 'default',
     })
     return {
@@ -35,7 +32,7 @@ export const useThemeStore = defineStore('theme', () => {
   })
 
   function toggleThemeMode() {
-    themeMode.value = isDark.value ? 'light' : 'dark'
+    theme.mode = isDark.value ? 'light' : 'dark'
   }
 
   function toggleThemeModeWithAnimation(event: MouseEvent) {
@@ -77,15 +74,12 @@ export const useThemeStore = defineStore('theme', () => {
   }
 
   function $reset() {
-    grayscale.value = preferenceConfig.theme.grayscale
-    themeMode.value = preferenceConfig.theme.mode as any
-    primaryColor.value = preferenceConfig.theme.primaryColor
-    colorWeakness.value = preferenceConfig.theme.colorWeakness
+    Object.assign(theme, { ...preferenceConfig.theme })
   }
 
   watchEffect(() => {
-    const grayscaleStyle = grayscale.value ? 'grayscale(100%)' : 'grayscale(0%)'
-    const colorWeaknessStyle = colorWeakness.value ? 'invert(80%)' : 'invert(0%)'
+    const grayscaleStyle = theme.grayscale ? 'grayscale(100%)' : 'grayscale(0%)'
+    const colorWeaknessStyle = theme.colorWeakness ? 'invert(80%)' : 'invert(0%)'
     document.documentElement.style.filter = `${grayscaleStyle} ${colorWeaknessStyle}`
   })
 
@@ -96,11 +90,8 @@ export const useThemeStore = defineStore('theme', () => {
   return {
     $reset,
     isDark,
-    grayscale,
-    themeMode,
     themeProps,
-    primaryColor,
-    colorWeakness,
+    ...toRefs(theme),
     toggleThemeMode,
     toggleThemeModeWithAnimation,
   }

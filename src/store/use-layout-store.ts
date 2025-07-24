@@ -15,7 +15,7 @@ export const useLayoutStore = defineStore('layout', () => {
   const layout = reactive({ ...preferenceConfig.layout })
 
   function $reset() {
-    Object.assign(layout, preferenceConfig.layout)
+    Object.assign(layout, { ...preferenceConfig.layout })
   }
 
   return {

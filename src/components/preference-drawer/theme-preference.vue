@@ -4,10 +4,10 @@ import { storeToRefs } from 'pinia'
 import { useThemeStore } from '@/store/use-theme-store'
 
 const {
-  themeMode,
   grayscale,
   primaryColor,
   colorWeakness,
+  mode: themeMode,
 } = storeToRefs(useThemeStore())
 </script>
 

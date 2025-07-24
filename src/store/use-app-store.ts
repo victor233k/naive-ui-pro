@@ -7,7 +7,7 @@ export const useAppStore = defineStore('app', () => {
   const app = reactive({ ...preferenceConfig.app })
 
   function $reset() {
-    Object.assign(app, preferenceConfig.app)
+    Object.assign(app, { ...preferenceConfig.app })
   }
 
   return {
