@@ -95,7 +95,7 @@ export interface RbacAccessPluginOptions {
 }
 
 let cachedRouteNames: RouteName[] | null = null
-let finalOptions: Required<RbacAccessPluginServiceReturned> = null
+let resolvedOptions: Required<RbacAccessPluginServiceReturned> = null
 async function resolveOptions(
   options: RbacAccessPluginOptions,
   { router, onCleanup }: {
@@ -103,9 +103,9 @@ async function resolveOptions(
     onCleanup: EventHookOn
   },
 ): Promise<Required<RbacAccessPluginServiceReturned>> {
-  if (!finalOptions) {
+  if (!resolvedOptions) {
     onCleanup(() => {
-      finalOptions = null
+      resolvedOptions = null
       cachedRouteNames = null
     })
   }
@@ -116,13 +116,14 @@ async function resolveOptions(
     ignoreAccessRouteNames,
     ...rest
   } = await options.service()
-  return {
+  resolvedOptions = {
     ...rest,
     homePath: homePath ?? '/home',
     loginPath: loginPath ?? '/login',
     parentNameForAddRoute: parentNameForAddRoute ?? null,
     ignoreAccessRouteNames: ignoreAccessRouteNames ?? (cachedRouteNames ||= getRoutesNames((router.options.routes ?? []) as RouteRecordRaw[])),
   }
+  return resolvedOptions
 }
 
 let registeredRoutes = false
@@ -224,7 +225,7 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
     })
 
     router.afterEach((to) => {
-      if (finalOptions && to.path === finalOptions.loginPath) {
+      if (resolvedOptions && to.path === resolvedOptions.loginPath) {
         cleanup()
       }
     })
