@@ -63,7 +63,7 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
         })
 
         const finalMenus = computed(() => {
-          return mapTree(routes, ({
+          return mapTree(sortRoutesByMetaOrder([...routes]), ({
             name,
             meta,
             children = [],
@@ -86,7 +86,7 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
               }
             }
             if (children.length > 0) {
-              menu.children = children as any
+              menu.children = sortRoutesByMetaOrder(children) as any
             }
             return menu
           }, 'children')
@@ -109,5 +109,11 @@ function builtinResolveIcon(icon: string) {
     icon,
     width: 18,
     height: 18,
+  })
+}
+
+function sortRoutesByMetaOrder(routes:Omit<RouteRecordRaw, 'component'>[]){
+  return routes.sort((a,b) =>{
+    return (a.meta.order ?? Number.MAX_SAFE_INTEGER) - (b.meta.order ?? Number.MAX_SAFE_INTEGER)
   })
 }
