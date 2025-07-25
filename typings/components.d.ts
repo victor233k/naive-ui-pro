@@ -35,6 +35,7 @@ declare module 'vue' {
     ProForm: typeof import('pro-naive-ui')['ProForm']
     ProInput: typeof import('pro-naive-ui')['ProInput']
     ProLayout: typeof import('pro-naive-ui')['ProLayout']
+    ProMenu: typeof import('pro-naive-ui')['ProMenu']
     ProPassword: typeof import('pro-naive-ui')['ProPassword']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

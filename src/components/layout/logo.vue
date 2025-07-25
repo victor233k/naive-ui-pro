@@ -11,6 +11,7 @@ const {
   mode,
   mobile,
   collapsed,
+  showSidebarMobile
 } = storeToRefs(useLayoutStore())
 
 const enablePaddingLeft = computed(() => {
@@ -26,6 +27,9 @@ const enablePaddingLeft = computed(() => {
 
 const showAppTitle = computed(() => {
   const layoutMode = mode.value as ProLayoutMode
+  if (showSidebarMobile.value) {
+    return true
+  }
   if (mobile.value) {
     return false
   }
