@@ -22,6 +22,7 @@ export const useThemeStore = defineStore('theme', () => {
       theme: isDark.value ? darkTheme : undefined,
       themeOverrides: {
         common: {
+          borderRadius: '6px',
           primaryColor: colors[5],
           primaryColorHover: colors[6],
           primaryColorSuppl: colors[4],
