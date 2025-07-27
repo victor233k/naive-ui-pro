@@ -1,7 +1,7 @@
 import { preferenceConfig } from '@root/preference'
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { computed, reactive, toRefs } from 'vue'
+import { computed, reactive, ref, toRefs } from 'vue'
 
 function useMobile() {
   const breakpoints = useBreakpoints(breakpointsTailwind)
@@ -12,10 +12,12 @@ function useMobile() {
 
 export const useLayoutStore = defineStore('layout', () => {
   const mobile = useMobile()
+  const showSidebarMobile = ref(false)
   const layout = reactive({ ...preferenceConfig.layout })
 
   return {
     mobile,
+    showSidebarMobile,
     ...toRefs(layout),
   }
 }, {
