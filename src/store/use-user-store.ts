@@ -19,6 +19,7 @@ export interface UserLoginPayload {
 
 export const useUserStore = defineStore('user', () => {
   const router = useRouter()
+  const loading = ref(false)
 
   const user = ref<UserInfo>({
     name: '',
@@ -26,8 +27,6 @@ export const useUserStore = defineStore('user', () => {
     codes: [],
     token: localStorage.getItem('token') ?? '',
   })
-
-  const loading = ref(false)
 
   async function fetchUpdateUserInfo() {
     try {
@@ -40,7 +39,7 @@ export const useUserStore = defineStore('user', () => {
     }
     catch (error) {
       console.error(error)
-      $reset()
+      logout()
       return user.value
     }
   }
@@ -58,7 +57,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  function $reset() {
+  function logout() {
     user.value = {
       name: '',
       token: '',
@@ -66,17 +65,12 @@ export const useUserStore = defineStore('user', () => {
       codes: [],
     }
     localStorage.removeItem('token')
-  }
-
-  function logout() {
-    $reset()
     router.push(LOGIN_ROUTE_PATH)
   }
 
   return {
     login,
     logout,
-    $reset,
     fetchUpdateUserInfo,
     loginLoading: loading,
     user: computed(() => user.value),
