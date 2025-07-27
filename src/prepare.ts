@@ -15,9 +15,12 @@ export async function prepareMount(app: App) {
 }
 
 function setupAppLoading() {
-  // TODO: 持久化这么取值有问题
-  const { title } = preferenceConfig.app
-  const { mode, primaryColor } = preferenceConfig.theme
+  const cachePreference = localStorage.getItem('preference')
+  const finalPreference: typeof preferenceConfig = cachePreference
+    ? JSON.parse(cachePreference)
+    : preferenceConfig
+  const { title } = finalPreference.app
+  const { mode, primaryColor } = finalPreference.theme
   if (mode === 'dark') {
     document.documentElement.classList.add('dark')
   }
