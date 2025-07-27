@@ -32,7 +32,7 @@ const storeIdToKeysInitialValueRecord = new Map<string, {
   initialValueMap: Map<string, any>
 }>()
 
-export function preferencePlugin({ pinia, options, store }: PiniaPluginContext) {
+export function preferencePlugin({ pinia, options, store, app }: PiniaPluginContext) {
   if (options.preference) {
     const { pick } = options.preference
     const [keys, prefixPath] = pick
@@ -70,13 +70,19 @@ export function preferencePlugin({ pinia, options, store }: PiniaPluginContext) 
     const preferences = getAllPreference(pinia)
     copy(JSON.stringify(preferences, null, 2))
   }
-
   if (!registedBeforeunloadEvent) {
     registedBeforeunloadEvent = true
     useEventListener('beforeunload', () => {
       localStorage.setItem('preference', JSON.stringify(getAllPreference(pinia)))
     })
   }
+  app.onUnmount(() => {
+    registedBeforeunloadEvent = false
+    localStorage.removeItem('preference')
+    storeIdToKeysInitialValueRecord.clear()
+    delete (store as any).$copyAllPreference
+    delete (store as any).$resetAllPreference
+  })
 }
 
 function getAllPreference(pinia: Pinia) {
