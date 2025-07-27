@@ -1,20 +1,11 @@
 <script setup lang='tsx'>
 import { useAppStore } from '@/store/use-app-store'
-import { useLayoutStore } from '@/store/use-layout-store'
-import { useThemeStore } from '@/store/use-theme-store'
 import AppPreference from './app-preference.vue'
 import LayoutPreference from './layout-preference.vue'
 import ThemePreference from './theme-preference.vue'
 
 const itemHeight = 32
 const appStore = useAppStore()
-const themeStore = useThemeStore()
-const layoutStore = useLayoutStore()
-
-function resetConfig() {
-  themeStore.$reset()
-  layoutStore.$reset()
-}
 </script>
 
 <template>
@@ -59,10 +50,13 @@ function resetConfig() {
           justify="space-between"
           class="w-full"
         >
-          <n-button @click="resetConfig">
+          <n-button @click="appStore.$resetAllPreference">
             重置配置
           </n-button>
-          <n-button type="primary">
+          <n-button
+            type="primary"
+            @click="appStore.$copyAllPreference"
+          >
             复制配置
           </n-button>
         </n-flex>

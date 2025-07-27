@@ -14,13 +14,12 @@ export const useLayoutStore = defineStore('layout', () => {
   const mobile = useMobile()
   const layout = reactive({ ...preferenceConfig.layout })
 
-  function $reset() {
-    Object.assign(layout, { ...preferenceConfig.layout })
-  }
-
   return {
-    $reset,
     mobile,
     ...toRefs(layout),
   }
+}, {
+  preference: {
+    pick: [Object.keys(preferenceConfig.layout), 'layout'],
+  },
 })

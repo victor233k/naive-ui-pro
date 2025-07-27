@@ -74,10 +74,6 @@ export const useThemeStore = defineStore('theme', () => {
     })
   }
 
-  function $reset() {
-    Object.assign(theme, { ...preferenceConfig.theme })
-  }
-
   watchEffect(() => {
     const grayscaleStyle = theme.grayscale ? 'grayscale(100%)' : 'grayscale(0%)'
     const colorWeaknessStyle = theme.colorWeakness ? 'invert(80%)' : 'invert(0%)'
@@ -89,11 +85,14 @@ export const useThemeStore = defineStore('theme', () => {
   })
 
   return {
-    $reset,
     isDark,
     themeProps,
     ...toRefs(theme),
     toggleThemeMode,
     toggleThemeModeWithAnimation,
   }
+}, {
+  preference: {
+    pick: [Object.keys(preferenceConfig.theme), 'theme'],
+  },
 })
