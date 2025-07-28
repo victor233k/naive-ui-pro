@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useLayoutStore } from '@/store/use-layout-store'
-import CollapseSidebarButton from '../layout/collapse-sidebar-button.vue'
-import Logo from '../layout/logo.vue'
+import CollapseSidebarButton from './collapse-sidebar-button.vue'
+import Logo from './logo.vue'
 
 interface MobileSidebarDrawerProps {
   /**
