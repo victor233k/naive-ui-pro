@@ -7,7 +7,7 @@ declare module 'pinia' {
   export interface DefineStoreOptionsBase<S, Store> {
     preference?: {
       /**
-       *
+       * 从 store 中选择需要处理的 key，第一个参数是 store 的 key 数组，第二个参数是 store 的 key 前缀
        */
       pick: [string[], string]
     }
@@ -54,6 +54,7 @@ export function preferencePlugin({ pinia, options, store, app }: PiniaPluginCont
       store[key] = finalValue
     })
   }
+
   store.$resetAllPreference = () => {
     const storeMap = (pinia as any)._s as Map<string, Store>
     storeMap.forEach((s) => {
@@ -66,16 +67,19 @@ export function preferencePlugin({ pinia, options, store, app }: PiniaPluginCont
       })
     })
   }
+
   store.$copyAllPreference = () => {
     const preferences = getAllPreference(pinia)
     copy(JSON.stringify(preferences, null, 2))
   }
+
   if (!registedBeforeunloadEvent) {
     registedBeforeunloadEvent = true
     useEventListener('beforeunload', () => {
       localStorage.setItem('preference', JSON.stringify(getAllPreference(pinia)))
     })
   }
+
   app.onUnmount(() => {
     registedBeforeunloadEvent = false
     localStorage.removeItem('preference')
