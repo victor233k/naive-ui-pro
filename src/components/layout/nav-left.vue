@@ -4,14 +4,13 @@ import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useLayoutStore } from '@/store/use-layout-store'
-import mobileMenu from '../menu/mobile-menu.vue'
 import Breadcrumbs from './breadcrumbs.vue'
 
 const {
   mode,
   mobile,
   showSidebar,
-  showSidebarMobile,
+  showMobileMenuDrawer,
 } = storeToRefs(useLayoutStore())
 
 const showSidebarHiddenButton = computed(() => {
@@ -34,7 +33,7 @@ const showBreadcrumbs = computed(() => {
 
 function toggleSidebar() {
   if (mobile.value) {
-    showSidebarMobile.value = !showSidebarMobile.value
+    showMobileMenuDrawer.value = !showMobileMenuDrawer.value
     return
   }
   showSidebar.value = !showSidebar.value
@@ -54,6 +53,5 @@ function toggleSidebar() {
       </template>
     </pro-button>
     <breadcrumbs v-if="showBreadcrumbs" />
-    <mobile-menu v-model="showSidebarMobile" />
   </div>
 </template>

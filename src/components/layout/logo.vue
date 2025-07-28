@@ -6,16 +6,27 @@ import logo from '@/assets/logo.svg'
 import { useAppStore } from '@/store/use-app-store'
 import { useLayoutStore } from '@/store/use-layout-store'
 
+interface LogoProps {
+  /**
+   * 是否在移动端菜单栏使用
+   */
+  isMobileSidebarDrawerBeUsed?: boolean
+}
+
+const { isMobileSidebarDrawerBeUsed = false } = defineProps<LogoProps>()
+
 const { title } = storeToRefs(useAppStore())
 const {
   mode,
   mobile,
   collapsed,
-  showSidebarMobile
 } = storeToRefs(useLayoutStore())
 
 const enablePaddingLeft = computed(() => {
   const layoutMode = mode.value as ProLayoutMode
+  if (isMobileSidebarDrawerBeUsed) {
+    return !collapsed.value
+  }
   if (mobile.value) {
     return true
   }
@@ -27,8 +38,8 @@ const enablePaddingLeft = computed(() => {
 
 const showAppTitle = computed(() => {
   const layoutMode = mode.value as ProLayoutMode
-  if (showSidebarMobile.value) {
-    return true
+  if (isMobileSidebarDrawerBeUsed) {
+    return !collapsed.value
   }
   if (mobile.value) {
     return false
