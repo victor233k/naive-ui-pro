@@ -1,5 +1,6 @@
 import type { App } from 'vue'
 import { preferenceConfig } from '@root/preference'
+import { merge } from 'lodash-es'
 import { setupRouter } from './router'
 import { setupPinia } from './store'
 import 'virtual:uno.css'
@@ -17,7 +18,7 @@ export async function prepareMount(app: App) {
 function setupAppLoading() {
   const cachePreference = localStorage.getItem('preference')
   const finalPreference: typeof preferenceConfig = cachePreference
-    ? JSON.parse(cachePreference)
+    ? merge(preferenceConfig, JSON.parse(cachePreference))
     : preferenceConfig
   const { title } = finalPreference.app
   const { mode, primaryColor } = finalPreference.theme
