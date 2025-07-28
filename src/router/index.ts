@@ -1,6 +1,6 @@
 import type { App } from 'vue'
 import {
-  autoRedirectToFirstChild,
+  autoRedirectPlugin,
   breadcrumbPlugin,
   createRouter,
   documentTitlePlugin,
@@ -17,11 +17,14 @@ import {
   createWebHistory,
 } from 'vue-router'
 
-import { useAppStore } from '@/store/use-app-store'
+import {
+  useAppStore,
+} from '@/store/use-app-store'
 
 import {
   useUserStore,
 } from '@/store/use-user-store'
+
 import {
   accessRoutes,
   HOME_ROUTE_PATH,
@@ -71,9 +74,24 @@ export async function setupRouter(app: App) {
         },
       }),
       /**
-       * 自动重定向到第一个子路由插件
+       * 自动重定向到目标路由插件
        */
-      autoRedirectToFirstChild(),
+      autoRedirectPlugin({
+        redirectTo: (to) => {
+          const { children } = to.matched[to.matched.length - 1]
+          if (children && children.length > 0) {
+            const availableRoutes = children.filter(item => !item.meta?.hideInMenu)
+            if (availableRoutes.length > 0) {
+              const firstAvailableRoute = availableRoutes[0]
+              // 重定向到第一个可用（不隐藏的）的子路由
+              return {
+                replace: true,
+                ...router.resolve(firstAvailableRoute),
+              }
+            }
+          }
+        },
+      }),
       /**
        * 权限插件
        */

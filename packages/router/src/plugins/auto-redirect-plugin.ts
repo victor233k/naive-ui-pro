@@ -1,0 +1,36 @@
+import type { NavigationGuardReturn, RouteLocationNormalizedGeneric } from 'vue-router'
+import type { ProRouterPlugin } from '../plugin'
+
+interface AutoRedirectPluginOptions {
+  /**
+   * 当可以被重定向时，重定向到指定路由，默认重定向到第一个子路由
+   * @param to 当前路由
+   * @returns 重定向后的路由
+   */
+  redirectTo?: (to: RouteLocationNormalizedGeneric) => NavigationGuardReturn
+}
+
+export function autoRedirectPlugin({
+  redirectTo,
+}: AutoRedirectPluginOptions = {}): ProRouterPlugin {
+  return ({ router }) => {
+    router.beforeResolve((to) => {
+      const currentRoute = to.matched[to.matched.length - 1]
+      if (
+        !currentRoute.redirect
+        && currentRoute.children
+        && currentRoute.children.length > 0
+      ) {
+        if (redirectTo) {
+          return redirectTo(to)
+        }
+        const firstChildRoute = currentRoute.children[0]
+        const resolved = router.resolve(firstChildRoute)
+        return {
+          ...resolved,
+          replace: true,
+        }
+      }
+    })
+  }
+}
