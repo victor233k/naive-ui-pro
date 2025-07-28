@@ -35,16 +35,22 @@ export function linkPlugin({
         open(link)
         return false
       }
-      else if (openInNewWindow && !to.query.opened) {
-        open(buildUrl(to.fullPath, true))
-        return false
+      if (openInNewWindow) {
+        const pathKey = `__PRO_ROUTER_LINK_PLUGIN_OPEN_IN_NEW_WINDOW_${to.fullPath.toUpperCase()}__`
+        if (window.localStorage.getItem(pathKey)) {
+          window.localStorage.removeItem(pathKey)
+          return
+        }
+        window.localStorage.setItem(pathKey, 'true')
+        const finalUrl = router.options.history.createHref(to.fullPath)
+        open(finalUrl)
       }
     })
   }
 }
 
 function builtinOpen(url: string) {
-  window && window.open(url, '_blank')
+  window.open(url, '_blank')
 }
 
 function builtinIsExternalUrl(url?: string) {
@@ -53,15 +59,4 @@ function builtinIsExternalUrl(url?: string) {
   }
   const httpRegex = /^https?:\/\/.*$/
   return httpRegex.test(url)
-}
-
-function buildUrl(path: string, markOpened = false) {
-  const { hash, origin } = window.location || {}
-  let fullPath = path.startsWith('/') ? path : `/${path}`
-  if (markOpened) {
-    // 添加opened标记，避免死循环
-    fullPath += fullPath.includes('?') ? '&opened=true' : '?opened=true'
-  }
-  const url = `${origin}${hash ? '/#' : ''}${fullPath}`
-  return url
 }

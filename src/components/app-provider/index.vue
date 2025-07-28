@@ -1,22 +1,17 @@
 <script setup lang='tsx'>
 import type { ProConfigProviderProps } from 'pro-naive-ui'
-import { merge } from 'lodash-es'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useThemeStore } from '@/store/use-theme-store'
 
-const { themeProps } = storeToRefs(useThemeStore())
+const {
+  themeProps,
+} = storeToRefs(useThemeStore())
 
-// TODO: 移动到 themeStore 中
 const configProviderProps = computed<ProConfigProviderProps>(() => {
   return {
-    ...merge(themeProps.value, {
-      themeOverrides: {
-        common: {
-          borderRadius: '6px',
-        },
-      },
-    }),
+    abstract: true,
+    ...themeProps.value,
     propOverrides: {
       ProButton: {
         focusable: false,
@@ -27,10 +22,7 @@ const configProviderProps = computed<ProConfigProviderProps>(() => {
 </script>
 
 <template>
-  <pro-config-provider
-    v-bind="configProviderProps"
-    abstract
-  >
+  <pro-config-provider v-bind="configProviderProps">
     <n-loading-bar-provider>
       <n-message-provider>
         <n-notification-provider>

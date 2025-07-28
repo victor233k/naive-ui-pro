@@ -6,13 +6,12 @@ export const useAppStore = defineStore('app', () => {
   const showPreferenceDrawer = ref(false)
   const app = reactive({ ...preferenceConfig.app })
 
-  function $reset() {
-    Object.assign(app, { ...preferenceConfig.app })
-  }
-
   return {
-    $reset,
     ...toRefs(app),
     showPreferenceDrawer,
   }
+}, {
+  preference: {
+    pick: [Object.keys(preferenceConfig.app), 'app'],
+  },
 })

@@ -1,5 +1,6 @@
 import type { App } from 'vue'
 import { preferenceConfig } from '@root/preference'
+import { merge } from 'lodash-es'
 import { setupRouter } from './router'
 import { setupPinia } from './store'
 import 'virtual:uno.css'
@@ -15,9 +16,12 @@ export async function prepareMount(app: App) {
 }
 
 function setupAppLoading() {
-  // TODO: 持久化这么取值有问题
-  const { title } = preferenceConfig.app
-  const { mode, primaryColor } = preferenceConfig.theme
+  const cachedPreference = localStorage.getItem('preference')
+  const finalPreference: typeof preferenceConfig = cachedPreference
+    ? merge(preferenceConfig, JSON.parse(cachedPreference))
+    : preferenceConfig
+  const { title } = finalPreference.app
+  const { mode, primaryColor } = finalPreference.theme
   if (mode === 'dark') {
     document.documentElement.classList.add('dark')
   }
