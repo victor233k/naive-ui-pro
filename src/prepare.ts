@@ -16,9 +16,9 @@ export async function prepareMount(app: App) {
 }
 
 function setupAppLoading() {
-  const cachePreference = localStorage.getItem('preference')
-  const finalPreference: typeof preferenceConfig = cachePreference
-    ? merge(preferenceConfig, JSON.parse(cachePreference))
+  const cachedPreference = localStorage.getItem('preference')
+  const finalPreference: typeof preferenceConfig = cachedPreference
+    ? merge(preferenceConfig, JSON.parse(cachedPreference))
     : preferenceConfig
   const { title } = finalPreference.app
   const { mode, primaryColor } = finalPreference.theme
