@@ -24,6 +24,7 @@ function setupAppLoading() {
   const { mode, primaryColor } = finalPreference.theme
   if (mode === 'dark') {
     document.documentElement.classList.add('dark')
+    document.documentElement.style.background = '#121212'
   }
   const loadingHtml = `
     <div class="fixed inset-0 flex flex-col gap-12px justify-center items-center bg-#f7fafc dark:bg-#121212">
