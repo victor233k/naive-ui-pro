@@ -1,68 +1,85 @@
 <script setup lang='tsx'>
+import { Icon } from '@iconify/vue'
 import { useAppStore } from '@/store/use-app-store'
+import { useLayoutStore } from '@/store/use-layout-store'
 import AppPreference from './app-preference.vue'
 import LayoutPreference from './layout-preference.vue'
 import ThemePreference from './theme-preference.vue'
 
 const itemHeight = 32
 const appStore = useAppStore()
+const layoutStore = useLayoutStore()
 </script>
 
 <template>
-  <n-drawer
-    v-model:show="appStore.showPreferenceDrawer"
-    :auto-focus="false"
-    :width="320"
-    :style="{
-      '--preference-item-height': itemHeight,
-    }"
-  >
-    <n-drawer-content
-      title="偏好设置"
-      closable
-      :native-scrollbar="false"
+  <div>
+    <n-drawer
+      v-model:show="appStore.showPreferenceDrawer"
+      :auto-focus="false"
+      :width="320"
+      :style="{
+        '--preference-item-height': itemHeight,
+      }"
     >
-      <n-tabs
-        type="segment"
-        animated
+      <n-drawer-content
+        title="偏好设置"
+        closable
+        :native-scrollbar="false"
       >
-        <n-tab-pane
-          name="theme"
-          tab="主题"
+        <n-tabs
+          type="segment"
+          animated
         >
-          <theme-preference />
-        </n-tab-pane>
-        <n-tab-pane
-          name="layout"
-          tab="布局"
-        >
-          <layout-preference />
-        </n-tab-pane>
-        <n-tab-pane
-          name="other"
-          tab="其他"
-        >
-          <app-preference />
-        </n-tab-pane>
-      </n-tabs>
-      <template #footer>
-        <n-flex
-          justify="space-between"
-          class="w-full"
-        >
-          <n-button @click="appStore.$resetAllPreference">
-            重置配置
-          </n-button>
-          <n-button
-            type="primary"
-            @click="appStore.$copyAllPreference"
+          <n-tab-pane
+            name="theme"
+            tab="主题"
           >
-            复制配置
-          </n-button>
-        </n-flex>
-      </template>
-    </n-drawer-content>
-  </n-drawer>
+            <theme-preference />
+          </n-tab-pane>
+          <n-tab-pane
+            name="layout"
+            tab="布局"
+          >
+            <layout-preference />
+          </n-tab-pane>
+          <n-tab-pane
+            name="other"
+            tab="其他"
+          >
+            <app-preference />
+          </n-tab-pane>
+        </n-tabs>
+        <template #footer>
+          <n-flex
+            justify="space-between"
+            class="w-full"
+          >
+            <n-button @click="appStore.$resetAllPreference">
+              重置配置
+            </n-button>
+            <n-button
+              type="primary"
+              @click="appStore.$copyAllPreference"
+            >
+              复制配置
+            </n-button>
+          </n-flex>
+        </template>
+      </n-drawer-content>
+    </n-drawer>
+
+    <n-float-button
+      v-if="layoutStore.mode === 'full-content'"
+      position="fixed"
+      right="10"
+      bottom="40"
+      @click="appStore.showPreferenceDrawer = true"
+    >
+      <n-icon>
+        <icon icon="uil:setting" />
+      </n-icon>
+    </n-float-button>
+  </div>
 </template>
 
 <style lang="scss">
