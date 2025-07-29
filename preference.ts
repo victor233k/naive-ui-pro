@@ -33,7 +33,7 @@ export const preferenceConfig = {
     /**
      * 是否显示底部
      */
-    showFooter: true,
+    showFooter: false,
     /**
      * 顶栏是否固定
      */
