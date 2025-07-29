@@ -12,12 +12,12 @@ function useMobile() {
 
 export const useLayoutStore = defineStore('layout', () => {
   const mobile = useMobile()
-  const showSidebarMobile = ref(false)
+  const showMobileMenuDrawer = ref(false)
   const layout = reactive({ ...preferenceConfig.layout })
 
   return {
     mobile,
-    showSidebarMobile,
+    showMobileMenuDrawer,
     ...toRefs(layout),
   }
 }, {

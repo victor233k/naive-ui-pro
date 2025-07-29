@@ -7,6 +7,7 @@ import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLayoutStore } from '@/store/use-layout-store'
 import { ProMenu } from '../menu'
+import MobileSidebarDrawer from './mobile-sidebar-drawer.vue'
 import CollapseSidebarButton from './collapse-sidebar-button.vue'
 import Content from './content.vue'
 import Logo from './logo.vue'
@@ -113,6 +114,17 @@ async function pushTo(path: string) {
     </template>
     <template #nav-left>
       <nav-left />
+      <mobile-sidebar-drawer :drawer-collapsed-width="finalSidebarCollapsedWidth">
+        <n-scrollbar class="flex-[1_0_0]">
+          <pro-menu
+            v-bind="layout.verticalMenuProps"
+            :indent="18"
+            :collapsed-width="finalSidebarCollapsedWidth"
+            :collapsed-show-title="sidebarCollapsedShowMenuTitle"
+            @update:value="pushTo"
+          />
+        </n-scrollbar>
+      </mobile-sidebar-drawer>
     </template>
     <template #nav-center>
       <div

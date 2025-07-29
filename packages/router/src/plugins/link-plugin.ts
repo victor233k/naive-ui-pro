@@ -36,15 +36,14 @@ export function linkPlugin({
         return false
       }
       if (openInNewWindow) {
-        const pathKey = `__pro-router-opened:${to.fullPath}`
+        const pathKey = `__PRO_ROUTER_LINK_PLUGIN_OPEN_IN_NEW_WINDOW_${to.fullPath.toUpperCase()}__`
         if (window.localStorage.getItem(pathKey)) {
           window.localStorage.removeItem(pathKey)
           return
         }
         window.localStorage.setItem(pathKey, 'true')
-        const finalUrl = router.resolve(to).href
+        const finalUrl = router.options.history.createHref(to.fullPath)
         open(finalUrl)
-        return false
       }
     })
   }
