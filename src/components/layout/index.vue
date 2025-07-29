@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import type { ProLayoutMode } from 'pro-naive-ui'
+import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { useLayoutMenu } from 'pro-naive-ui'
 import { computed, watch } from 'vue'
@@ -15,6 +16,7 @@ import Tabbar from './tabbar.vue'
 
 const route = useRoute()
 const router = useRouter()
+const vars = useThemeVars()
 
 const {
   mode,
@@ -103,6 +105,7 @@ async function pushTo(path: string) {
     :tabbar-height="tabbarHeight"
     :show-sidebar="finalShowSidebar"
     :show-sidebar-extra="showSidebarExtra"
+    content-class="pro-layout__content--embedded"
     :sidebar-collapsed-width="finalSidebarCollapsedWidth"
   >
     <template #logo>
@@ -175,3 +178,9 @@ async function pushTo(path: string) {
     </template>
   </pro-layout>
 </template>
+
+<style scoped lang="scss">
+:deep(.pro-layout__content--embedded) {
+  background-color: v-bind('vars.actionColor');
+}
+</style>
