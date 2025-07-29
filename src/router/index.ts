@@ -1,4 +1,5 @@
 import type { App } from 'vue'
+
 import {
   autoRedirectPlugin,
   breadcrumbPlugin,
@@ -25,6 +26,10 @@ import {
 import {
   useUserStore,
 } from '@/store/use-user-store'
+
+import {
+  layoutFalsyPlugin,
+} from './plugins/layout-falsy-plugin'
 
 import {
   accessRoutes,
@@ -130,6 +135,10 @@ export async function setupRouter(app: App) {
        * 设置后可以精准渲染与当前路由匹配的视图组件
        */
       exactRenderPlugin(),
+      /**
+       * 支持不显示布局的插件
+       */
+      layoutFalsyPlugin(),
     ],
   })
   app.use(router)
