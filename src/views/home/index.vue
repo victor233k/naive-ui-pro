@@ -175,9 +175,9 @@ const projectUpdates = [
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
+  <div>
     <!-- 欢迎区域 -->
-    <div class="mb-8">
+    <div class="mb-3">
       <n-card class="backdrop-blur-sm bg-white/90 dark:bg-gray-800/90">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
           <div class="flex items-center">
@@ -232,7 +232,7 @@ const projectUpdates = [
     </div>
 
     <!-- 数据概览卡片 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-3">
       <n-card
         v-for="(card, index) in statCards"
         :key="index"
@@ -276,7 +276,7 @@ const projectUpdates = [
     </div>
 
     <!-- 活动记录和项目动态 -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-3">
       <!-- 活动记录 -->
       <n-card
         title="活动记录"
