@@ -1,6 +1,7 @@
 import type { App } from 'vue'
 import { preferenceConfig } from '@root/preference'
 import { merge } from 'lodash-es'
+import { ProInput, ProSelect } from 'pro-naive-ui'
 import { setupRouter } from './router'
 import { setupPinia } from './store'
 import 'virtual:uno.css'
@@ -13,6 +14,12 @@ export async function prepareCreateApp() {
 export async function prepareMount(app: App) {
   await setupPinia(app)
   await setupRouter(app)
+  setupComponents(app)
+}
+
+function setupComponents(app: App) {
+  const components = [ProInput, ProSelect]
+  components.forEach(com => app.component(com.name!, com))
 }
 
 function setupAppLoading() {

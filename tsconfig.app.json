@@ -25,6 +25,7 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "typings/*.d.ts",
+    "mock/**/*.ts",
     "preference.ts"
   ]
 }

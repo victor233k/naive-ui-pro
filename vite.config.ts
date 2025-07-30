@@ -52,6 +52,7 @@ export default defineConfig(({ mode }) => {
         enableProd: true,
         infixName: false,
         include: ['mock'],
+        exclude: ['mock/utils'],
       }),
       // analyzer(),
     ],
