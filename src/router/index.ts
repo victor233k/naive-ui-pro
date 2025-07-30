@@ -5,9 +5,9 @@ import {
   breadcrumbPlugin,
   createRouter,
   documentTitlePlugin,
-  exactRenderPlugin,
   keepAlivePlugin,
   linkPlugin,
+  nestedRouteRenderPlugin,
   nMenuPlugin,
   progressPlugin,
   rbacAccessPlugin,
@@ -131,10 +131,10 @@ export async function setupRouter(app: App) {
         },
       }),
       /**
-       * 路由视图精确渲染插件，将会为 RouterView 扩展 exact 属性，
-       * 设置后可以精准渲染与当前路由匹配的视图组件
+       * 嵌套路由视图渲染插件，需要在嵌套路由渲染有问题的 `<RouterView>` 上
+       * 设置 `:route="router.resolveNestedRoute()"`
        */
-      exactRenderPlugin(),
+      nestedRouteRenderPlugin(),
       /**
        * 支持不显示布局的插件
        */
