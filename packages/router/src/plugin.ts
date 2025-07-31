@@ -2,34 +2,48 @@ import type { App } from 'vue'
 import type { Router, RouterOptions } from 'vue-router'
 import { APP, EFFECT_SCOPE, RUN_WITH_APP_HANDLERS, UNMOUNT_HANDLERS } from './symbols'
 
+export type ProRouterPluginCleanupHandler = () => void
 export type ProRouterPluginUnmountHandler = () => void
 export type ProRouterPluginRunWithAppHandler = (app: App) => void
 
 export interface ProRouterPluginContext {
   /**
-   * The router instance.
+   * 路由实例
    */
   router: Router
   /**
-   * Runs a function with the vue app.
+   * 运行一个函数，router.install 时调用，会有 vue 实例参数
    */
   runWithApp: (handler: ProRouterPluginRunWithAppHandler) => void
   /**
-   * Register a function to be called when the plugin is uninstalled.
+   * 注册一个函数，当 vue 实例被卸载时调用
    */
   onUnmount: (handler: ProRouterPluginUnmountHandler) => void
 }
 
 export interface ProRouterObjectPlugin {
-  install?: (ctx: ProRouterPluginContext) => void
+  /**
+   * 插件安装函数
+   */
+  install?: (ctx: ProRouterPluginContext) => void | ProRouterPluginReturned
+  /**
+   * 插件执行前，可以对 options 进行修改
+   */
   resolveOptions?: (options: RouterOptions) => RouterOptions
 }
 
+export interface ProRouterPluginReturned {
+  /**
+   * 清理函数钩子，当用户执行 router.runPluginsCleanup 时调用
+   */
+  onCleanup?: () => void
+}
+
 export interface ProRouterFunctionPlugin {
-/**
- * Called when the plugin is installed.
- */
-  (ctx: ProRouterPluginContext): void
+  /**
+   * 插件安装函数
+   */
+  (ctx: ProRouterPluginContext): void | ProRouterPluginReturned
   /**
    * 插件执行前，可以对 options 进行修改
    */

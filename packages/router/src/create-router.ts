@@ -1,6 +1,6 @@
 import type { App, EffectScope } from 'vue'
 import type { RouterOptions as _RouterOptions, Router } from 'vue-router'
-import type { ProRouterObjectPlugin, ProRouterPlugin, ProRouterPluginRunWithAppHandler, ProRouterPluginUnmountHandler } from './plugin'
+import type { ProRouterObjectPlugin, ProRouterPlugin, ProRouterPluginCleanupHandler, ProRouterPluginRunWithAppHandler, ProRouterPluginUnmountHandler } from './plugin'
 import { effectScope } from 'vue'
 import { createRouter as _createRouter } from 'vue-router'
 import { setupPlugin } from './plugin'
@@ -12,10 +12,22 @@ export interface ProRouterOptions extends _RouterOptions {
 }
 
 export function createRouter(options: ProRouterOptions): Router {
-  const { plugins = [], vrOptions } = resolveOptions(options)
+  const {
+    vrOptions,
+    plugins = [],
+    pluginCleanups,
+  } = resolveOptions(options)
+
   const router = _createRouter(vrOptions)
   const scope = (router[EFFECT_SCOPE] ??= effectScope(true))
-  const { install, beforeEach, beforeResolve, afterEach, onError } = router
+
+  const {
+    install,
+    onError,
+    afterEach,
+    beforeEach,
+    beforeResolve,
+  } = router
 
   router.install = (...args) => {
     const [app] = args
@@ -58,9 +70,14 @@ export function createRouter(options: ProRouterOptions): Router {
     }, ...rest)
   }
 
+  router.runPluginsCleanup = () => {
+    pluginCleanups.forEach(cleanup => cleanup())
+  }
+
   plugins.forEach((plugin) => {
     setupPlugin({ router, plugin })
   })
+
   return router
 }
 
@@ -74,17 +91,22 @@ function prepareInstall(app: App, router: Router) {
   app.onUnmount(() => {
     router[EFFECT_SCOPE]?.stop()
     router[UNMOUNT_HANDLERS]?.forEach(handler => handler())
-
     delete router[APP]
     delete router[EFFECT_SCOPE]
     delete router[UNMOUNT_HANDLERS]
     delete router[ALREADY_INSTALLED]
     delete router[RUN_WITH_APP_HANDLERS]
+    delete router.runPluginsCleanup
   })
 }
 
 function resolveOptions(options: ProRouterOptions) {
-  const { plugins = [], ...vueRouterOptions } = options
+  const pluginCleanups: ProRouterPluginCleanupHandler[] = []
+
+  const {
+    plugins = [],
+    ...vueRouterOptions
+  } = options
 
   const builtinPlugins = [
     normalizeRoutesPlugin(),
@@ -93,7 +115,7 @@ function resolveOptions(options: ProRouterOptions) {
   const objectPlugins = [
     ...builtinPlugins,
     ...plugins,
-  ].map(convertToObjectPlugin)
+  ].map(plugin => convertToObjectPlugin(plugin, pluginCleanups))
 
   const finalVrOptions = objectPlugins.reduce((p, c) => {
     if (c.resolveOptions) {
@@ -103,15 +125,25 @@ function resolveOptions(options: ProRouterOptions) {
   }, vueRouterOptions)
 
   return {
+    pluginCleanups,
     plugins: objectPlugins,
     vrOptions: finalVrOptions,
   }
 }
 
-function convertToObjectPlugin(plugin: ProRouterPlugin): ProRouterObjectPlugin {
+function convertToObjectPlugin(
+  plugin: ProRouterPlugin,
+  pluginCleanups: ProRouterPluginCleanupHandler[],
+): ProRouterObjectPlugin {
   if (typeof plugin === 'function') {
     return {
-      install: plugin,
+      install: (...args) => {
+        const exposed = plugin(...args)
+        if (exposed && exposed.onCleanup) {
+          pluginCleanups.push(exposed.onCleanup)
+        }
+        return exposed
+      },
     }
   }
   return plugin
@@ -120,24 +152,28 @@ function convertToObjectPlugin(plugin: ProRouterPlugin): ProRouterObjectPlugin {
 declare module 'vue-router' {
   export interface Router {
     /**
-     * vue instance
+     * Vue 实例
      */
     [APP]?: App
     /**
-     * The vue effect scope.
+     * vueInstance.effectScope
      */
     [EFFECT_SCOPE]?: EffectScope
     /**
-     * The router plugin uninstall functions.
+     * 插件的 onUnmount 钩子集合
      */
     [UNMOUNT_HANDLERS]?: ProRouterPluginUnmountHandler[]
     /**
-     * The router plugin run with app functions.
+     * 插件的 runWithApp 钩子集合
      */
     [RUN_WITH_APP_HANDLERS]?: ProRouterPluginRunWithAppHandler[]
     /**
-     * The flag to indicate whether the router is prepared.
+     * 是否已经安装
      */
     [ALREADY_INSTALLED]?: boolean
+    /**
+     * 运行所有已注册的插件中返回的 onCleanup 钩子
+     */
+    runPluginsCleanup: ProRouterPluginCleanupHandler
   }
 }
