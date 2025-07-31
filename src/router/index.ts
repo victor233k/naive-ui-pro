@@ -32,6 +32,10 @@ import {
 } from './plugins/layout-falsy-plugin'
 
 import {
+  stateCleanupPlugin,
+} from './plugins/state-cleanup-plugin'
+
+import {
   accessRoutes,
   HOME_ROUTE_PATH,
   ignoreAccessRoutes,
@@ -139,6 +143,10 @@ export async function setupRouter(app: App) {
        * 支持不显示布局的插件
        */
       layoutFalsyPlugin(),
+      /**
+       * 状态清理插件
+       */
+      stateCleanupPlugin(),
     ],
   })
   app.use(router)
