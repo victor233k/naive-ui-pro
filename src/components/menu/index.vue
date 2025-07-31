@@ -45,7 +45,7 @@ const nMenuProps = computed(() => {
   />
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 .pro-menu.pro-menu--collapsed-show-title {
   :deep(.n-menu-item-content) {
     display: flex;

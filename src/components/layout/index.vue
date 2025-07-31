@@ -191,7 +191,7 @@ async function pushTo(path: string) {
   </pro-layout>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 :deep(.n-pro-layout__content.pro-layout__content--embedded) {
   background-color: v-bind('vars.actionColor');
 }

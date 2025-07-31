@@ -51,22 +51,24 @@ const builtinTransitionNameToTransitionPropsRecord: Partial<Record<RouteTransiti
   'fade-down': {
     enterFromClass: 'opacity-0 transform -translate-y-4',
     leaveToClass: 'opacity-0 transform -translate-y-4',
-    enterActiveClass: 'transition-opacity transition-transform duration-300 ease-in-out',
-    leaveActiveClass: 'transition-opacity transition-transform duration-300 ease-in-out',
+    enterActiveClass: 'transition-[opacity,transform] duration-300 ease-in-out',
+    leaveActiveClass: 'transition-[opacity,transform] duration-300 ease-in-out',
   },
   'fade-up': {
     enterFromClass: 'opacity-0 transform translate-y-4',
     leaveToClass: 'opacity-0 transform translate-y-4',
-    enterActiveClass: 'transition-opacity transition-transform duration-300 ease-in-out',
-    leaveActiveClass: 'transition-opacity transition-transform duration-300 ease-in-out',
+    enterActiveClass: 'transition-[opacity,transform] duration-300 ease-in-out',
+    leaveActiveClass: 'transition-[opacity,transform] duration-300 ease-in-out',
   },
   'fade-slide': {
     enterFromClass: 'opacity-0 transform translate-x-4',
-    leaveToClass: 'opacity-0 transform -translate-x-4',
-    enterActiveClass: 'transition-opacity transition-transform duration-300 ease-in-out',
-    leaveActiveClass: 'transition-opacity transition-transform duration-300 ease-in-out',
+    leaveToClass: 'opacity-0 transform translate-x-4',
+    enterActiveClass: 'transition-[opacity,transform] duration-300 ease-in-out',
+    leaveActiveClass: 'transition-[opacity,transform] duration-300 ease-in-out',
   },
-  'none': {},
+  'none': {
+    css: false,
+  },
 }
 
 export function transitionPlugin({

@@ -37,7 +37,7 @@ const { showMobileMenuDrawer, sidebarWidth, collapsed } = storeToRefs(useLayoutS
   </n-drawer>
 </template>
 
-<style lang="scss">
+<style>
 .mobile-sidebar-drawer {
   transition: width .3s var(--n-bezier);
   .n-drawer-content {
