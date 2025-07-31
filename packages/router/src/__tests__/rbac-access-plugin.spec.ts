@@ -183,6 +183,7 @@ describe('rbac-access-plugin', () => {
       await router.push('/login')
       expect(router.currentRoute.value.name).toBe('Login')
       expect(router.currentRoute.value.query.redirect).toBeUndefined()
+      router.runPluginsCleanup()
       expect(router.getRoutes().length).toBe(5)
       router.setOptions({ logined: true })
       await router.push('/list/basic-info?b=2')

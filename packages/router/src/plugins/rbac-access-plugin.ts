@@ -224,15 +224,13 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
       }
     })
 
-    router.afterEach((to) => {
-      if (resolvedOptions && to.path === resolvedOptions.loginPath) {
-        cleanup()
-      }
-    })
-
     onUnmount(() => {
       cleanup()
     })
+
+    return {
+      onCleanup: cleanup,
+    }
   }
 }
 
