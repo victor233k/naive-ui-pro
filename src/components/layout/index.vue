@@ -106,7 +106,7 @@ async function pushTo(path: string) {
     :tabbar-height="tabbarHeight"
     :show-sidebar="finalShowSidebar"
     :show-sidebar-extra="showSidebarExtra"
-    content-class="pro-layout__content--embedded"
+    content-class="pro-layout__content--embedded p-16px"
     :sidebar-collapsed-width="finalSidebarCollapsedWidth"
   >
     <template #logo>
@@ -192,7 +192,7 @@ async function pushTo(path: string) {
 </template>
 
 <style scoped lang="scss">
-:deep(.pro-layout__content--embedded) {
+:deep(.n-pro-layout__content.pro-layout__content--embedded) {
   background-color: v-bind('vars.actionColor');
 }
 </style>
