@@ -1,7 +1,7 @@
 import type { App } from 'vue'
 import { preferenceConfig } from '@root/preference'
 import { merge } from 'lodash-es'
-import { ProInput, ProSelect } from 'pro-naive-ui'
+import { create, ProInput, ProSelect } from 'pro-naive-ui'
 import { setupRouter } from './router'
 import { setupPinia } from './store'
 import 'virtual:uno.css'
@@ -18,8 +18,13 @@ export async function prepareMount(app: App) {
 }
 
 function setupComponents(app: App) {
-  const components = [ProInput, ProSelect]
-  components.forEach(com => app.component(com.name!, com))
+  // pro-naive-ui 中的 pro-search-form 支持按需加载组件，所以这里需要手动注册
+  app.use(create({
+    components: [
+      ProInput,
+      ProSelect,
+    ],
+  }))
 }
 
 function setupAppLoading() {
