@@ -82,7 +82,7 @@ const layoutStore = useLayoutStore()
   </div>
 </template>
 
-<style lang="scss">
+<style>
 .preference-item {
   display: flex;
   align-items: center;

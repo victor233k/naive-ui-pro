@@ -79,5 +79,8 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    css: {
+      transformer: 'lightningcss',
+    },
   }
 })
