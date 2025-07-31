@@ -1,10 +1,10 @@
 import type { Awaitable } from '@vueuse/core'
+import type { UseRequestOptions, UseRequestService } from 'pro-naive-ui'
 import { isFunction } from 'lodash-es'
 import { useMessage, useModal } from 'naive-ui'
 import {
   useRequest,
-  type UseRequestOptions,
-  type UseRequestService,
+
 } from 'pro-naive-ui'
 
 export interface UseHandleOptions<Data, Params extends any[]>
@@ -60,7 +60,7 @@ export function useHandle<Data, Params extends any[]>(
   options = Object.assign(
     {
       successTip: options.delete ? '删除成功' : '操作成功',
-      errorTip: (e) => e.message,
+      errorTip: e => e.message,
       useConfirm: true,
       confirmFn(resolve) {
         modal.create({
@@ -111,7 +111,8 @@ export function useHandle<Data, Params extends any[]>(
     try {
       await runGuard(params)
       return runAsync(...params)
-    } catch {
+    }
+    catch {
       return undefined as Data
     }
   }
@@ -134,7 +135,8 @@ export function useHandle<Data, Params extends any[]>(
       ? await useConfirm(params)
       : useConfirm
 
-    if (!useConfirmValue || !confirmFn) return
+    if (!useConfirmValue || !confirmFn)
+      return
 
     const value = await new Promise<boolean>((resolve) => {
       confirmFn(resolve, params)
