@@ -29,7 +29,7 @@ export function linkPlugin({
   isExternalUrl = builtinIsExternalUrl,
 }: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
-    router.beforeEach((to) => {
+    router.beforeEach((to, from) => {
       const { link, openInNewWindow = false } = to.meta || {}
       if (isExternalUrl(link)) {
         open(link)
@@ -44,6 +44,7 @@ export function linkPlugin({
         window.localStorage.setItem(pathKey, 'true')
         const finalUrl = router.options.history.createHref(to.fullPath)
         open(finalUrl)
+        return from
       }
     })
   }
