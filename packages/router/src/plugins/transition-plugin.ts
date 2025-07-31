@@ -77,17 +77,31 @@ export function transitionPlugin({
   return ({ router, onUnmount }) => {
     if (!router.currentRouteTransitionProps) {
       router.currentRouteTransitionProps = computed(() => {
+        let preElement: Element = null
         const mergedTransitionName = resolveTransitionName(router, transitionName)
         const transitionProps = builtinTransitionNameToTransitionPropsRecord[mergedTransitionName]
         return {
           ...transitionProps,
           appear: true,
           mode: 'out-in',
-          onEnter: (el) => {
+          onEnter(el) {
             lockScroll(el.parentElement)
           },
-          onAfterEnter: (el) => {
+          onAfterEnter(el) {
             unlockScroll(el.parentElement)
+          },
+          onEnterCancelled(el) {
+            unlockScroll(el.parentElement)
+          },
+          onLeave(el) {
+            preElement = el.parentElement
+            lockScroll(preElement)
+          },
+          onAfterLeave() {
+            unlockScroll(preElement)
+          },
+          onLeaveCancelled() {
+            unlockScroll(preElement)
           },
         }
       })
