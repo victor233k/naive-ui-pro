@@ -8,6 +8,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useLayoutStore } from '@/store/use-layout-store'
 import { ProMenu } from '../menu'
 import CollapseSidebarButton from './collapse-sidebar-button.vue'
+import { useTabs } from './composables/use-tabs'
 import Content from './content.vue'
 import Logo from './logo.vue'
 import MobileSidebarDrawer from './mobile-sidebar-drawer.vue'
@@ -19,6 +20,9 @@ const route = useRoute()
 const router = useRouter()
 const vars = useThemeVars()
 
+const {
+  handleAddTab,
+} = useTabs()
 const {
   mode,
   mobile,
@@ -78,6 +82,13 @@ const showSidebarExtraCollapseButton = computed(() => {
 
 watch(() => route.path, (value) => {
   activeKey.value = value
+  handleAddTab({
+    title: (route.meta.title || route.name || route.fullPath) as string,
+    icon: route.meta.icon || '',
+    affix: false,
+    active: true,
+    fullPath: route.fullPath,
+  })
 }, { immediate: true })
 
 async function pushTo(path: string) {

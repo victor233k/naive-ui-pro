@@ -14,6 +14,8 @@ const {
   showFooter,
   showSidebar,
   footerFixed,
+  tabbarTheme,
+  tabbarCache,
   footerHeight,
   tabbarHeight,
   sidebarWidth,
@@ -29,6 +31,11 @@ const layoutOptions: Array<{ label: string, value: ProLayoutMode }> = [
   { label: '混合侧边栏布局', value: 'mixed-sidebar' },
   { label: '内容全屏布局', value: 'full-content' },
   { label: '双栏布局', value: 'two-column' },
+]
+
+const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
+  { label: '谷歌', value: 'chrome' },
+  { label: '卡片', value: 'card' },
 ]
 </script>
 
@@ -102,11 +109,23 @@ const layoutOptions: Array<{ label: string, value: ProLayoutMode }> = [
         <n-switch v-model:value="showTabbar" />
       </div>
       <div class="preference-item">
+        <span>是否缓存标签页</span>
+        <n-switch v-model:value="tabbarCache" />
+      </div>
+      <div class="preference-item">
         <span>标签栏高度</span>
         <n-input-number
           v-model:value="tabbarHeight"
           class="w-120px"
           placeholder="请输入"
+        />
+      </div>
+      <div class="preference-item">
+        <span>标签页主题</span>
+        <n-select
+          v-model:value="tabbarTheme"
+          class="w-150px"
+          :options="tabbarThemeOptions"
         />
       </div>
     </n-flex>

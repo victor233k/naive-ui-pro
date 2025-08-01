@@ -63,6 +63,14 @@ export const preferenceConfig = {
      */
     tabbarHeight: 38,
     /**
+     * 标签页主题
+     */
+    tabbarTheme: 'chrome',
+    /**
+     * 是否缓存标签页
+     */
+    tabbarCache: true,
+    /**
      * 侧边栏折叠后的宽度
      */
     sidebarCollapsedWidth: 58,
