@@ -2,90 +2,86 @@ import { defineStore } from 'pinia'
 import { move } from 'pro-naive-ui'
 import { ref } from 'vue'
 
-interface Tab {
-  id: string
+export interface Tab {
   icon: string
   title: string
   affix: boolean
   active: boolean
   fullPath: string
-  iconColor?: string
 }
 
-type IndexOrId = number | string
+export const CACHE_KEY = 'NAIVE_UI_PRO__TABS'
 
 export const useTabsStore = defineStore('tabs', () => {
   const tabs = ref<Tab[]>([])
 
-  function isAffixTab(index: number) {
-    return tabs.value[index].affix ?? false
-  }
-
-  function isActiveTab(index: number) {
-    return tabs.value[index].active ?? false
-  }
-
-  function closeOtherTabs(index: number) {
-    const id = tabs.value[index].id
-    tabs.value = tabs.value.filter((_, i) => {
-      return i === index || isAffixTab(i)
-    })
-    setActiveTab(tabs.value.findIndex(tab => tab.id === id))
-  }
-
-  function closeLeftTabs(index: number) {
-    tabs.value = tabs.value.filter((_, i) => {
-      return i >= index || isAffixTab(i)
-    })
-    setActiveTab(tabs.value.findIndex(tab => tab.id === id))
-  }
-
-  function closeRightTabs(id: string) {
-    const index = tryIndexToId(indexOrId)
-
-    tabs.value = tabs.value.filter((_, i) => {
-      return i <= index || isAffixTab(i)
-    })
-    setActiveTab(index)
-  }
-
-  function closeTab(id: string) {
-    const index = tryIndexToId(indexOrId)
-
-    if (!isAffixTab(index) && tabs.value.length > 1) {
-      // const beforeIndex = index - 1
-      tabs.value.splice(index, 1)
-      if (isActiveTab(index)) {
-        // setActiveTab(beforeIndex)
-      }
-    }
-  }
-
-  function moveTab(from: IndexOrId, to: IndexOrId) {
-    const fromIndex = tryIndexToId(from)
-    const toIndex = tryIndexToId(to)
-
-    move(tabs.value, from, to)
-  }
-
-  function closeAllTabs() {
-    tabs.value = tabs.value.filter((_, i) => isAffixTab(i))
+  function findIndexByFullPath(fullPath: string) {
+    return tabs.value.findIndex(tab => tab.fullPath === fullPath)
   }
 
   function setActiveTab(index: number) {
-    if (!isActiveTab(index) && tabs.value[index]) {
-      tabs.value[index].active = true
+    tabs.value.forEach((tab, i) => {
+      tab.active = i === index
+    })
+  }
+
+  function initTabs() {
+    const cachedTabs = localStorage.getItem(CACHE_KEY)
+    if (cachedTabs) {
+      tabs.value = JSON.parse(cachedTabs)
     }
+  }
+
+  function cacheTabs() {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(tabs.value))
+  }
+
+  function addTab(tab: Tab) {
+    tabs.value.push({ ...tab })
+  }
+
+  function removeTab(index: number) {
+    tabs.value.splice(index, 1)
+  }
+
+  function closeLeftTabs(index: number) {
+    tabs.value = tabs.value.filter((tab, i) => i >= index || tab.affix)
+  }
+
+  function closeRightTabs(index: number) {
+    tabs.value = tabs.value.filter((tab, i) => i <= index || tab.affix)
+  }
+
+  function closeOtherTabs(index: number) {
+    tabs.value = tabs.value.filter((tab, i) => i === index || tab.affix)
+  }
+
+  function closeAllTabs() {
+    const affixTabs = tabs.value.filter(tab => tab.affix)
+    tabs.value = affixTabs.length > 0 ? affixTabs : tabs.value.slice(0, 1)
+  }
+
+  function moveTab(from: number, to: number) {
+    move(tabs.value, from, to)
+  }
+
+  function toggleAffix(index: number) {
+    tabs.value[index].affix = !tabs.value[index].affix
   }
 
   return {
     tabs,
-    moveTab,
-    closeTab,
-    closeAllTabs,
+    initTabs,
+    cacheTabs,
+    findIndexByFullPath,
     setActiveTab,
+    addTab,
+    removeTab,
     closeLeftTabs,
-    closeOtherTabs,
     closeRightTabs,
+    closeOtherTabs,
+    closeAllTabs,
+    moveTab,
+    toggleAffix,
   }
 })

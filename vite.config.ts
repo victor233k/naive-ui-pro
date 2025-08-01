@@ -50,9 +50,7 @@ export default defineConfig(({ mode }) => {
       vitePluginFakeServer({
         logger: false,
         enableProd: true,
-        infixName: false,
         include: ['mock'],
-        exclude: ['mock/utils'],
       }),
       // analyzer(),
     ],
