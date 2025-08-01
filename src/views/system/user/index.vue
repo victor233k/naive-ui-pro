@@ -2,18 +2,18 @@
 import type { ProDataTableColumns, ProSearchFormColumns } from 'pro-naive-ui'
 import { Icon } from '@iconify/vue'
 import { format } from 'date-fns'
-import { useMessage } from 'naive-ui'
-import { createProSearchForm, useNDataTable } from 'pro-naive-ui'
+import { useMessage, useModal } from 'naive-ui'
+import { createProSearchForm, useNDataTable, useRequest } from 'pro-naive-ui'
 import { shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { UserApi } from '@/api/system/user'
 import { SysEnableDisableDict } from '@/dicts/sys-enable-disable'
 import { SysUserGenderDict } from '@/dicts/sys-user-gender'
 import { renderProTagByDictValue } from '@/dicts/utils'
-import { useHandle } from '@/hooks/use-handle'
 
 const router = useRouter()
 const message = useMessage()
+const modal = useModal()
 
 const searchForm = createProSearchForm()
 const searchColumns: ProSearchFormColumns<UserApi.page.RequestData> = [
@@ -67,13 +67,27 @@ const {
 )
 
 const checkedRowKeys = shallowRef([])
-const { run: delData } = useHandle(UserApi.del, {
-  delete: true,
+const { run: del } = useRequest(UserApi.del, {
   onSuccess() {
     checkedRowKeys.value = []
     refresh()
+    message.success('删除成功')
+  },
+  onError(e) {
+    message.error(e.message)
   },
 })
+const delData: typeof del = (...args) => {
+  modal.create({
+    preset: 'dialog',
+    type: 'warning',
+    title: '提示',
+    positiveText: '确定',
+    negativeText: '取消',
+    content: '您确定要删除选中的数据吗？',
+    onPositiveClick: () => del(...args),
+  })
+}
 
 const columns: ProDataTableColumns<UserApi.Model> = [
   {

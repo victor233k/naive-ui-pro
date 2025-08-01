@@ -76,11 +76,11 @@ const { loading } = useRequest(() => UserApi.get(route.params.id as string), {
 </script>
 
 <template>
-  <n-spin :show="loading || submitting">
+  <pro-card class="max-w-[500px]">
     <pro-form
-      class="max-w-[500px]"
       :form
       :rules
+      :loading="loading || submitting"
     >
       <pro-input
         title="用户名"
@@ -159,5 +159,5 @@ const { loading } = useRequest(() => UserApi.get(route.params.id as string), {
         </n-button>
       </n-flex>
     </pro-form>
-  </n-spin>
+  </pro-card>
 </template>
