@@ -1,31 +1,28 @@
 import type { FakeRoute } from 'vite-plugin-fake-server'
 import type { BaseModel, WithPageParams } from '@/api/interface'
+import { faker } from '@faker-js/faker'
 import { filterByParams, joinURLs } from './index'
 import { RF } from './response'
 
-export interface CURD<T extends object> {
-  baseURL: string
-  data: T[]
-  routes: FakeRoute[]
-}
-
-export function buildCURD<T extends BaseModel>(
+export function buildCURDRoutes<T extends BaseModel>(
   baseURL: string,
-  idGenerator: () => string,
-): CURD<T> {
-  const data: T[] = []
+  collection: T[],
+): FakeRoute[] {
   const routes: FakeRoute[] = [
     // #region 分页列表
     {
       method: 'get',
       url: 'page',
       response({ query }) {
-        const {
-          page = 1,
-          pageSize = 20,
-          ...otherParams
-        } = query as WithPageParams<Record<string, any>>
-        const filteredData = filterByParams(data, otherParams)
+        const { page, pageSize, ...otherParams } = query as WithPageParams<
+          Record<string, any>
+        >
+
+        if (page == null || pageSize == null) {
+          return RF.error('参数 page 和 pageSize 不能为空')
+        }
+
+        const filteredData = filterByParams(collection, otherParams)
         return RF.success({
           page,
           pageSize,
@@ -41,7 +38,7 @@ export function buildCURD<T extends BaseModel>(
       method: 'get',
       url: 'list',
       response({ query }) {
-        return RF.success(filterByParams(data, query))
+        return RF.success(filterByParams(collection, query))
       },
     },
     // #endregion
@@ -54,7 +51,7 @@ export function buildCURD<T extends BaseModel>(
         if (params.id == null) {
           return RF.error('缺失 id 参数')
         }
-        return RF.success(data.find(item => item.id === params.id))
+        return RF.success(collection.find((item) => item.id === params.id))
       },
     },
     // #endregion
@@ -64,9 +61,9 @@ export function buildCURD<T extends BaseModel>(
       method: 'post',
       url: '',
       response({ body }) {
-        data.push({
+        collection.push({
           ...body,
-          id: idGenerator(),
+          id: faker.string.uuid(),
           createTime: new Date().toISOString(),
           updateTime: new Date().toISOString(),
         } as T)
@@ -80,7 +77,7 @@ export function buildCURD<T extends BaseModel>(
       method: 'put',
       url: '',
       response({ body }) {
-        const item = data.find(item => item.id === body.id)
+        const item = collection.find((item) => item.id === body.id)
         if (!item) {
           return RF.error('数据不存在')
         }
@@ -103,21 +100,18 @@ export function buildCURD<T extends BaseModel>(
         }
 
         const idArray = params.id.toString().split(',')
-        const newData = data.filter(item => !idArray.includes(item.id))
-        data.length = 0
-        data.push(...newData)
+        const newData = collection.filter((item) => !idArray.includes(item.id))
+        collection.length = 0
+        collection.push(...newData)
 
         return RF.success(null)
       },
     },
     // #endregion
   ]
-  return {
-    baseURL,
-    data,
-    routes: routes.map((route) => {
-      route.url = joinURLs(baseURL, route.url)
-      return route
-    }),
-  }
+  
+  return routes.map((route) => {
+    route.url = joinURLs(baseURL, route.url)
+    return route
+  })
 }

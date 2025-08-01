@@ -65,8 +65,3 @@ export function filterByParams<T extends BaseModel>(
     return value === params
   }
 }
-
-export function idFactory(idPrefix: string) {
-  let id = 0
-  return () => `${idPrefix}${++id}`
-}
