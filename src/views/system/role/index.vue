@@ -2,17 +2,17 @@
 import type { ProDataTableColumns, ProSearchFormColumns } from 'pro-naive-ui'
 import { Icon } from '@iconify/vue'
 import { format } from 'date-fns'
-import { useMessage } from 'naive-ui'
-import { createProSearchForm, useNDataTable } from 'pro-naive-ui'
+import { useMessage, useModal } from 'naive-ui'
+import { createProSearchForm, useNDataTable, useRequest } from 'pro-naive-ui'
 import { shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { RoleApi } from '@/api/system/role'
 import { SysEnableDisableDict } from '@/dicts/sys-enable-disable'
 import { renderProTagByDictValue } from '@/dicts/utils'
-import { useHandle } from '@/hooks/use-handle'
 
 const router = useRouter()
 const message = useMessage()
+const modal = useModal()
 
 const searchForm = createProSearchForm()
 const searchColumns: ProSearchFormColumns<RoleApi.page.RequestData> = [
@@ -46,7 +46,7 @@ const {
       ...searchForm.values.value,
       page: current,
       pageSize,
-    }).then(res => res.data),
+    }).then((res) => res.data),
   {
     form: searchForm,
     onError(e) {
@@ -56,13 +56,27 @@ const {
 )
 
 const checkedRowKeys = shallowRef([])
-const { run: delData } = useHandle(RoleApi.del, {
-  delete: true,
+const { run: del } = useRequest(RoleApi.del, {
   onSuccess() {
     checkedRowKeys.value = []
     refresh()
+    message.success('删除成功')
+  },
+  onError(e) {
+    message.error(e.message)
   },
 })
+const delData: typeof del = (...args) => {
+  modal.create({
+    preset: 'dialog',
+    type: 'warning',
+    title: '提示',
+    positiveText: '确定',
+    negativeText: '取消',
+    content: '您确定要删除选中的数据吗？',
+    onPositiveClick: () => del(...args),
+  })
+}
 
 const columns: ProDataTableColumns<RoleApi.Model> = [
   {
@@ -74,23 +88,23 @@ const columns: ProDataTableColumns<RoleApi.Model> = [
   },
   {
     title: '角色名',
-    render: row => row.name,
+    render: (row) => row.name,
   },
   {
     title: '角色编码',
-    render: row => row.code,
+    render: (row) => row.code,
   },
   {
     title: '状态',
-    render: row => renderProTagByDictValue(row.status, SysEnableDisableDict),
+    render: (row) => renderProTagByDictValue(row.status, SysEnableDisableDict),
   },
   {
     title: '备注',
-    render: row => row.remark,
+    render: (row) => row.remark,
   },
   {
     title: '更新时间',
-    render: row =>
+    render: (row) =>
       row.updateTime && format(row.updateTime, 'yyyy-MM-dd HH:mm:ss'),
   },
   {
@@ -104,7 +118,8 @@ const columns: ProDataTableColumns<RoleApi.Model> = [
             quaternary
             size="small"
             onClick={() =>
-              router.push({ name: 'RoleDetail', params: { id: row.id } })}
+              router.push({ name: 'RoleDetail', params: { id: row.id } })
+            }
           >
             {{
               icon: () => (

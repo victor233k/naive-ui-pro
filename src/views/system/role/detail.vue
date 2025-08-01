@@ -57,11 +57,11 @@ const { loading } = useRequest(() => RoleApi.get(route.params.id as string), {
 </script>
 
 <template>
-  <n-spin :show="loading || submitting">
+  <pro-card class="max-w-[500px]">
     <pro-form
-      class="max-w-[500px]"
       :form
       :rules
+      :loading="loading || submitting"
     >
       <pro-input
         title="角色名"
@@ -89,9 +89,7 @@ const { loading } = useRequest(() => RoleApi.get(route.params.id as string), {
       />
 
       <n-flex justify="center">
-        <n-button @click="router.back()">
-          返回
-        </n-button>
+        <n-button @click="router.back()"> 返回 </n-button>
         <n-button
           attr-type="reset"
           type="warning"
@@ -106,5 +104,5 @@ const { loading } = useRequest(() => RoleApi.get(route.params.id as string), {
         </n-button>
       </n-flex>
     </pro-form>
-  </n-spin>
+  </pro-card>
 </template>
