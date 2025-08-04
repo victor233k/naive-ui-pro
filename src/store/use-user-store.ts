@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { apiLogin, apiQueryUserInfo } from '@/api/user'
 import { LOGIN_ROUTE_PATH } from '@/router/routes'
+import { apiLogin, apiQueryUserInfo } from './api/user.api'
 
 export interface UserInfo {
   name: string

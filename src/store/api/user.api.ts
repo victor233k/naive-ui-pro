@@ -1,4 +1,4 @@
-import type { UserInfo, UserLoginPayload } from '@/store/use-user-store'
+import type { UserInfo, UserLoginPayload } from '../use-user-store'
 import http from '@/utils/axios'
 
 export function apiLogin(payload: UserLoginPayload) {
