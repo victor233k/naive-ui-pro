@@ -1,22 +1,66 @@
 <script setup lang="tsx">
 import type { ProDataTableColumns, ProSearchFormColumns } from 'pro-naive-ui'
+import type { User, UserModalFormParams, UserSearchFormParams } from './user.api'
 import { Icon } from '@iconify/vue'
-import { format } from 'date-fns'
-import { useMessage, useModal } from 'naive-ui'
-import { createProSearchForm, useNDataTable, useRequest } from 'pro-naive-ui'
-import { shallowRef } from 'vue'
-import { useRouter } from 'vue-router'
-import { UserApi } from '@/api/system/user'
-import { SysEnableDisableDict } from '@/dicts/sys-enable-disable'
-import { SysUserGenderDict } from '@/dicts/sys-user-gender'
-import { renderProTagByDictValue } from '@/dicts/utils'
-
-const router = useRouter()
-const message = useMessage()
-const modal = useModal()
+import { createProModalForm, createProSearchForm, renderProDateText, renderProTags } from 'pro-naive-ui'
+import { useProNDataTable } from '@/composables/use-pro-n-data-table'
+import { useProRequest } from '@/composables/use-pro-request'
+import { genderMapping, genderOptions, genderToColorMapping, statusMapping, statusOptions, statusToColorMapping } from './constants'
+import UserModalForm from './user-modal-form.vue'
+import { apiDeleteUsers, apiGetUserDetail, apiGetUsers, apiInsertOrUpdate } from './user.api'
 
 const searchForm = createProSearchForm()
-const searchColumns: ProSearchFormColumns<UserApi.page.RequestData> = [
+
+const {
+  loading: insertOrUpdateLoading,
+  runAsync: runAsyncInsertOrUpdate,
+} = useProRequest(apiInsertOrUpdate, {
+  manual: true,
+  successTip: true,
+})
+
+const {
+  search: { proSearchFormProps },
+  table: { tableProps, onChange },
+} = useProNDataTable(({ current, pageSize }, values) => {
+  return apiGetUsers({ pageSize, page: current, ...values })
+}, {
+  form: searchForm,
+})
+
+const modalForm = createProModalForm({
+  onSubmit: (values) => {
+    runAsyncInsertOrUpdate({
+      ...values as UserModalFormParams,
+      id: modalForm.values.value.id,
+    }).then(() => {
+      modalForm.show.value = false
+      onChange({ page: 1 })
+    })
+  },
+})
+
+const {
+  run: runDeleteUsers,
+} = useProRequest(apiDeleteUsers, {
+  manual: true,
+  successTip: '删除成功',
+  onSuccess() {
+    onChange({ page: 1 })
+  },
+})
+
+const {
+  run: runGetUserDetail,
+} = useProRequest(apiGetUserDetail, {
+  manual: true,
+  onSuccess: ({ data: user }) => {
+    modalForm.show.value = true
+    modalForm.values.value = user
+  },
+})
+
+const searchColumns: ProSearchFormColumns<UserSearchFormParams> = [
   {
     title: '用户名',
     path: 'username',
@@ -29,142 +73,113 @@ const searchColumns: ProSearchFormColumns<UserApi.page.RequestData> = [
     title: '性别',
     path: 'gender',
     field: 'select',
-    fieldProps() {
-      return {
-        options: SysUserGenderDict.items(),
-      }
+    fieldProps: {
+      options: genderOptions,
     },
   },
   {
     title: '状态',
     path: 'status',
     field: 'select',
-    fieldProps() {
-      return {
-        options: SysEnableDisableDict.items(),
-      }
+    fieldProps: {
+      options: statusOptions,
     },
   },
 ]
 
-const {
-  table: { tableProps },
-  search: { proSearchFormProps },
-  refresh,
-} = useNDataTable(
-  ({ current, pageSize }) =>
-    UserApi.page({
-      ...searchForm.values.value,
-      page: current,
-      pageSize,
-    }).then(res => res.data),
+const tableColumns: ProDataTableColumns<User> = [
   {
-    form: searchForm,
-    onError(e) {
-      message.error(e.message)
-    },
-  },
-)
-
-const checkedRowKeys = shallowRef([])
-const { run: del } = useRequest(UserApi.del, {
-  onSuccess() {
-    checkedRowKeys.value = []
-    refresh()
-    message.success('删除成功')
-  },
-  onError(e) {
-    message.error(e.message)
-  },
-})
-const delData: typeof del = (...args) => {
-  modal.create({
-    preset: 'dialog',
-    type: 'warning',
-    title: '提示',
-    positiveText: '确定',
-    negativeText: '取消',
-    content: '您确定要删除选中的数据吗？',
-    onPositiveClick: () => del(...args),
-  })
-}
-
-const columns: ProDataTableColumns<UserApi.Model> = [
-  {
-    type: 'selection',
-  },
-  {
-    title: '行号',
+    title: '序号',
     type: 'index',
   },
   {
     title: '用户名',
-    render: row => row.username,
+    path: 'username',
+    width: 120,
   },
   {
     title: '昵称',
-    render: row => row.nickname,
+    path: 'nickname',
+    width: 100,
   },
   {
     title: '性别',
-    render: row => renderProTagByDictValue(row.gender, SysUserGenderDict),
+    width: 100,
+    render: (row) => {
+      return renderProTags({
+        content: genderMapping[row.gender],
+        type: genderToColorMapping[row.gender],
+      })
+    },
   },
   {
     title: '邮箱',
-    render: row => row.email,
+    path: 'email',
+    width: 220,
   },
   {
     title: '手机号',
-    render: row => row.phone,
+    path: 'phone',
+    width: 140,
   },
   {
     title: '状态',
-    render: row => renderProTagByDictValue(row.status, SysEnableDisableDict),
+    width: 100,
+    render: (row) => {
+      return renderProTags({
+        content: statusMapping[row.status],
+        type: statusToColorMapping[row.status],
+      })
+    },
   },
   {
     title: '备注',
-    render: row => row.remark,
+    path: 'remark',
+    width: 230,
   },
   {
     title: '更新时间',
-    render: row =>
-      row.updateTime && format(row.updateTime, 'yyyy-MM-dd HH:mm:ss'),
+    width: 220,
+    render: row => renderProDateText(row.updateTime),
   },
   {
     title: '操作',
-    width: 150,
+    width: 120,
     render: (row) => {
       return (
         <n-flex>
           <n-button
             type="primary"
-            quaternary
             size="small"
-            onClick={() =>
-              router.push({ name: 'UserDetail', params: { id: row.id } })}
+            text={true}
+            onClick={() => runGetUserDetail(row.id)}
+          >
+            编辑
+          </n-button>
+          <n-popconfirm
+            onPositiveClick={() => runDeleteUsers(row.id)}
           >
             {{
-              icon: () => (
-                <n-icon>
-                  <Icon icon="ant-design:edit-outlined" />
-                </n-icon>
+              default: () => (
+                <span>
+                  确定删除
+                  <span class="c-red-500 font-bold">{row.nickname}</span>
+                  吗？
+                </span>
               ),
+              trigger: () => {
+                return (
+                  <n-button
+                    type="error"
+                    size="small"
+                    text={true}
+                  >
+                    删除
+                  </n-button>
+                )
+              },
             }}
-          </n-button>
-          <n-button
-            type="error"
-            quaternary
-            size="small"
-            onClick={() => delData(row.id)}
-          >
-            {{
-              icon: () => (
-                <n-icon>
-                  <Icon icon="ant-design:delete-outlined" />
-                </n-icon>
-              ),
-            }}
-          </n-button>
+          </n-popconfirm>
         </n-flex>
       )
     },
@@ -178,27 +193,27 @@ const columns: ProDataTableColumns<UserApi.Model> = [
     vertical
     size="large"
   >
-    <pro-card title="筛选条件">
+    <pro-card content-class="pb-0!">
       <pro-search-form
         :form="searchForm"
         :columns="searchColumns"
         v-bind="proSearchFormProps"
       />
     </pro-card>
-
     <pro-data-table
-      v-model:checked-row-keys="checkedRowKeys"
+      title="用户列表"
       row-key="id"
       flex-height
-      :columns
+      :scroll-x="1440"
+      :columns="tableColumns"
       v-bind="tableProps"
     >
-      <template #extra>
+      <template #toolbar>
         <n-flex>
           <n-button
             type="primary"
             ghost
-            @click="router.push({ name: 'UserDetail' })"
+            @click="modalForm.show.value = true"
           >
             <template #icon>
               <n-icon>
@@ -207,33 +222,16 @@ const columns: ProDataTableColumns<UserApi.Model> = [
             </template>
             新增
           </n-button>
-          <n-button
-            type="error"
-            ghost
-            :disabled="checkedRowKeys.length === 0"
-            @click="delData(checkedRowKeys)"
-          >
-            <template #icon>
-              <n-icon>
-                <icon icon="ant-design:delete-outlined" />
-              </n-icon>
-            </template>
-            删除
-          </n-button>
-
-          <n-button
-            ghost
-            @click="refresh"
-          >
-            <template #icon>
-              <n-icon>
-                <icon icon="ant-design:reload-outlined" />
-              </n-icon>
-            </template>
-            刷新
-          </n-button>
         </n-flex>
       </template>
     </pro-data-table>
+    <pro-modal-form
+      :form="modalForm"
+      label-width="100"
+      :loading="insertOrUpdateLoading"
+      :title="`${modalForm.values.value.id ? `编辑` : '新增'}用户`"
+    >
+      <user-modal-form />
+    </pro-modal-form>
   </n-flex>
 </template>
