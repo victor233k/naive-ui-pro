@@ -16,6 +16,13 @@ const configProviderProps = computed<ProConfigProviderProps>(() => {
       ProButton: {
         focusable: false,
       },
+      ProDataTable: {
+        size: 'small',
+      },
+      ProModalForm: {
+        preset: 'card',
+        labelPlacement: 'left',
+      },
     },
   }
 })

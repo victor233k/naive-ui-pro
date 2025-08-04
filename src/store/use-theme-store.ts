@@ -28,6 +28,9 @@ export const useThemeStore = defineStore('theme', () => {
           primaryColorSuppl: colors[4],
           primaryColorPressed: colors[7],
         },
+        Tag: {
+          borderRadius: '6px',
+        },
       },
     }
   })
