@@ -51,7 +51,7 @@ export function buildCURDRoutes<T extends BaseModel>(
         if (params.id == null) {
           return RF.error('缺失 id 参数')
         }
-        return RF.success(collection.find((item) => item.id === params.id))
+        return RF.success(collection.find(item => item.id === params.id))
       },
     },
     // #endregion
@@ -77,7 +77,7 @@ export function buildCURDRoutes<T extends BaseModel>(
       method: 'put',
       url: '',
       response({ body }) {
-        const item = collection.find((item) => item.id === body.id)
+        const item = collection.find(item => item.id === body.id)
         if (!item) {
           return RF.error('数据不存在')
         }
@@ -100,7 +100,7 @@ export function buildCURDRoutes<T extends BaseModel>(
         }
 
         const idArray = params.id.toString().split(',')
-        const newData = collection.filter((item) => !idArray.includes(item.id))
+        const newData = collection.filter(item => !idArray.includes(item.id))
         collection.length = 0
         collection.push(...newData)
 
@@ -109,7 +109,7 @@ export function buildCURDRoutes<T extends BaseModel>(
     },
     // #endregion
   ]
-  
+
   return routes.map((route) => {
     route.url = joinURLs(baseURL, route.url)
     return route

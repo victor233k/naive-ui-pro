@@ -89,7 +89,9 @@ const { loading } = useRequest(() => RoleApi.get(route.params.id as string), {
       />
 
       <n-flex justify="center">
-        <n-button @click="router.back()"> 返回 </n-button>
+        <n-button @click="router.back()">
+          返回
+        </n-button>
         <n-button
           attr-type="reset"
           type="warning"

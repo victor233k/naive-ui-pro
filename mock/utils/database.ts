@@ -10,7 +10,7 @@ export const database = {
   menu: [] as MenuApi.Model[],
 }
 
-//#region 初始化角色数据
+// #region 初始化角色数据
 {
   const builtinRoles = [
     { code: 'admin', name: '管理员' },
@@ -31,9 +31,9 @@ export const database = {
       } as RoleApi.Model),
   )
 }
-//#endregion
+// #endregion
 
-//#region 初始化用户数据
+// #region 初始化用户数据
 {
   database.user = Array.from(
     { length: 100 },
@@ -43,7 +43,7 @@ export const database = {
         nickname: faker.person.fullName(),
         username: faker.internet.username(),
         password: faker.internet.password(),
-        roleIds: faker.helpers.arrayElements(database.role.map((item) => item.id)),
+        roleIds: faker.helpers.arrayElements(database.role.map(item => item.id)),
         email: faker.internet.email(),
         phone: faker.phone.number(),
         gender: faker.helpers.arrayElement(Object.values(SysUserGender)),
@@ -54,10 +54,10 @@ export const database = {
       } as UserApi.Model),
   )
 }
-//#endregion
+// #endregion
 
-//#region 初始化菜单数据
+// #region 初始化菜单数据
 {
   database.menu = []
 }
-//#endregion
+// #endregion

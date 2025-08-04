@@ -46,7 +46,7 @@ const {
       ...searchForm.values.value,
       page: current,
       pageSize,
-    }).then((res) => res.data),
+    }).then(res => res.data),
   {
     form: searchForm,
     onError(e) {
@@ -88,23 +88,23 @@ const columns: ProDataTableColumns<RoleApi.Model> = [
   },
   {
     title: '角色名',
-    render: (row) => row.name,
+    render: row => row.name,
   },
   {
     title: '角色编码',
-    render: (row) => row.code,
+    render: row => row.code,
   },
   {
     title: '状态',
-    render: (row) => renderProTagByDictValue(row.status, SysEnableDisableDict),
+    render: row => renderProTagByDictValue(row.status, SysEnableDisableDict),
   },
   {
     title: '备注',
-    render: (row) => row.remark,
+    render: row => row.remark,
   },
   {
     title: '更新时间',
-    render: (row) =>
+    render: row =>
       row.updateTime && format(row.updateTime, 'yyyy-MM-dd HH:mm:ss'),
   },
   {
@@ -118,8 +118,7 @@ const columns: ProDataTableColumns<RoleApi.Model> = [
             quaternary
             size="small"
             onClick={() =>
-              router.push({ name: 'RoleDetail', params: { id: row.id } })
-            }
+              router.push({ name: 'RoleDetail', params: { id: row.id } })}
           >
             {{
               icon: () => (

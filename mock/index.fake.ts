@@ -1,9 +1,9 @@
-import { defineFakeRoute } from 'vite-plugin-fake-server/client'
 import type { MenuApi } from '@/api/system/menu'
-import { database } from './utils/database'
 import type { RoleApi } from '@/api/system/role'
 import type { UserApi } from '@/api/system/user'
+import { defineFakeRoute } from 'vite-plugin-fake-server/client'
 import { buildCURDRoutes } from './utils/curd'
+import { database } from './utils/database'
 
 const users = [
   {
@@ -52,7 +52,7 @@ function createErrorResponse(message: string) {
 }
 
 function isInvalidToken(token: string) {
-  return !token || !users.some((user) => user.token === token)
+  return !token || !users.some(user => user.token === token)
 }
 
 const systemRoleRoutes = buildCURDRoutes<RoleApi.Model>('/system/role', database.role)
@@ -67,10 +67,7 @@ export default defineFakeRoute([
     url: '/user/login',
     method: 'post',
     response: ({ body }) => {
-      const user = users.find(
-        (user) =>
-          user.username === body.username && user.password === body.password,
-      )
+      const user = users.find(user => user.username === body.username && user.password === body.password)
       if (!user) {
         return createErrorResponse('用户名或密码错误')
       }
@@ -85,7 +82,7 @@ export default defineFakeRoute([
       if (isInvalidToken(token)) {
         return createErrorResponse('token 无效')
       }
-      const user = users.find((user) => user.token === token)
+      const user = users.find(user => user.token === token)
       if (!user) {
         return createErrorResponse('用户名或密码错误')
       }
