@@ -42,8 +42,8 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
       pro-naive-ui:
-        specifier: ^2.4.3
-        version: 2.4.3(naive-ui@2.42.0(vue@3.5.17(typescript@5.8.3)))(vue@3.5.17(typescript@5.8.3))
+        specifier: ^2.4.4
+        version: 2.4.4(naive-ui@2.42.0(vue@3.5.17(typescript@5.8.3)))(vue@3.5.17(typescript@5.8.3))
       unocss:
         specifier: ^66.2.0
         version: 66.2.3(postcss@8.5.6)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
@@ -2718,8 +2718,8 @@ packages:
     peerDependencies:
       vue: '>= 3.3.0'
 
-  pro-composables@3.3.2:
-    resolution: {integrity: sha512-wFlA7wSLfsQTNqeDiMhF2XuIer1MK/CijHYdbrzOe0jqIWDr+/W1BM8clxFyy3JenhjXnFuQtCAS9ct32AgHAw==}
+  pro-composables@3.3.3:
+    resolution: {integrity: sha512-1e7Od/pTdJyhBZOeWAAVuZW7MlOLSX7BCIJRSYnJyIX11MDusyVY5bCcKTGgsxo1Huau76ezxmpIXh1zgEpDhg==}
     peerDependencies:
       vue: '>= 3.3.0'
 
@@ -2727,8 +2727,8 @@ packages:
     resolution: {integrity: sha512-CEPDm2B4RSIxtVWdN+mlXNs8rQ4EQi5mp2x4ZTLgVhcvvC3v0NwxqHtjjR+swqGcBbKJ0ZN4/UlkxRIgd3+AdA==}
     engines: {node: '>=18.12.0'}
 
-  pro-naive-ui@2.4.3:
-    resolution: {integrity: sha512-dXXaiM2kUeZwS5S2y5WwTWv+oDJ4yOlzdv8/idevYjC8mnn2Uy6Go5RTpBQAuSHKlk9z6Jw8kRQ3Bm8h6CvWVg==}
+  pro-naive-ui@2.4.4:
+    resolution: {integrity: sha512-gN6YAEJCVw6FgAc0pK7Nsfsg4clx1SaC/ahGO+7sp48H7YrQJLTfnSOckMd2Ozj0Pr1RUtxaQJp9gJvtpA+O8g==}
     engines: {node: '>=18.12.0'}
     peerDependencies:
       naive-ui: ^2.38.2
@@ -6229,7 +6229,7 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
 
-  pro-composables@3.3.2(vue@3.5.17(typescript@5.8.3)):
+  pro-composables@3.3.3(vue@3.5.17(typescript@5.8.3)):
     dependencies:
       '@types/lodash-es': 4.17.12
       '@vueuse/core': 11.3.0(vue@3.5.17(typescript@5.8.3))
@@ -6241,7 +6241,7 @@ snapshots:
 
   pro-naive-ui-resolver@1.0.2: {}
 
-  pro-naive-ui@2.4.3(naive-ui@2.42.0(vue@3.5.17(typescript@5.8.3)))(vue@3.5.17(typescript@5.8.3)):
+  pro-naive-ui@2.4.4(naive-ui@2.42.0(vue@3.5.17(typescript@5.8.3)))(vue@3.5.17(typescript@5.8.3)):
     dependencies:
       '@css-render/plugin-bem': 0.15.14(css-render@0.15.14)
       '@css-render/vue3-ssr': 0.15.14(vue@3.5.17(typescript@5.8.3))
@@ -6253,7 +6253,7 @@ snapshots:
       date-fns: 3.6.0
       lodash-es: 4.17.21
       naive-ui: 2.42.0(vue@3.5.17(typescript@5.8.3))
-      pro-composables: 3.3.2(vue@3.5.17(typescript@5.8.3))
+      pro-composables: 3.3.3(vue@3.5.17(typescript@5.8.3))
       sortablejs: 1.15.6
       type-fest: 4.41.0
       vooks: 0.2.12(vue@3.5.17(typescript@5.8.3))
