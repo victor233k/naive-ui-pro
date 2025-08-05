@@ -14,11 +14,15 @@ const LOGIN_ROUTE_PATH = '/login'
 const notFoundRoute: RouteRecordRaw = {
   path: '/:path(.*)*',
   name: 'FallbackNotFound',
-  component: () => import('@/views/not-found/index.vue'),
+  component: () => import('@/views/demos/fallback/404.vue'),
   meta: {
     title: '404',
   },
 }
+
+/**
+ * TODO: 后面把 route.name 都删掉
+ */
 
 /**
  * 忽略权限的路由
@@ -200,6 +204,87 @@ const accessRoutes: RouteRecordRaw[] = [
     // ],
   },
   {
+    path: '/demos',
+    name: 'Demos',
+    children: [
+      {
+        path: 'fallback',
+        name: 'Falback',
+        children: [
+          {
+            path: '403',
+            name: '403',
+            component: () => import('@/views/demos/fallback/403.vue'),
+            meta: {
+              title: '403',
+              icon: 'mdi:forbid',
+            },
+          },
+          {
+            path: '404',
+            name: '404',
+            component: () => import('@/views/demos/fallback/404.vue'),
+            meta: {
+              title: '404',
+              icon: 'ic:baseline-browser-not-supported',
+            },
+          },
+          {
+            path: '500',
+            name: '500',
+            component: () => import('@/views/demos/fallback/500.vue'),
+            meta: {
+              title: '500',
+              icon: 'streamline-flex:monitor-error',
+            },
+          },
+        ],
+        meta: {
+          title: '异常页',
+          icon: 'solar:shield-warning-broken',
+        },
+      },
+      {
+        name: 'External',
+        path: '/external',
+        meta: {
+          title: '外部页面',
+          icon: 'ant-design:link-outlined',
+          keepAlive: false,
+          hideInBreadcrumb: true,
+        },
+        children: [
+          {
+            name: 'Baidu',
+            path: 'baidu',
+            component: {},
+            meta: {
+              title: '百度',
+              icon: 'ri:baidu-fill',
+              keepAlive: false,
+              link: 'https://www.baidu.com',
+            },
+          },
+          {
+            name: 'component',
+            path: 'menu',
+            component: () => import('@/views/system/menu/index.vue'),
+            meta: {
+              title: '菜单管理(外部打开)',
+              icon: 'ant-design:menu-outlined',
+              keepAlive: false,
+              openInNewWindow: true,
+            },
+          },
+        ],
+      },
+    ],
+    meta: {
+      title: '演示',
+      icon: 'hugeicons:codesandbox',
+    },
+  },
+  {
     name: 'System',
     path: '/system',
     meta: {
@@ -240,40 +325,6 @@ const accessRoutes: RouteRecordRaw[] = [
           icon: 'ant-design:menu-outlined',
           keepAlive: true,
           hideInBreadcrumb: false,
-        },
-      },
-    ],
-  },
-  {
-    name: 'External',
-    path: '/external',
-    meta: {
-      title: '外部页面',
-      icon: 'ant-design:link-outlined',
-      keepAlive: false,
-      hideInBreadcrumb: true,
-    },
-    children: [
-      {
-        name: 'Baidu',
-        path: 'baidu',
-        component: {},
-        meta: {
-          title: '百度',
-          icon: 'ri:baidu-fill',
-          keepAlive: false,
-          link: 'https://www.baidu.com',
-        },
-      },
-      {
-        name: 'component',
-        path: 'menu',
-        component: () => import('@/views/system/menu/index.vue'),
-        meta: {
-          title: '菜单管理(外部打开)',
-          icon: 'ant-design:menu-outlined',
-          keepAlive: false,
-          openInNewWindow: true,
         },
       },
     ],
