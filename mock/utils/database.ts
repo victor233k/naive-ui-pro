@@ -1,7 +1,7 @@
 /* eslint-disable no-lone-blocks */
-import type { MenuApi } from '@/views/system/menu/index.api'
-import type { RoleApi } from '@/views/system/role/index.api'
-import type { UserApi } from '@/views/system/user/index.api'
+import type { Api as MenuApi } from '@/views/system/menu/index.api'
+import type { Api as RoleApi } from '@/views/system/role/index.api'
+import type { Api as UserApi } from '@/views/system/user/index.api'
 import { fakerZH_CN as faker } from '@faker-js/faker'
 import { SysEnableDisable, SysUserGender } from './dicts'
 

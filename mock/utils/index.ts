@@ -40,7 +40,8 @@ export function joinURLs(baseURL: string, ...relativeURLs: string[]) {
  * filterByParams(data, { name: '三', age: 18 })
  * ```
  */
-export function filterByParams<T extends Api.BaseModel>(
+// eslint-disable-next-line ts/no-empty-object-type
+export function filterByParams<T extends {}>(
   data: T[],
   params: Record<string, any>,
 ): T[] {

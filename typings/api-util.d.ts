@@ -1,7 +1,7 @@
 import type { Simplify } from 'type-fest'
 
 declare global {
-  export namespace Api {
+  export namespace ApiUtil {
     export interface PaginationParams {
       page: number
       pageSize: number
@@ -10,11 +10,7 @@ declare global {
     export type WithPaginationParams<T> = Simplify<T & PaginationParams>
     export type WithoutPaginationParams<T> = Omit<T, keyof PaginationParams>
 
-    export interface BaseModel {
-      id: string
-      createTime: string
-      updateTime: string
-    }
+    export type CommonModelAttrs = 'id' | 'createTime' | 'updateTime'
 
     export namespace ResponseFormat {
       export type Base<T> = Simplify<T>

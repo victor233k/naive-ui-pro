@@ -3,7 +3,13 @@ import { faker } from '@faker-js/faker'
 import { filterByParams, joinURLs } from './index'
 import { RF } from './response'
 
-export function buildCURDRoutes<T extends Api.BaseModel>(
+export interface BaseModel {
+  id: string
+  createTime: string
+  updateTime: string
+}
+
+export function buildCURDRoutes<T extends BaseModel>(
   baseURL: string,
   collection: T[],
 ): FakeRoute[] {
@@ -13,7 +19,7 @@ export function buildCURDRoutes<T extends Api.BaseModel>(
       method: 'get',
       url: 'page',
       response({ query }) {
-        const { page, pageSize, ...otherParams } = query as Api.WithPaginationParams<
+        const { page, pageSize, ...otherParams } = query as ApiUtil.WithPaginationParams<
           Record<string, any>
         >
 

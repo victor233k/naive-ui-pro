@@ -10,7 +10,7 @@ import {
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
 import UserModalForm from './components/user-modal-form.vue'
-import { UserApi } from './index.api'
+import { Api } from './index.api'
 import {
   genderMapping,
   genderOptions,
@@ -23,7 +23,7 @@ import {
 const searchForm = createProSearchForm()
 
 const { loading: insertOrUpdateLoading, runAsync: runAsyncInsertOrUpdate }
-  = useProRequest(UserApi.insertOrUpdate, {
+  = useProRequest(Api.insertOrUpdate, {
     manual: true,
     successTip: true,
   })
@@ -33,7 +33,7 @@ const {
   table: { tableProps, onChange },
 } = useProNDataTable(
   async ({ current, pageSize }, values) => {
-    const res = await UserApi.page({ pageSize, page: current, ...values })
+    const res = await Api.page({ pageSize, page: current, ...values })
     return res.data
   },
   {
@@ -41,8 +41,8 @@ const {
   },
 )
 
-const modalForm = createProModalForm<UserApi.insertOrUpdate.RequestData>({
-  onSubmit: (values: Omit<UserApi.insertOrUpdate.RequestData, keyof Api.BaseModel>) => {
+const modalForm = createProModalForm<Api.insertOrUpdate.RequestData>({
+  onSubmit: (values: Omit<Api.insertOrUpdate.RequestData, ApiUtil.CommonModelAttrs>) => {
     runAsyncInsertOrUpdate({
       ...values,
       id: modalForm.values.value.id,
@@ -53,7 +53,7 @@ const modalForm = createProModalForm<UserApi.insertOrUpdate.RequestData>({
   },
 })
 
-const { run: runDeleteUsers } = useProRequest(UserApi.del, {
+const { run: runDeleteUsers } = useProRequest(Api.del, {
   manual: true,
   successTip: '删除成功',
   onSuccess() {
@@ -61,7 +61,7 @@ const { run: runDeleteUsers } = useProRequest(UserApi.del, {
   },
 })
 
-const { run: handleEditUser } = useProRequest(UserApi.get, {
+const { run: handleEditUser } = useProRequest(Api.get, {
   manual: true,
   onSuccess: ({ data: user }) => {
     modalForm.show.value = true
@@ -69,7 +69,7 @@ const { run: handleEditUser } = useProRequest(UserApi.get, {
   },
 })
 
-const searchColumns: ProSearchFormColumns<UserApi.page.RequestData> = [
+const searchColumns: ProSearchFormColumns<Api.page.RequestData> = [
   {
     title: '用户名',
     path: 'username',
@@ -96,7 +96,7 @@ const searchColumns: ProSearchFormColumns<UserApi.page.RequestData> = [
   },
 ]
 
-const tableColumns: ProDataTableColumns<UserApi.Model> = [
+const tableColumns: ProDataTableColumns<Api.Model> = [
   {
     title: '序号',
     type: 'index',

@@ -10,7 +10,7 @@ import {
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
 import RoleModalForm from './components/role-modal-form.vue'
-import { RoleApi } from './index.api'
+import { Api } from './index.api'
 import {
   statusMapping,
   statusOptions,
@@ -20,7 +20,7 @@ import {
 const searchForm = createProSearchForm()
 
 const { loading: insertOrUpdateLoading, runAsync: runAsyncInsertOrUpdate }
-  = useProRequest(RoleApi.insertOrUpdate, {
+  = useProRequest(Api.insertOrUpdate, {
     manual: true,
     successTip: true,
   })
@@ -30,7 +30,7 @@ const {
   table: { tableProps, onChange },
 } = useProNDataTable(
   async ({ current, pageSize }, values) => {
-    const { data } = await RoleApi.page({ pageSize, page: current, ...values })
+    const { data } = await Api.page({ pageSize, page: current, ...values })
     return data
   },
   {
@@ -38,9 +38,9 @@ const {
   },
 )
 
-const modalForm = createProModalForm<RoleApi.insertOrUpdate.RequestData>({
+const modalForm = createProModalForm<Api.insertOrUpdate.RequestData>({
   onSubmit: (
-    values: Omit<RoleApi.insertOrUpdate.RequestData, keyof Api.BaseModel>,
+    values: Omit<Api.insertOrUpdate.RequestData, ApiUtil.CommonModelAttrs>,
   ) => {
     runAsyncInsertOrUpdate({
       ...values,
@@ -52,7 +52,7 @@ const modalForm = createProModalForm<RoleApi.insertOrUpdate.RequestData>({
   },
 })
 
-const { run: runDeleteRoles } = useProRequest(RoleApi.del, {
+const { run: runDeleteRoles } = useProRequest(Api.del, {
   manual: true,
   successTip: '删除成功',
   onSuccess() {
@@ -60,7 +60,7 @@ const { run: runDeleteRoles } = useProRequest(RoleApi.del, {
   },
 })
 
-const { run: handleEditRole } = useProRequest(RoleApi.get, {
+const { run: handleEditRole } = useProRequest(Api.get, {
   manual: true,
   onSuccess: ({ data: role }) => {
     modalForm.show.value = true
@@ -68,7 +68,7 @@ const { run: handleEditRole } = useProRequest(RoleApi.get, {
   },
 })
 
-const searchColumns: ProSearchFormColumns<RoleApi.page.RequestData> = [
+const searchColumns: ProSearchFormColumns<Api.page.RequestData> = [
   {
     title: '角色名',
     path: 'name',
@@ -87,7 +87,7 @@ const searchColumns: ProSearchFormColumns<RoleApi.page.RequestData> = [
   },
 ]
 
-const tableColumns: ProDataTableColumns<RoleApi.Model> = [
+const tableColumns: ProDataTableColumns<Api.Model> = [
   {
     title: '序号',
     type: 'index',
