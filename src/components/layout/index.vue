@@ -83,8 +83,8 @@ const showSidebarExtraCollapseButton = computed(() => {
 watch(() => route.path, (value) => {
   activeKey.value = value
   handleAddTab({
-    title: (route.meta.title || route.name || route.fullPath) as string,
-    icon: route.meta.icon || '',
+    title: (route.meta?.title || route.name || route.fullPath) as string,
+    icon: route.meta?.icon || '',
     affix: false,
     active: true,
     fullPath: route.fullPath,

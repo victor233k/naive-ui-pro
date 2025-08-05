@@ -18,7 +18,7 @@ export function layoutFalsyPlugin(): ProRouterPlugin {
     router.afterEach((to) => {
       const layoutStore = useLayoutStore()
       if (
-        to.meta.layout === false
+        to.meta?.layout === false
         && layoutStore.mode !== 'full-content'
       ) {
         layoutStore.mode = 'full-content'
