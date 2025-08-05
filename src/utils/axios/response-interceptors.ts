@@ -9,8 +9,8 @@ declare module 'axios' {
 
 export function setupTransformResponseInterceptor(http: AxiosInstance) {
   http.interceptors.response.use((response) => {
+    response.rawResponse = response
     if (isSuccess(response)) {
-      response.rawResponse = response
       return response.data
     }
     return response
