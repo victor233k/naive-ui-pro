@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { useProRequest } from '@/composables/use-pro-request'
-import { genderOptions, statusOptions } from './constants'
-import { apiGetRoles } from './user.api'
+import { UserApi } from '../index.api'
+import { genderOptions, statusOptions } from '../utils/constants'
 
-const {
-  data: roleOptions,
-} = useProRequest(() => {
-  return apiGetRoles().then(res => res.data.map(item => ({
+const { data: roleOptions } = useProRequest(async () => {
+  const res = await UserApi.roleList()
+  return res.data.map(item => ({
     value: item.id,
     label: item.name,
-  })))
+  }))
 })
 </script>
 

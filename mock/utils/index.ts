@@ -1,4 +1,3 @@
-import type { BaseModel } from '@/api/interface'
 import { isArray, isString, toString } from 'lodash-es'
 
 /**
@@ -41,7 +40,7 @@ export function joinURLs(baseURL: string, ...relativeURLs: string[]) {
  * filterByParams(data, { name: '三', age: 18 })
  * ```
  */
-export function filterByParams<T extends BaseModel>(
+export function filterByParams<T extends Api.BaseModel>(
   data: T[],
   params: Record<string, any>,
 ): T[] {

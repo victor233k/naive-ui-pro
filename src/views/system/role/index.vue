@@ -1,37 +1,49 @@
 <script setup lang="tsx">
 import type { ProDataTableColumns, ProSearchFormColumns } from 'pro-naive-ui'
-import type { Role, RoleModalFormParams, RoleSearchFormParams } from './role.api'
 import { Icon } from '@iconify/vue'
-import { createProModalForm, createProSearchForm, renderProDateText, renderProTags } from 'pro-naive-ui'
+import {
+  createProModalForm,
+  createProSearchForm,
+  renderProDateText,
+  renderProTags,
+} from 'pro-naive-ui'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
-import { statusMapping, statusOptions, statusToColorMapping } from './constants'
-import RoleModalForm from './role-modal-form.vue'
-import { apiDeleteRoles, apiGetRoleDetail, apiGetRoles, apiInsertOrUpdate } from './role.api'
+import RoleModalForm from './components/role-modal-form.vue'
+import { RoleApi } from './index.api'
+import {
+  statusMapping,
+  statusOptions,
+  statusToColorMapping,
+} from './utils/constants'
 
 const searchForm = createProSearchForm()
 
-const {
-  loading: insertOrUpdateLoading,
-  runAsync: runAsyncInsertOrUpdate,
-} = useProRequest(apiInsertOrUpdate, {
-  manual: true,
-  successTip: true,
-})
+const { loading: insertOrUpdateLoading, runAsync: runAsyncInsertOrUpdate }
+  = useProRequest(RoleApi.insertOrUpdate, {
+    manual: true,
+    successTip: true,
+  })
 
 const {
   search: { proSearchFormProps },
   table: { tableProps, onChange },
-} = useProNDataTable(({ current, pageSize }, values) => {
-  return apiGetRoles({ pageSize, page: current, ...values })
-}, {
-  form: searchForm,
-})
+} = useProNDataTable(
+  async ({ current, pageSize }, values) => {
+    const { data } = await RoleApi.page({ pageSize, page: current, ...values })
+    return data
+  },
+  {
+    form: searchForm,
+  },
+)
 
-const modalForm = createProModalForm({
-  onSubmit: (values) => {
+const modalForm = createProModalForm<RoleApi.insertOrUpdate.RequestData>({
+  onSubmit: (
+    values: Omit<RoleApi.insertOrUpdate.RequestData, keyof Api.BaseModel>,
+  ) => {
     runAsyncInsertOrUpdate({
-      ...values as RoleModalFormParams,
+      ...values,
       id: modalForm.values.value.id,
     }).then(() => {
       modalForm.show.value = false
@@ -40,9 +52,7 @@ const modalForm = createProModalForm({
   },
 })
 
-const {
-  run: runDeleteRoles,
-} = useProRequest(apiDeleteRoles, {
+const { run: runDeleteRoles } = useProRequest(RoleApi.del, {
   manual: true,
   successTip: '删除成功',
   onSuccess() {
@@ -50,9 +60,7 @@ const {
   },
 })
 
-const {
-  run: handleEditRole,
-} = useProRequest(apiGetRoleDetail, {
+const { run: handleEditRole } = useProRequest(RoleApi.get, {
   manual: true,
   onSuccess: ({ data: role }) => {
     modalForm.show.value = true
@@ -60,7 +68,7 @@ const {
   },
 })
 
-const searchColumns: ProSearchFormColumns<RoleSearchFormParams> = [
+const searchColumns: ProSearchFormColumns<RoleApi.page.RequestData> = [
   {
     title: '角色名',
     path: 'name',
@@ -79,7 +87,7 @@ const searchColumns: ProSearchFormColumns<RoleSearchFormParams> = [
   },
 ]
 
-const tableColumns: ProDataTableColumns<Role> = [
+const tableColumns: ProDataTableColumns<RoleApi.Model> = [
   {
     title: '序号',
     type: 'index',
@@ -131,9 +139,7 @@ const tableColumns: ProDataTableColumns<Role> = [
           >
             编辑
           </n-button>
-          <n-popconfirm
-            onPositiveClick={() => runDeleteRoles(row.id)}
-          >
+          <n-popconfirm onPositiveClick={() => runDeleteRoles(row.id)}>
             {{
               default: () => (
                 <span>

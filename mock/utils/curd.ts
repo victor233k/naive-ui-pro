@@ -1,10 +1,9 @@
 import type { FakeRoute } from 'vite-plugin-fake-server'
-import type { BaseModel, WithPageParams } from '@/api/interface'
 import { faker } from '@faker-js/faker'
 import { filterByParams, joinURLs } from './index'
 import { RF } from './response'
 
-export function buildCURDRoutes<T extends BaseModel>(
+export function buildCURDRoutes<T extends Api.BaseModel>(
   baseURL: string,
   collection: T[],
 ): FakeRoute[] {
@@ -14,7 +13,7 @@ export function buildCURDRoutes<T extends BaseModel>(
       method: 'get',
       url: 'page',
       response({ query }) {
-        const { page, pageSize, ...otherParams } = query as WithPageParams<
+        const { page, pageSize, ...otherParams } = query as Api.WithPaginationParams<
           Record<string, any>
         >
 

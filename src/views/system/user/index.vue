@@ -1,37 +1,50 @@
 <script setup lang="tsx">
 import type { ProDataTableColumns, ProSearchFormColumns } from 'pro-naive-ui'
-import type { User, UserModalFormParams, UserSearchFormParams } from './user.api'
 import { Icon } from '@iconify/vue'
-import { createProModalForm, createProSearchForm, renderProDateText, renderProTags } from 'pro-naive-ui'
+import {
+  createProModalForm,
+  createProSearchForm,
+  renderProDateText,
+  renderProTags,
+} from 'pro-naive-ui'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
-import { genderMapping, genderOptions, genderToColorMapping, statusMapping, statusOptions, statusToColorMapping } from './constants'
-import UserModalForm from './user-modal-form.vue'
-import { apiDeleteUsers, apiGetUserDetail, apiGetUsers, apiInsertOrUpdate } from './user.api'
+import UserModalForm from './components/user-modal-form.vue'
+import { UserApi } from './index.api'
+import {
+  genderMapping,
+  genderOptions,
+  genderToColorMapping,
+  statusMapping,
+  statusOptions,
+  statusToColorMapping,
+} from './utils/constants'
 
 const searchForm = createProSearchForm()
 
-const {
-  loading: insertOrUpdateLoading,
-  runAsync: runAsyncInsertOrUpdate,
-} = useProRequest(apiInsertOrUpdate, {
-  manual: true,
-  successTip: true,
-})
+const { loading: insertOrUpdateLoading, runAsync: runAsyncInsertOrUpdate }
+  = useProRequest(UserApi.insertOrUpdate, {
+    manual: true,
+    successTip: true,
+  })
 
 const {
   search: { proSearchFormProps },
   table: { tableProps, onChange },
-} = useProNDataTable(({ current, pageSize }, values) => {
-  return apiGetUsers({ pageSize, page: current, ...values })
-}, {
-  form: searchForm,
-})
+} = useProNDataTable(
+  async ({ current, pageSize }, values) => {
+    const res = await UserApi.page({ pageSize, page: current, ...values })
+    return res.data
+  },
+  {
+    form: searchForm,
+  },
+)
 
-const modalForm = createProModalForm({
-  onSubmit: (values) => {
+const modalForm = createProModalForm<UserApi.insertOrUpdate.RequestData>({
+  onSubmit: (values: Omit<UserApi.insertOrUpdate.RequestData, keyof Api.BaseModel>) => {
     runAsyncInsertOrUpdate({
-      ...values as UserModalFormParams,
+      ...values,
       id: modalForm.values.value.id,
     }).then(() => {
       modalForm.show.value = false
@@ -40,9 +53,7 @@ const modalForm = createProModalForm({
   },
 })
 
-const {
-  run: runDeleteUsers,
-} = useProRequest(apiDeleteUsers, {
+const { run: runDeleteUsers } = useProRequest(UserApi.del, {
   manual: true,
   successTip: '删除成功',
   onSuccess() {
@@ -50,9 +61,7 @@ const {
   },
 })
 
-const {
-  run: handleEditUser,
-} = useProRequest(apiGetUserDetail, {
+const { run: handleEditUser } = useProRequest(UserApi.get, {
   manual: true,
   onSuccess: ({ data: user }) => {
     modalForm.show.value = true
@@ -60,7 +69,7 @@ const {
   },
 })
 
-const searchColumns: ProSearchFormColumns<UserSearchFormParams> = [
+const searchColumns: ProSearchFormColumns<UserApi.page.RequestData> = [
   {
     title: '用户名',
     path: 'username',
@@ -87,7 +96,7 @@ const searchColumns: ProSearchFormColumns<UserSearchFormParams> = [
   },
 ]
 
-const tableColumns: ProDataTableColumns<User> = [
+const tableColumns: ProDataTableColumns<UserApi.Model> = [
   {
     title: '序号',
     type: 'index',
@@ -156,9 +165,7 @@ const tableColumns: ProDataTableColumns<User> = [
           >
             编辑
           </n-button>
-          <n-popconfirm
-            onPositiveClick={() => runDeleteUsers(row.id)}
-          >
+          <n-popconfirm onPositiveClick={() => runDeleteUsers(row.id)}>
             {{
               default: () => (
                 <span>

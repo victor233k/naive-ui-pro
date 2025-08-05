@@ -1,6 +1,9 @@
 import type { SetOptional } from 'type-fest'
-import type { BaseModel, ResponseFormat, WithoutPageParams, WithPageParams } from '../interface'
+import type { statusMapping } from './utils/constants'
+import { isNil } from 'lodash-es'
 import http from '@/utils/axios'
+
+type StatusEnum = keyof typeof statusMapping
 
 export class RoleApi {
   static page(params: RoleApi.page.RequestData) {
@@ -17,7 +20,7 @@ export class RoleApi {
 
   static insertOrUpdate(data: RoleApi.insertOrUpdate.RequestData) {
     return http({
-      method: data.id == null ? 'post' : 'put',
+      method: isNil(data.id) ? 'post' : 'put',
       url: '/system/role',
       data,
     })
@@ -29,34 +32,34 @@ export class RoleApi {
 }
 
 export declare namespace RoleApi {
-  export interface Model extends BaseModel {
+  export interface Model extends Api.BaseModel {
     name: string
     code: string
-    status: string
+    status: StatusEnum
     remark?: string
   }
 
   export namespace page {
-    export type RequestData = WithPageParams<{
+    export type RequestData = Api.WithPaginationParams<{
       name?: string
       code?: string
       status?: string
     }>
 
-    export type ResponseData = ResponseFormat.Page<Model>
+    export type ResponseData = Api.ResponseFormat.Page<Model>
   }
 
   export namespace list {
-    export type RequestData = WithoutPageParams<page.RequestData>
+    export type RequestData = Api.WithoutPaginationParams<page.RequestData>
 
-    export type ResponseData = ResponseFormat.Base<Model[]>
+    export type ResponseData = Api.ResponseFormat.Base<Model[]>
   }
 
   export namespace get {
-    export type ResponseData = ResponseFormat.Base<Model>
+    export type ResponseData = Api.ResponseFormat.Base<Model>
   }
 
   export namespace insertOrUpdate {
-    export type RequestData = SetOptional<Model, 'id'>
+    export type RequestData = SetOptional<Model, keyof Api.BaseModel>
   }
 }

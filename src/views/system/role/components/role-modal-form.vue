@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { statusOptions } from './constants'
+import { statusOptions } from '../utils/constants'
 </script>
 
 <template>
