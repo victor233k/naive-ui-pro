@@ -19,7 +19,7 @@ export function documentTitlePlugin({ titleTemplate }: DocumentTitlePluginOption
       if (failure) {
         return
       }
-      const title = to.meta.title ?? normalizeRouteName(to.name)
+      const title = to.meta?.title ?? normalizeRouteName(to.name)
       useTitle(title, {
         titleTemplate: () => {
           return titleTemplate

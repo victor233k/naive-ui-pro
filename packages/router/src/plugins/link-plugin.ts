@@ -30,7 +30,7 @@ export function linkPlugin({
 }: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
     router.beforeEach((to, from) => {
-      const { link, openInNewWindow = false } = to.meta || {}
+      const { link, openInNewWindow = false } = to.meta ?? {}
       if (isExternalUrl(link)) {
         open(link)
         return false

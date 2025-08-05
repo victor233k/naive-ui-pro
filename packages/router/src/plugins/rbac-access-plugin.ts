@@ -269,7 +269,7 @@ function buildRoutesByFrontend(
 ): RouteRecordRaw[] {
   routes = cloneDeep(routes)
   const hasAuth = (route: RouteRecordRaw) => {
-    const routeRoles = route.meta.roles ?? []
+    const routeRoles = route.meta?.roles ?? []
     if (routeRoles.length <= 0) {
       // 如果没有设置 roles，则表示所有角色都可以访问
       return true

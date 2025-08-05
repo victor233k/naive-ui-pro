@@ -40,7 +40,7 @@ export function breadcrumbPlugin(): ProRouterPlugin {
         const breadcrumbs = computed(() => {
           const breadcrumbs: BreadcrumbItem[] = []
           router.currentRoute.value.matched.forEach(({ meta, path, name }) => {
-            const { title, icon, hideInBreadcrumb } = meta
+            const { title, icon, hideInBreadcrumb } = meta ?? {}
             if (title && !hideInBreadcrumb) {
               breadcrumbs.push({
                 path,

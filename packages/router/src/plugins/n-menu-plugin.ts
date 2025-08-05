@@ -73,7 +73,7 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
               icon,
               title,
               hideInMenu = false,
-            } = meta
+            } = meta ?? {}
             const normalizedName = normalizeRouteName(name)
             const menu: MenuOption = {
               show: !hideInMenu,
@@ -87,7 +87,7 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
                   : builtinResolveIcon(icon)
               }
             }
-            if (children.filter(item => !item.meta.hideInMenu).length > 0) {
+            if (children.filter(item => !item.meta?.hideInMenu).length > 0) {
               menu.children = sortRoutesByMetaOrder(children) as any
             }
             return menu
@@ -116,6 +116,6 @@ function builtinResolveIcon(icon: string) {
 
 function sortRoutesByMetaOrder(routes: Omit<RouteRecordRaw, 'component'>[]) {
   return routes.sort((a, b) => {
-    return (a.meta.order ?? Number.MAX_SAFE_INTEGER) - (b.meta.order ?? Number.MAX_SAFE_INTEGER)
+    return (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER)
   })
 }

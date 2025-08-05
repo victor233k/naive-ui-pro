@@ -51,7 +51,7 @@ export function keepAlivePlugin({ defaultKeepAlive = false }: KeepAlivePluginOpt
       if (!from.name) {
         return
       }
-      const { keepAlive = defaultKeepAlive } = from.meta
+      const { keepAlive = defaultKeepAlive } = from.meta ?? {}
       const normalizedName = normalizeRouteName(from.name)
       if (isBoolean(keepAlive)) {
         keepAlive

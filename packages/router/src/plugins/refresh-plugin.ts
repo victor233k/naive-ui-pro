@@ -53,7 +53,7 @@ export function refreshPlugin(): ProRouterPlugin {
         return
       }
       const normalizedName = normalizeRouteName(to.name)
-      const baseKey = to.meta.useFullPathAsKey ? to.fullPath : to.path
+      const baseKey = to.meta?.useFullPathAsKey ? to.fullPath : to.path
 
       routeKeyMap.value.set(normalizedName, {
         ...(routeKeyMap.value.get(normalizedName) ?? {}),

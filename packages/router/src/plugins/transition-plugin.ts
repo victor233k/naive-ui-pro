@@ -115,7 +115,7 @@ export function transitionPlugin({
 
 function resolveTransitionName(router: Router, transitionName: MaybeRefOrGetter<RouteTransitionName>) {
   transitionName = toValue(transitionName)
-  const mergedTransitioName = router.currentRoute.value.meta.transitionName ?? transitionName
+  const mergedTransitioName = router.currentRoute.value.meta?.transitionName ?? transitionName
   if (!has(builtinTransitionNameToTransitionPropsRecord, mergedTransitioName)) {
     const finalTransitioName = has(builtinTransitionNameToTransitionPropsRecord, transitionName)
       ? transitionName
