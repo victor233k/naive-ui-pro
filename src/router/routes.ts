@@ -230,20 +230,6 @@ const accessRoutes: RouteRecordRaw[] = [
           keepAlive: true,
           hideInBreadcrumb: false,
         },
-        children: [
-          {
-            path: 'detail/:id?',
-            name: 'RoleDetail',
-            component: () => import('@/views/system/role/detail.vue'),
-            meta: {
-              title: '角色详情',
-              icon: 'ant-design:user-add-outlined',
-              keepAlive: true,
-              hideInBreadcrumb: false,
-              hideInMenu: true,
-            },
-          },
-        ],
       },
       {
         name: 'Menu',

@@ -1,21 +1,66 @@
 <script setup lang="tsx">
 import type { ProDataTableColumns, ProSearchFormColumns } from 'pro-naive-ui'
+import type { Role, RoleModalFormParams, RoleSearchFormParams } from './role.api'
 import { Icon } from '@iconify/vue'
-import { format } from 'date-fns'
-import { useMessage, useModal } from 'naive-ui'
-import { createProSearchForm, useNDataTable, useRequest } from 'pro-naive-ui'
-import { shallowRef } from 'vue'
-import { useRouter } from 'vue-router'
-import { RoleApi } from '@/api/system/role'
-import { SysEnableDisableDict } from '@/dicts/sys-enable-disable'
-import { renderProTagByDictValue } from '@/dicts/utils'
-
-const router = useRouter()
-const message = useMessage()
-const modal = useModal()
+import { createProModalForm, createProSearchForm, renderProDateText, renderProTags } from 'pro-naive-ui'
+import { useProNDataTable } from '@/composables/use-pro-n-data-table'
+import { useProRequest } from '@/composables/use-pro-request'
+import { statusMapping, statusOptions, statusToColorMapping } from './constants'
+import RoleModalForm from './role-modal-form.vue'
+import { apiDeleteRoles, apiGetRoleDetail, apiGetRoles, apiInsertOrUpdate } from './role.api'
 
 const searchForm = createProSearchForm()
-const searchColumns: ProSearchFormColumns<RoleApi.page.RequestData> = [
+
+const {
+  loading: insertOrUpdateLoading,
+  runAsync: runAsyncInsertOrUpdate,
+} = useProRequest(apiInsertOrUpdate, {
+  manual: true,
+  successTip: true,
+})
+
+const {
+  search: { proSearchFormProps },
+  table: { tableProps, onChange },
+} = useProNDataTable(({ current, pageSize }, values) => {
+  return apiGetRoles({ pageSize, page: current, ...values })
+}, {
+  form: searchForm,
+})
+
+const modalForm = createProModalForm({
+  onSubmit: (values) => {
+    runAsyncInsertOrUpdate({
+      ...values as RoleModalFormParams,
+      id: modalForm.values.value.id,
+    }).then(() => {
+      modalForm.show.value = false
+      onChange({ page: 1 })
+    })
+  },
+})
+
+const {
+  run: runDeleteRoles,
+} = useProRequest(apiDeleteRoles, {
+  manual: true,
+  successTip: '删除成功',
+  onSuccess() {
+    onChange({ page: 1 })
+  },
+})
+
+const {
+  run: handleEditRole,
+} = useProRequest(apiGetRoleDetail, {
+  manual: true,
+  onSuccess: ({ data: role }) => {
+    modalForm.show.value = true
+    modalForm.values.value = role
+  },
+})
+
+const searchColumns: ProSearchFormColumns<RoleSearchFormParams> = [
   {
     title: '角色名',
     path: 'name',
@@ -28,120 +73,88 @@ const searchColumns: ProSearchFormColumns<RoleApi.page.RequestData> = [
     title: '状态',
     path: 'status',
     field: 'select',
-    fieldProps() {
-      return {
-        options: SysEnableDisableDict.items(),
-      }
+    fieldProps: {
+      options: statusOptions,
     },
   },
 ]
 
-const {
-  table: { tableProps },
-  search: { proSearchFormProps },
-  refresh,
-} = useNDataTable(
-  ({ current, pageSize }) =>
-    RoleApi.page({
-      ...searchForm.values.value,
-      page: current,
-      pageSize,
-    }).then(res => res.data),
+const tableColumns: ProDataTableColumns<Role> = [
   {
-    form: searchForm,
-    onError(e) {
-      message.error(e.message)
-    },
-  },
-)
-
-const checkedRowKeys = shallowRef([])
-const { run: del } = useRequest(RoleApi.del, {
-  onSuccess() {
-    checkedRowKeys.value = []
-    refresh()
-    message.success('删除成功')
-  },
-  onError(e) {
-    message.error(e.message)
-  },
-})
-const delData: typeof del = (...args) => {
-  modal.create({
-    preset: 'dialog',
-    type: 'warning',
-    title: '提示',
-    positiveText: '确定',
-    negativeText: '取消',
-    content: '您确定要删除选中的数据吗？',
-    onPositiveClick: () => del(...args),
-  })
-}
-
-const columns: ProDataTableColumns<RoleApi.Model> = [
-  {
-    type: 'selection',
-  },
-  {
-    title: '行号',
+    title: '序号',
     type: 'index',
   },
   {
     title: '角色名',
-    render: row => row.name,
+    path: 'name',
+    width: 120,
   },
   {
     title: '角色编码',
-    render: row => row.code,
+    path: 'code',
+    width: 120,
   },
   {
     title: '状态',
-    render: row => renderProTagByDictValue(row.status, SysEnableDisableDict),
+    width: 100,
+    render: (row) => {
+      return renderProTags({
+        content: statusMapping[row.status],
+        type: statusToColorMapping[row.status],
+      })
+    },
   },
   {
     title: '备注',
-    render: row => row.remark,
+    path: 'remark',
+    ellipsis: {
+      tooltip: true,
+    },
+    width: 230,
   },
   {
     title: '更新时间',
-    render: row =>
-      row.updateTime && format(row.updateTime, 'yyyy-MM-dd HH:mm:ss'),
+    width: 220,
+    render: row => renderProDateText(row.updateTime),
   },
   {
     title: '操作',
-    width: 150,
+    width: 120,
     render: (row) => {
       return (
         <n-flex>
           <n-button
             type="primary"
-            quaternary
             size="small"
-            onClick={() =>
-              router.push({ name: 'RoleDetail', params: { id: row.id } })}
+            text={true}
+            onClick={() => handleEditRole(row.id)}
+          >
+            编辑
+          </n-button>
+          <n-popconfirm
+            onPositiveClick={() => runDeleteRoles(row.id)}
           >
             {{
-              icon: () => (
-                <n-icon>
-                  <Icon icon="ant-design:edit-outlined" />
-                </n-icon>
+              default: () => (
+                <span>
+                  确定删除
+                  <span class="c-red-500 font-bold">{row.name}</span>
+                  吗？
+                </span>
               ),
+              trigger: () => {
+                return (
+                  <n-button
+                    type="error"
+                    size="small"
+                    text={true}
+                  >
+                    删除
+                  </n-button>
+                )
+              },
             }}
-          </n-button>
-          <n-button
-            type="error"
-            quaternary
-            size="small"
-            onClick={() => delData(row.id)}
-          >
-            {{
-              icon: () => (
-                <n-icon>
-                  <Icon icon="ant-design:delete-outlined" />
-                </n-icon>
-              ),
-            }}
-          </n-button>
+          </n-popconfirm>
         </n-flex>
       )
     },
@@ -155,27 +168,27 @@ const columns: ProDataTableColumns<RoleApi.Model> = [
     vertical
     size="large"
   >
-    <pro-card title="筛选条件">
+    <pro-card content-class="pb-0!">
       <pro-search-form
         :form="searchForm"
         :columns="searchColumns"
         v-bind="proSearchFormProps"
       />
     </pro-card>
-
     <pro-data-table
-      v-model:checked-row-keys="checkedRowKeys"
+      title="角色列表"
       row-key="id"
       flex-height
-      :columns
+      :scroll-x="970"
+      :columns="tableColumns"
       v-bind="tableProps"
     >
-      <template #extra>
+      <template #toolbar>
         <n-flex>
           <n-button
             type="primary"
             ghost
-            @click="router.push({ name: 'RoleDetail' })"
+            @click="modalForm.show.value = true"
           >
             <template #icon>
               <n-icon>
@@ -184,33 +197,15 @@ const columns: ProDataTableColumns<RoleApi.Model> = [
             </template>
             新增
           </n-button>
-          <n-button
-            type="error"
-            ghost
-            :disabled="checkedRowKeys.length === 0"
-            @click="delData(checkedRowKeys)"
-          >
-            <template #icon>
-              <n-icon>
-                <icon icon="ant-design:delete-outlined" />
-              </n-icon>
-            </template>
-            删除
-          </n-button>
-
-          <n-button
-            ghost
-            @click="refresh"
-          >
-            <template #icon>
-              <n-icon>
-                <icon icon="ant-design:reload-outlined" />
-              </n-icon>
-            </template>
-            刷新
-          </n-button>
         </n-flex>
       </template>
     </pro-data-table>
+    <pro-modal-form
+      :form="modalForm"
+      :loading="insertOrUpdateLoading"
+      :title="`${modalForm.values.value.id ? `编辑` : '新增'}角色`"
+    >
+      <role-modal-form />
+    </pro-modal-form>
   </n-flex>
 </template>
