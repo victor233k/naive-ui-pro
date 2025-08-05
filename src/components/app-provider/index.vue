@@ -22,6 +22,7 @@ const configProviderProps = computed<ProConfigProviderProps>(() => {
       ProModalForm: {
         preset: 'card',
         labelPlacement: 'left',
+        labelWidth: '100',
       },
     },
   }
