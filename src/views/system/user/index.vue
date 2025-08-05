@@ -51,7 +51,7 @@ const {
 })
 
 const {
-  run: runGetUserDetail,
+  run: handleEditUser,
 } = useProRequest(apiGetUserDetail, {
   manual: true,
   onSuccess: ({ data: user }) => {
@@ -152,7 +152,7 @@ const tableColumns: ProDataTableColumns<User> = [
             type="primary"
             size="small"
             text={true}
-            onClick={() => runGetUserDetail(row.id)}
+            onClick={() => handleEditUser(row.id)}
           >
             编辑
           </n-button>
@@ -227,7 +227,6 @@ const tableColumns: ProDataTableColumns<User> = [
     </pro-data-table>
     <pro-modal-form
       :form="modalForm"
-      label-width="100"
       :loading="insertOrUpdateLoading"
       :title="`${modalForm.values.value.id ? `编辑` : '新增'}用户`"
     >
