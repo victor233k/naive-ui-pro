@@ -2,6 +2,7 @@ import type { FakeRoute } from 'vite-plugin-fake-server'
 import { faker } from '@faker-js/faker'
 import { filterByParams, joinURLs } from './index'
 import { RF } from './response'
+import { orderBy } from 'lodash-es'
 
 export interface BaseModel {
   id: string
@@ -13,6 +14,8 @@ export function buildCURDRoutes<T extends BaseModel>(
   baseURL: string,
   collection: T[],
 ): FakeRoute[] {
+  const getOrderedCollection = () => orderBy(collection, ['updateTime'], ['desc'])
+
   const routes: FakeRoute[] = [
     // #region 分页列表
     {
@@ -27,7 +30,7 @@ export function buildCURDRoutes<T extends BaseModel>(
           return RF.error('参数 page 和 pageSize 不能为空')
         }
 
-        const filteredData = filterByParams(collection, otherParams)
+        const filteredData = filterByParams(getOrderedCollection(), otherParams)
         return RF.success({
           page,
           pageSize,
@@ -43,7 +46,7 @@ export function buildCURDRoutes<T extends BaseModel>(
       method: 'get',
       url: 'list',
       response({ query }) {
-        return RF.success(filterByParams(collection, query))
+        return RF.success(filterByParams(getOrderedCollection(), query))
       },
     },
     // #endregion
