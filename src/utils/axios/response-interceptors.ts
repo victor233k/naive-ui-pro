@@ -23,7 +23,7 @@ export function setupResponseInterceptors(
   })
 
   // 在这里注册错误拦截，确保能捕获所有的错误
-  http.interceptors.response.use(null, (error) => handleError(error, options))
+  http.interceptors.response.use(null, error => handleError(error, options))
 }
 
 function unwrapResponseData(
@@ -33,18 +33,19 @@ function unwrapResponseData(
   try {
     response.rawData = response.data
     response.data = options.unwrapResponseData(response)
-  } catch (e: unknown) {
+  }
+  catch (e: unknown) {
     throw isAxiosError(e)
       ? e
       : isError(e)
-      ? AxiosError.from(
-          e,
-          AxiosError.ERR_BAD_RESPONSE,
-          response.config,
-          response.request,
-          response,
-        )
-      : new AxiosError(
+        ? AxiosError.from(
+            e,
+            AxiosError.ERR_BAD_RESPONSE,
+            response.config,
+            response.request,
+            response,
+          )
+        : new AxiosError(
           toString(e) || 'Unknown Error',
           AxiosError.ERR_BAD_RESPONSE,
           response.config,

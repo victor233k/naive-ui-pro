@@ -2,6 +2,7 @@ import type { App } from 'vue'
 import { preferenceConfig } from '@root/preference'
 import { merge } from 'lodash-es'
 import { create, ProInput, ProSelect } from 'pro-naive-ui'
+import { ProIconifyIcons } from './components/iconify-icons'
 import { setupRouter } from './router'
 import { setupPinia } from './store'
 import 'virtual:uno.css'
@@ -25,6 +26,7 @@ function setupComponents(app: App) {
       ProSelect,
     ],
   }))
+  app.component(ProIconifyIcons.name!, ProIconifyIcons)
 }
 
 function setupAppLoading() {

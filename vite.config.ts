@@ -40,6 +40,21 @@ export default defineConfig(({ mode }) => {
       }),
       Components({
         resolvers: [
+          {
+            type: 'component',
+            resolve: (name: string) => {
+              const components = [
+                { name: 'ProIconifyIcons', from: '@/components/iconify-icons' },
+              ]
+              const comp = components.find(comp => comp.name === name)
+              if (comp) {
+                return {
+                  name: comp.name,
+                  from: comp.from,
+                }
+              }
+            },
+          },
           NaiveUiResolver(),
           ProNaiveUIResolver(),
         ],
@@ -79,6 +94,15 @@ export default defineConfig(({ mode }) => {
     },
     css: {
       transformer: 'lightningcss',
+    },
+    server: {
+      proxy: {
+        '/iconify': {
+          target: 'https://api.iconify.design',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/iconify/, ''),
+        },
+      },
     },
   }
 })
