@@ -6,7 +6,7 @@ import { Api } from '../index.api'
 import { buildTree } from '../utils'
 import { linkModeOptions, statusOptions, typeOptions } from '../utils/constants'
 import { orderBy } from 'lodash-es'
-import { ProIconifyIcons } from '@/components/iconify-icons'
+import { IconSelect } from '@/components/icon-select'
 
 type CascaderOption = _CascaderOption & Pick<Api.Model, 'id' | 'parentId'>
 
@@ -77,7 +77,7 @@ function isDisabled(item: Api.Model | undefined): boolean {
       options: cascaderOptions,
     }"
   />
-  <pro-iconify-icons
+  <icon-select
     title="菜单图标"
     path="icon"
     required
