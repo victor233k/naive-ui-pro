@@ -1,6 +1,6 @@
 <script setup lang="tsx">
 import { computed, h, shallowRef, type VNodeChild } from 'vue'
-import { proIconSelectProps } from './interface'
+import { proIconSelectProps, type ProIconSelectSlots } from './interface'
 import { ProSelect, useInjectProForm, type ProSelectInst } from 'pro-naive-ui'
 import { useProRequest } from '@/composables/use-pro-request'
 import { Api } from './index.api'
@@ -12,6 +12,8 @@ import { useDebounceFn } from '@vueuse/core'
 defineOptions({
   name: 'ProIconSelect',
 })
+
+defineSlots<ProIconSelectSlots>()
 
 const { path, fieldProps = {} } = defineProps(proIconSelectProps)
 const limit = computed(() => fieldProps.limit ?? 50)
@@ -85,8 +87,8 @@ defineExpose(
           fieldProps: {
             renderLabel,
             ...($props.fieldProps || {}),
-            remote: true,
             options,
+            remote: true,
             filterable: true,
             loading: remoteIconsLoading,
             onSearch: handleSearch,
