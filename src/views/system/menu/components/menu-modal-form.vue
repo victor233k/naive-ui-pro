@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { CascaderOption as _CascaderOption } from 'naive-ui'
+import { orderBy } from 'lodash-es'
 import { ref, shallowReactive } from 'vue'
+import { IconSelect } from '@/components/icon-select'
 import { useProRequest } from '@/composables/use-pro-request'
 import { Api } from '../index.api'
 import { buildTree } from '../utils'
 import { linkModeOptions, statusOptions, typeOptions } from '../utils/constants'
-import { orderBy } from 'lodash-es'
-import { IconSelect } from '@/components/icon-select'
 
 type CascaderOption = _CascaderOption & Pick<Api.Model, 'id' | 'parentId'>
 
@@ -25,7 +25,8 @@ useProRequest(Api.list, {
     for (const item of data) {
       idMap.set(item.id, item)
 
-      if (item.type === '3') continue
+      if (item.type === '3')
+        continue
 
       const parentId = item.parentId || null
       const children = parentIdMap.get(parentId) || []
@@ -49,12 +50,13 @@ function toOption(item: Api.Model): CascaderOption {
 }
 
 function isDisabled(item: Api.Model | undefined): boolean {
-  if (!item) return false
+  if (!item)
+    return false
 
   return (
-    item.status === '0' ||
-    item.id === values.id ||
-    (!!item.parentId && isDisabled(idMap.get(item.parentId)))
+    item.status === '0'
+    || item.id === values.id
+    || (!!item.parentId && isDisabled(idMap.get(item.parentId)))
   )
 }
 </script>
