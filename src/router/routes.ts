@@ -59,149 +59,7 @@ const accessRoutes: RouteRecordRaw[] = [
     meta: {
       title: '首页',
       icon: 'material-symbols:dashboard-outline-rounded',
-      keepAlive: true,
-      hideInBreadcrumb: false,
     },
-    // children: [
-    //   {
-    //     name: 'User22',
-    //     path: 'user',
-    //     component: () => import('@/views/system/user/index.vue'),
-    //     meta: {
-    //       title: '用户管理',
-    //       icon: 'ant-design:user-outlined',
-    //       keepAlive: true,
-    //       hideInBreadcrumb: false,
-    //     },
-    //   },
-    //   {
-    //     name: 'Role222222',
-    //     path: 'role',
-    //     component: () => import('@/views/system/role/index.vue'),
-    //     meta: {
-    //       title: '角色管理',
-    //       icon: 'carbon:user-role',
-    //       keepAlive: true,
-    //       hideInBreadcrumb: false,
-    //     },
-    //   },
-    //   {
-    //     name: 'Menu2222222',
-    //     path: 'menu',
-    //     component: () => import('@/views/system/menu/index.vue'),
-    //     meta: {
-    //       title: '菜单管理',
-    //       icon: 'ant-design:menu-outlined',
-    //       keepAlive: true,
-    //       hideInBreadcrumb: false,
-    //     },
-    //     children: [
-    //       {
-    //         name: 'User22',
-    //         path: 'user',
-    //         component: () => import('@/views/system/user/index.vue'),
-    //         meta: {
-    //           title: '用户管理',
-    //           icon: 'ant-design:user-outlined',
-    //           keepAlive: true,
-    //           hideInBreadcrumb: false,
-    //         },
-    //       },
-    //       {
-    //         name: 'Role22',
-    //         path: 'role',
-    //         component: () => import('@/views/system/role/index.vue'),
-    //         meta: {
-    //           title: '角色管理',
-    //           icon: 'carbon:user-role',
-    //           keepAlive: true,
-    //           hideInBreadcrumb: false,
-    //         },
-    //       },
-    //       {
-    //         name: 'Menu22',
-    //         path: 'menu',
-    //         component: () => import('@/views/system/menu/index.vue'),
-    //         meta: {
-    //           title: '菜单管理',
-    //           icon: 'ant-design:menu-outlined',
-    //           keepAlive: true,
-    //           hideInBreadcrumb: false,
-    //         },
-    //         children: [
-    //           {
-    //             name: 'User33',
-    //             path: 'user',
-    //             component: () => import('@/views/system/user/index.vue'),
-    //             meta: {
-    //               title: '用户管理',
-    //               icon: 'ant-design:user-outlined',
-    //               keepAlive: true,
-    //               hideInBreadcrumb: false,
-    //             },
-    //           },
-    //           {
-    //             name: 'Role33',
-    //             path: 'role',
-    //             component: () => import('@/views/system/role/index.vue'),
-    //             meta: {
-    //               title: '角色管理',
-    //               icon: 'carbon:user-role',
-    //               keepAlive: true,
-    //               hideInBreadcrumb: false,
-    //             },
-    //           },
-    //           {
-    //             name: 'Menu33',
-    //             path: 'menu',
-    //             component: () => import('@/views/system/menu/index.vue'),
-    //             meta: {
-    //               title: '菜单管理',
-    //               icon: 'ant-design:menu-outlined',
-    //               keepAlive: true,
-    //               hideInBreadcrumb: false,
-    //             },
-    //             children: [
-    //               {
-    //                 name: 'User333',
-    //                 path: 'user',
-    //                 component: () => import('@/views/system/user/index.vue'),
-    //                 meta: {
-    //                   title: '用户管理',
-    //                   icon: 'ant-design:user-outlined',
-    //                   keepAlive: true,
-    //                   hideInBreadcrumb: false,
-    //                 },
-    //               },
-    //               {
-    //                 name: 'Role333',
-    //                 path: 'role',
-    //                 component: () => import('@/views/system/role/index.vue'),
-    //                 meta: {
-    //                   title: '角色管理',
-    //                   icon: 'carbon:user-role',
-    //                   keepAlive: true,
-    //                   hideInBreadcrumb: false,
-    //                 },
-    //               },
-    //               {
-    //                 name: 'Menu3333',
-    //                 path: 'menu',
-    //                 component: () => import('@/views/system/menu/index.vue'),
-    //                 meta: {
-    //                   title: '菜单管理',
-    //                   icon: 'ant-design:menu-outlined',
-    //                   keepAlive: true,
-    //                   hideInBreadcrumb: false,
-    //                 },
-    //               },
-    //             ],
-    //           },
-    //         ],
-    //       },
-    //     ],
-    //   },
-    // ],
   },
   {
     path: '/demos',
@@ -250,30 +108,55 @@ const accessRoutes: RouteRecordRaw[] = [
         meta: {
           title: '外部页面',
           icon: 'ant-design:link-outlined',
-          keepAlive: false,
-          hideInBreadcrumb: true,
         },
         children: [
           {
-            name: 'Baidu',
-            path: 'baidu',
-            component: {},
+            name: 'Link',
+            path: 'link',
+            children: [
+              {
+                name: 'Vite',
+                path: 'vite',
+                component: {},
+                meta: {
+                  icon: 'logos:vitejs',
+                  link: 'https://vite.dev',
+                },
+              },
+              {
+                name: 'Vue',
+                path: 'vue',
+                component: {},
+                meta: {
+                  icon: 'logos:vue',
+                  link: 'https://vuejs.org/',
+                },
+              },
+              {
+                name: 'OpenNewWindow',
+                path: 'menu',
+                component: () => import('@/views/system/menu/index.vue'),
+                meta: {
+                  title: '外部打开路由',
+                  icon: 'ant-design:menu-outlined',
+                  openInNewWindow: true,
+                },
+              },
+              {
+                name: 'LayoutFalsy',
+                path: 'menu-layout-falsy',
+                component: () => import('@/views/system/menu/index.vue'),
+                meta: {
+                  title: '无布局',
+                  icon: 'ant-design:menu-outlined',
+                  layout: false,
+                  openInNewWindow: true,
+                },
+              },
+            ],
             meta: {
-              title: '百度',
-              icon: 'ri:baidu-fill',
-              keepAlive: false,
-              link: 'https://www.baidu.com',
-            },
-          },
-          {
-            name: 'component',
-            path: 'menu',
-            component: () => import('@/views/system/menu/index.vue'),
-            meta: {
-              title: '菜单管理(外部打开)',
-              icon: 'ant-design:menu-outlined',
-              keepAlive: false,
-              openInNewWindow: true,
+              title: '外链',
+              icon: 'akar-icons:link-out',
             },
           },
         ],
@@ -287,12 +170,6 @@ const accessRoutes: RouteRecordRaw[] = [
   {
     name: 'System',
     path: '/system',
-    meta: {
-      title: '系统管理',
-      icon: 'ant-design:setting-outlined',
-      keepAlive: true,
-      hideInBreadcrumb: false,
-    },
     children: [
       {
         name: 'User',
@@ -301,8 +178,6 @@ const accessRoutes: RouteRecordRaw[] = [
         meta: {
           title: '用户管理',
           icon: 'ant-design:user-outlined',
-          keepAlive: true,
-          hideInBreadcrumb: false,
         },
       },
       {
@@ -312,8 +187,6 @@ const accessRoutes: RouteRecordRaw[] = [
         meta: {
           title: '角色管理',
           icon: 'carbon:user-role',
-          keepAlive: true,
-          hideInBreadcrumb: false,
         },
       },
       {
@@ -323,11 +196,13 @@ const accessRoutes: RouteRecordRaw[] = [
         meta: {
           title: '菜单管理',
           icon: 'ant-design:menu-outlined',
-          keepAlive: true,
-          hideInBreadcrumb: false,
         },
       },
     ],
+    meta: {
+      title: '系统管理',
+      icon: 'ant-design:setting-outlined',
+    },
   },
 ]
 
