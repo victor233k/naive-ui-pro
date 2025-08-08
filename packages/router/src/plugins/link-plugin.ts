@@ -69,7 +69,7 @@ const BuiltinIframeComponent = /* @__PURE__ */ defineComponent({
 })
 
 export function linkPlugin({
-  openInNewWindow = builtinOpenInNewWindow,
+  openInNewWindow = (url) => window.open(url, '_blank'),
 }: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
     router.beforeEach((to, from) => {
@@ -127,10 +127,6 @@ function resolveLink(
       link === true ? router.options.history.createHref(route.fullPath) : link,
     isLinkRoute: link === true,
   }
-}
-
-function builtinOpenInNewWindow(url: string) {
-  window.open(url, '_blank')
 }
 
 function getStorageKey({
