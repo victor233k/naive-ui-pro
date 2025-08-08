@@ -259,7 +259,7 @@ const accessRoutes: RouteRecordRaw[] = [
             path: 'baidu',
             component: {},
             meta: {
-              title: '百度',
+              title: '百度(外部打开)',
               icon: 'ri:baidu-fill',
               keepAlive: false,
               link: 'https://www.baidu.com',
@@ -273,7 +273,31 @@ const accessRoutes: RouteRecordRaw[] = [
               title: '菜单管理(外部打开)',
               icon: 'ant-design:menu-outlined',
               keepAlive: false,
-              openInNewWindow: true,
+              link: true,
+            },
+          },
+          {
+            name: 'Baidu:iframe',
+            path: 'baidu-iframe',
+            component: {},
+            meta: {
+              title: '百度(iframe 打开)',
+              icon: 'ri:baidu-fill',
+              keepAlive: false,
+              link: 'https://www.baidu.com',
+              linkMode: 'iframe'
+            },
+          },
+          {
+            name: 'component:iframe',
+            path: 'menu-iframe',
+            component: () => import('@/views/system/menu/index.vue'),
+            meta: {
+              title: '菜单管理(iframe 打开)',
+              icon: 'ant-design:menu-outlined',
+              keepAlive: false,
+              link: true,
+              linkMode: 'iframe'
             },
           },
         ],
