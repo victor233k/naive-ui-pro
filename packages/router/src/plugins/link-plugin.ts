@@ -1,11 +1,23 @@
 import {
   useRoute,
+  useRouter,
   type RouteLocationNormalizedGeneric,
   type Router,
 } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
-import { defineComponent, h } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  MaybeRefOrGetter,
+  nextTick,
+  ref,
+  toValue,
+} from 'vue'
 import { warn } from '../utils/warn'
+import { NButton, NResult, NSpin } from 'naive-ui'
+import { useTimeoutFn } from '@vueuse/core'
+import { isError, toString } from 'lodash-es'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -23,7 +35,7 @@ declare module 'vue-router' {
     /**
      * @internal
      */
-    [IFRAME_SRC]?: string
+    [IFRAME_CONFIG]?: { src: string; timeout: MaybeRefOrGetter<number> }
     /**
      * @internal
      */
@@ -42,16 +54,20 @@ export interface LinkPluginOptions {
    * ```
    */
   openInNewWindow?: (url: string) => void
+  /**
+   * iframe 超时时间，单位：秒
+   * @default 10
+   */
+  iframeTimeout?: MaybeRefOrGetter<number>
 }
 
-const IFRAME_SRC = Symbol('iframe src')
+const IFRAME_CONFIG = Symbol('iframe config')
 const IFRAME_CLEANUP_FN = Symbol('iframe cleanup fn')
 
 const BuiltinIframeComponent = /* @__PURE__ */ defineComponent({
   setup() {
     const route = useRoute()
-    const src = route.meta[IFRAME_SRC]
-    route.meta[IFRAME_CLEANUP_FN]?.()
+    const { src, timeout } = route.meta[IFRAME_CONFIG] || {}
 
     if (__DEV__) {
       if (!src) {
@@ -59,17 +75,94 @@ const BuiltinIframeComponent = /* @__PURE__ */ defineComponent({
       }
     }
 
+    const loading = ref(true)
+    const loadError = ref<string>()
+
+    const { stop } = useTimeoutFn(
+      () => {
+        loading.value && handleLoaded('加载超时，请检查外链是否正确！')
+      },
+      computed(() => toValue(timeout) * 1e3),
+    )
+
+    function handleLoaded(errorMessage?: string) {
+      if (!loading.value) return
+
+      stop()
+      loading.value = false
+      loadError.value = errorMessage
+    }
+
+    const router = useRouter()
+    function handleReload() {
+      router.refresh()
+    }
+
     return () => {
-      return h('iframe', {
-        class: 'relative w-full h-full border-none overflow-hidden',
-        src: src,
-      })
+      return h(
+        'div',
+        {
+          class: 'relative w-full h-full',
+        },
+        [
+          h('iframe', {
+            class: [
+              'size-full border-none overflow-hidden',
+
+              // 避免闪屏
+              loading.value || loadError.value
+                ? 'opacity-0 pointer-events-none'
+                : '',
+            ],
+            src,
+            onLoad() {
+              handleLoaded()
+            },
+            onError(e) {
+              handleLoaded(e.message)
+            },
+          }),
+
+          h(
+            NSpin,
+            {
+              class: 'z-1 absolute inset-0',
+              show: loading.value,
+            },
+            // 没有子元素时 NSpin 更改 show 不会关闭
+            () => h('div'),
+          ),
+
+          loadError.value &&
+            h(
+              NResult,
+              {
+                class: 'z-2 absolute top-25% inset-x-0',
+                status: 'error',
+                title: '加载失败',
+                description: loadError.value,
+              },
+              {
+                footer: () =>
+                  h(
+                    NButton,
+                    {
+                      type: 'primary',
+                      onClick: handleReload,
+                    },
+                    '重新加载',
+                  ),
+              },
+            ),
+        ],
+      )
     }
   },
 })
 
 export function linkPlugin({
   openInNewWindow = (url) => window.open(url, '_blank'),
+  iframeTimeout = 10,
 }: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
     router.beforeEach((to, from) => {
@@ -103,10 +196,10 @@ export function linkPlugin({
           const rawDefaultComponent = components.default
           components.default = BuiltinIframeComponent
 
-          to.meta[IFRAME_SRC] = link
+          to.meta[IFRAME_CONFIG] = { src: link, timeout: iframeTimeout }
           to.meta[IFRAME_CLEANUP_FN] = () => {
             components.default = rawDefaultComponent
-            to.meta[IFRAME_SRC] = undefined
+            to.meta[IFRAME_CONFIG] = undefined
             to.meta[IFRAME_CLEANUP_FN] = undefined
           }
         }

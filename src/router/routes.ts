@@ -300,6 +300,18 @@ const accessRoutes: RouteRecordRaw[] = [
               linkMode: 'iframe'
             },
           },
+          {
+            name: 'error:iframe',
+            path: 'error-iframe',
+            component: {},
+            meta: {
+              title: 'iframe 加载失败',
+              icon: 'ant-design:menu-outlined',
+              keepAlive: false,
+              link: 'https://example.com/non-existent-page',
+              linkMode: 'iframe'
+            },
+          },
         ],
       },
     ],
