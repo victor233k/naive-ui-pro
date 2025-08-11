@@ -1,10 +1,13 @@
 <script setup lang='tsx'>
 import { Icon } from '@iconify/vue'
 import { useFullscreen } from '@vueuse/core'
+import { ref, watch } from 'vue'
 import { useAppStore } from '@/store/use-app-store'
 import { useThemeStore } from '@/store/use-theme-store'
 import UserAvatar from './user-avatar.vue'
 
+const rotateDuration = 300
+const rotating = ref(false)
 const appStore = useAppStore()
 const themeStore = useThemeStore()
 
@@ -12,6 +15,13 @@ const {
   toggle,
   isFullscreen,
 } = useFullscreen()
+
+watch(() => themeStore.isDark, () => {
+  rotating.value = true
+  setTimeout(() => {
+    rotating.value = false
+  }, rotateDuration)
+})
 </script>
 
 <template>
@@ -34,7 +44,11 @@ const {
     >
       <template #icon>
         <n-icon>
-          <icon :icon="themeStore.isDark ? 'ri:sun-fill' : 'fa6-solid:moon'" />
+          <icon
+            class="transition-transform duration-300"
+            :class="{ 'rotate-180': rotating }"
+            :icon="themeStore.isDark ? 'ri:sun-fill' : 'fa6-solid:moon'"
+          />
         </n-icon>
       </template>
     </pro-button>
