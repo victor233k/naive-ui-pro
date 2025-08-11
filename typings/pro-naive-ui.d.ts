@@ -1,13 +1,20 @@
-import type { ProIconifyIconsProps, ProIconifyIconsSlots } from '@/components/iconify-icons'
+import type { ProSelectSlots } from 'pro-naive-ui'
+import type { ProIconifyIconsProps } from '@/components/iconify-icons'
 
 declare module 'pro-naive-ui' {
   interface ProFieldCustomColumn {
-    column: IconifyIconsColumn
+    column: IconifyIconsColumn | IconifyIconsColumn2
   }
 
   interface IconifyIconsColumn {
     field: 'iconify-icons'
-    fieldSlots: ProIconifyIconsSlots
+    fieldSlots: ProSelectSlots
+    fieldProps: ProIconifyIconsProps['fieldProps']
+  }
+
+  interface IconifyIconsColumn2 {
+    field: 'iconify-icons2'
+    fieldSlots: ProSelectSlots
     fieldProps: ProIconifyIconsProps['fieldProps']
   }
 }

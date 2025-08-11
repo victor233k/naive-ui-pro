@@ -45,6 +45,7 @@ export default defineConfig(({ mode }) => {
             resolve: (name: string) => {
               const components = [
                 { name: 'ProIconifyIcons', from: '@/components/iconify-icons' },
+                { name: 'ProIconifyIcons2', from: '@/components/iconify-icons' },
               ]
               const comp = components.find(comp => comp.name === name)
               if (comp) {

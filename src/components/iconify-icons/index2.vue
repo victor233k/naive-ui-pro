@@ -1,16 +1,17 @@
 <script setup lang="tsx">
-import type { SelectRenderLabel } from 'naive-ui'
+import type { SelectOption, SelectRenderLabel } from 'naive-ui'
 import type { ProSelectProps, ProSelectSlots } from 'pro-naive-ui'
 import { Icon } from '@iconify/vue'
+import { castArray } from 'lodash-es'
 import { NButton } from 'naive-ui'
 import { ProSelect, useForwardRef, useProField } from 'pro-naive-ui'
-import { computed, h, watch } from 'vue'
+import { computed, h, ref } from 'vue'
 import { useProRequest } from '@/composables/use-pro-request'
 import { Api } from './iconify-icons.api'
 import { proIconifyIconsProps } from './props'
 
 defineOptions({
-  name: 'ProIconifyIcons',
+  name: 'ProIconifyIcons2',
 })
 
 const props = defineProps(proIconifyIconsProps)
@@ -32,7 +33,7 @@ const {
   async (query: string, limit: number = 50) => {
     limit = props.fieldProps?.limit ?? limit
     const res = await Api.queryIcons(query, limit)
-    return res.data.icons.map(icon => ({ label: icon, value: icon }))
+    return res.data.icons
   },
   {
     manual: true,
@@ -40,14 +41,28 @@ const {
   },
 )
 
+const searching = ref(false)
+
 function handleSearch(query: string) {
-  if (!query.length) {
-    icons.value = []
+  searching.value = !!query
+  if (!query) {
     cancel()
+    icons.value = []
     return
   }
   queryIcons(query)
 }
+
+/**
+ * 解决手动赋值回显逻辑
+ */
+const options = computed(() => {
+  const set = new Set([
+    ...castArray(searching.value ? [] : field.value.value || []),
+    ...(icons.value ?? []),
+  ])
+  return [...set].map(icon => ({ label: icon, value: icon } as SelectOption))
+})
 
 const renderLabel: SelectRenderLabel = (option) => {
   return (
@@ -76,32 +91,12 @@ const proSelectProps = computed<ProSelectProps>(() => {
       remote: true,
       filterable: true,
       loading: loading.value,
-      options: icons.value ?? [],
+      options: options.value,
       onSearch: handleSearch,
       renderLabel,
     },
   }
 })
-
-/**
- * 解决手动赋值回显逻辑
- */
-watch(field.value, (query: string | string[] | undefined) => {
-  if (
-    !query
-    || !query.length
-    || field.touching // 判断是否为手动交互而非 js 交互
-  ) {
-    return
-  }
-  if (props.fieldProps?.multiple) {
-    query = query[query.length - 1]
-  }
-  const index = (icons.value ?? []).findIndex(icon => icon.value === query)
-  if (!~index) {
-    queryIcons(query as string)
-  }
-}, { flush: 'sync', immediate: true })
 </script>
 
 <template>

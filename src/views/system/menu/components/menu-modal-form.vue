@@ -2,7 +2,6 @@
 import type { CascaderOption as _CascaderOption } from 'naive-ui'
 import { orderBy } from 'lodash-es'
 import { ref, shallowReactive } from 'vue'
-import { IconSelect } from '@/components/icon-select'
 import { useProRequest } from '@/composables/use-pro-request'
 import { Api } from '../index.api'
 import { buildTree } from '../utils'
@@ -79,7 +78,7 @@ function isDisabled(item: Api.Model | undefined): boolean {
       options: cascaderOptions,
     }"
   />
-  <icon-select
+  <pro-iconify-icons
     title="菜单图标"
     path="icon"
     required
