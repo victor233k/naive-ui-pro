@@ -66,6 +66,55 @@ const accessRoutes: RouteRecordRaw[] = [
     name: 'Demos',
     children: [
       {
+        path: 'access',
+        name: 'Access',
+        children: [
+          {
+            path: 'toggle',
+            name: 'Toggle',
+            component: () => import('@/views/demos/access/toggle/index.vue'),
+            meta: {
+              title: '权限切换',
+              icon: 'mdi:page-previous-outline',
+            },
+          },
+          // {
+          //   path: 'super-visibility',
+          //   name: 'SuperVisibility',
+          //   component: () => import('@/views/demos/access/visibility/super.vue'),
+          //   meta: {
+          //     title: 'Super 可见',
+          //     icon: 'tdesign:user-visible-filled',
+          //     roles: ['Super'],
+          //   },
+          // },
+          // {
+          //   path: 'admin-visibility',
+          //   name: 'AdminVisibility',
+          //   component: () => import('@/views/demos/access/visibility/admin.vue'),
+          //   meta: {
+          //     title: 'Admin 可见',
+          //     icon: 'tdesign:user-visible-filled',
+          //     roles: ['Admin'],
+          //   },
+          // },
+          // {
+          //   path: 'user-visibility',
+          //   name: 'UserVisibility',
+          //   component: () => import('@/views/demos/access/visibility/user.vue'),
+          //   meta: {
+          //     title: 'User 可见',
+          //     icon: 'tdesign:user-visible-filled',
+          //     roles: ['User'],
+          //   },
+          // },
+        ],
+        meta: {
+          title: '权限',
+          icon: 'material-symbols:lock-outline',
+        },
+      },
+      {
         path: 'fallback',
         name: 'Falback',
         children: [

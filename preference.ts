@@ -8,6 +8,10 @@ export const preferenceConfig = {
      * 路由过渡动画名称
      */
     transitionName: 'fade-slide',
+    /**
+     * 权限模式
+     */
+    accessMode: 'frontend',
   },
   layout: {
     /**
