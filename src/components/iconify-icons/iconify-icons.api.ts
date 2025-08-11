@@ -6,8 +6,12 @@ interface QueryIconsResponse {
 
 export class Api {
   static queryIcons(query: string, limit: number) {
-    return http<QueryIconsResponse>(`/search?query=${query}&limit=${limit}`, {
+    return http<QueryIconsResponse>('/search', {
       baseURL: '/iconify',
+      params: {
+        query,
+        limit,
+      },
     })
   }
 }
