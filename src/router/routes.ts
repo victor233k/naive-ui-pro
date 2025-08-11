@@ -204,8 +204,62 @@ const accessRoutes: RouteRecordRaw[] = [
               },
             ],
             meta: {
+<<<<<<< HEAD
               title: '外链',
               icon: 'akar-icons:link-out',
+=======
+              title: '百度(外部打开)',
+              icon: 'ri:baidu-fill',
+              keepAlive: false,
+              link: 'https://www.baidu.com',
+            },
+          },
+          {
+            name: 'component',
+            path: 'menu',
+            component: () => import('@/views/system/menu/index.vue'),
+            meta: {
+              title: '菜单管理(外部打开)',
+              icon: 'ant-design:menu-outlined',
+              keepAlive: false,
+              link: true,
+            },
+          },
+          {
+            name: 'Baidu:iframe',
+            path: 'baidu-iframe',
+            component: {},
+            meta: {
+              title: '百度(iframe 打开)',
+              icon: 'ri:baidu-fill',
+              keepAlive: false,
+              link: 'https://www.baidu.com',
+              linkMode: 'iframe'
+            },
+          },
+          {
+            name: 'component:iframe',
+            path: 'menu-iframe',
+            component: () => import('@/views/system/menu/index.vue'),
+            meta: {
+              title: '菜单管理(iframe 打开)',
+              icon: 'ant-design:menu-outlined',
+              keepAlive: false,
+              link: true,
+              linkMode: 'iframe'
+            },
+          },
+          {
+            name: 'error:iframe',
+            path: 'error-iframe',
+            component: {},
+            meta: {
+              title: 'iframe 加载失败',
+              icon: 'ant-design:menu-outlined',
+              keepAlive: false,
+              link: 'https://example.com/non-existent-page',
+              linkMode: 'iframe'
+>>>>>>> 1da732e0c95dc27fcfea7515c16a1d77b3d965c7
             },
           },
         ],

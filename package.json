@@ -10,9 +10,10 @@
     "dev": "vite --mode development",
     "build": "vite build --mode production",
     "preview": "vite preview",
-    "lint": "eslint",
-    "lint:fix": "eslint --fix",
-    "test:@pro/router": "pnpm --filter @pro/router run test"
+    "lint": "eslint --cache --cache-location=node_modules/.cache/.eslint-cache",
+    "lint:fix": "pnpm run lint --fix",
+    "test:@pro/router": "pnpm --filter @pro/router run test",
+    "prepare": "simple-git-hooks"
   },
   "dependencies": {
     "@ant-design/colors": "^7.2.1",
@@ -40,9 +41,12 @@
     "@vitejs/plugin-vue-jsx": "^5.0.1",
     "@vue/tsconfig": "^0.7.0",
     "eslint": "^9.28.0",
+    "eslint-plugin-format": "^1.0.1",
     "happy-dom": "^18.0.1",
     "lightningcss": "^1.30.1",
+    "lint-staged": "^16.1.5",
     "pro-naive-ui-resolver": "^1.0.2",
+    "simple-git-hooks": "^2.13.1",
     "type-fest": "^4.41.0",
     "typescript": "~5.8.3",
     "unplugin-vue-components": "^28.7.0",
@@ -51,5 +55,8 @@
     "vite-plugin-fake-server": "^2.2.0",
     "vite-plugin-html": "^3.2.2",
     "vue-tsc": "^2.2.8"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
   }
 }

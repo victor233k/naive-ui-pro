@@ -1,6 +1,7 @@
 import type { SelectProps } from 'naive-ui'
-import { proSelectProps, type BaseFieldProps } from 'pro-naive-ui'
+import type { BaseFieldProps, ProSelectInst, ProSelectSlots } from 'pro-naive-ui'
 import type { ExtractPublicPropTypes, PropType } from 'vue'
+import { proSelectProps } from 'pro-naive-ui'
 
 export const proIconSelectProps = {
   ...proSelectProps,
@@ -22,3 +23,7 @@ export const proIconSelectProps = {
 export type ProIconSelectProps = ExtractPublicPropTypes<
   typeof proIconSelectProps
 >
+
+export type ProIconSelectSlots = ProSelectSlots
+
+export type ProIconSelectInst = ProSelectInst
