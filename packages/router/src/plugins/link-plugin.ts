@@ -1,23 +1,23 @@
-import {
-  useRoute,
-  useRouter,
-  type RouteLocationNormalizedGeneric,
-  type Router,
-} from 'vue-router'
+import type {
+  MaybeRefOrGetter,
+} from 'vue'
+import type { RouteLocationNormalizedGeneric, Router } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
+import { useTimeoutFn } from '@vueuse/core'
+import { NButton, NResult, NSpin } from 'naive-ui'
 import {
   computed,
   defineComponent,
   h,
-  MaybeRefOrGetter,
-  nextTick,
   ref,
   toValue,
 } from 'vue'
+import {
+
+  useRoute,
+  useRouter,
+} from 'vue-router'
 import { warn } from '../utils/warn'
-import { NButton, NResult, NSpin } from 'naive-ui'
-import { useTimeoutFn } from '@vueuse/core'
-import { isError, toString } from 'lodash-es'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -35,10 +35,12 @@ declare module 'vue-router' {
     /**
      * @internal
      */
-    [IFRAME_CONFIG]?: { src: string; timeout: MaybeRefOrGetter<number> }
+    // eslint-disable-next-line ts/no-use-before-define
+    [IFRAME_CONFIG]?: { src: string, timeout: MaybeRefOrGetter<number> }
     /**
      * @internal
      */
+    // eslint-disable-next-line ts/no-use-before-define
     [IFRAME_CLEANUP_FN]?: () => void
   }
 }
@@ -86,7 +88,8 @@ const BuiltinIframeComponent = /* @__PURE__ */ defineComponent({
     )
 
     function handleLoaded(errorMessage?: string) {
-      if (!loading.value) return
+      if (!loading.value)
+        return
 
       stop()
       loading.value = false
@@ -123,7 +126,7 @@ const BuiltinIframeComponent = /* @__PURE__ */ defineComponent({
             },
           }),
 
-          h(
+          loading.value && h(
             NSpin,
             {
               class: 'z-1 absolute inset-0',
@@ -133,27 +136,27 @@ const BuiltinIframeComponent = /* @__PURE__ */ defineComponent({
             () => h('div'),
           ),
 
-          loadError.value &&
-            h(
-              NResult,
-              {
-                class: 'z-2 absolute top-25% inset-x-0',
-                status: 'error',
-                title: '加载失败',
-                description: loadError.value,
-              },
-              {
-                footer: () =>
-                  h(
-                    NButton,
-                    {
-                      type: 'primary',
-                      onClick: handleReload,
-                    },
-                    '重新加载',
-                  ),
-              },
-            ),
+          loadError.value
+          && h(
+            NResult,
+            {
+              class: 'z-2 absolute top-25% inset-x-0',
+              status: 'error',
+              title: '加载失败',
+              description: loadError.value,
+            },
+            {
+              footer: () =>
+                h(
+                  NButton,
+                  {
+                    type: 'primary',
+                    onClick: handleReload,
+                  },
+                  '重新加载',
+                ),
+            },
+          ),
         ],
       )
     }
@@ -161,7 +164,7 @@ const BuiltinIframeComponent = /* @__PURE__ */ defineComponent({
 })
 
 export function linkPlugin({
-  openInNewWindow = (url) => window.open(url, '_blank'),
+  openInNewWindow = url => window.open(url, '_blank'),
   iframeTimeout = 10,
 }: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
@@ -171,7 +174,8 @@ export function linkPlugin({
       }
 
       const resolved = resolveLink(to, router)
-      if (!resolved) return
+      if (!resolved)
+        return
 
       const { linkMode = 'newWindow' } = to.meta
       const { link, isLinkRoute } = resolved
@@ -211,9 +215,10 @@ export function linkPlugin({
 function resolveLink(
   route: RouteLocationNormalizedGeneric,
   router: Router,
-): { link: string; isLinkRoute: boolean } | undefined {
+): { link: string, isLinkRoute: boolean } | undefined {
   const link = route.meta.link
-  if (!link) return
+  if (!link)
+    return
 
   return {
     link:
