@@ -7,7 +7,7 @@ import { NButton } from 'naive-ui'
 import { ProSelect, useForwardRef, useProField } from 'pro-naive-ui'
 import { computed, h, ref } from 'vue'
 import { useProRequest } from '@/composables/use-pro-request'
-import { Api } from './iconify-icons.api'
+import { Api } from './index.api'
 import { proIconifyIconsProps } from './props'
 
 defineOptions({
