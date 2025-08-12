@@ -152,6 +152,15 @@ const accessRoutes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'editor',
+        name: 'EditorDemo',
+        component: () => import('@/views/demos/access/editor/index.vue'),
+        meta: {
+          title: '富文本编辑器',
+          icon: 'material-symbols:edit-document-outline',
+        },
+      },
+      {
         name: 'External',
         path: '/external',
         meta: {
