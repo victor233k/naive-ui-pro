@@ -1,43 +1,69 @@
 <script setup lang="ts">
-import { NCard, useThemeVars } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { NCard } from 'naive-ui'
+import { computed } from 'vue'
 import { useAppStore } from '@/store/use-app-store'
 import { useUserStore } from '@/store/use-user-store'
 
 const appStore = useAppStore()
 const userStore = useUserStore()
-const accessModeText = computed(() => {
-  return appStore.accessMode === 'frontend' ? '前端权限控制' : '后端权限控制'
+
+const accessModes = computed(() => {
+  return [
+    { label: '前端权限控制', value: 'frontend' },
+    { label: '后端权限控制', value: 'backend' },
+  ]
 })
 
-const accessModeOptions = [
-  { label: '前端权限控制', value: 'frontend' },
-  { label: '后端权限控制', value: 'backend' },
-]
+const accounts = computed(() => {
+  return [
+    { username: 'super', password: '123456', role: 'super', roleName: '超级管理员' },
+    { username: 'admin', password: '123456', role: 'admin', roleName: '普通管理员' },
+    { username: 'user', password: '123456', role: 'user', roleName: '普通用户' },
+  ]
+})
+
+async function handleAccount(account: { username: string, password: string }) {
+  await userStore.logoutWithQueryRedirect()
+  await userStore.login(account)
+}
+
+async function handleAccessMode(accessMode: string) {
+  appStore.accessMode = accessMode
+  const account = accounts.value.find(account => account.username === userStore.user.name.toLowerCase())!
+  await userStore.logoutWithQueryRedirect()
+  await userStore.login(account)
+}
 </script>
 
 <template>
   <div class="flex flex-col gap-16px">
     <n-card title="切换权限模式">
+      <div class="mb-8px font-bold">
+        切换权限模式后查看【左侧菜单->系统管理】
+      </div>
       <div class="flex gap-8px">
-        <n-button :disabled="appStore.accessMode === 'frontend'">
-          前端权限控制
-        </n-button>
-        <n-button :disabled="appStore.accessMode === 'backend'">
-          后端权限控制
+        <n-button
+          v-for="accessMode in accessModes"
+          :key="accessMode.value"
+          :disabled="appStore.accessMode === accessMode.value"
+          @click="handleAccessMode(accessMode.value)"
+        >
+          {{ accessMode.label }}
         </n-button>
       </div>
     </n-card>
     <n-card title="切换账号">
+      <div class="mb-8px font-bold">
+        切换账号后查看【左侧菜单->系统管理】
+      </div>
       <div class="flex gap-8px">
-        <n-button :disabled="userStore.user.roles.includes('super')">
-          超级管理员
-        </n-button>
-        <n-button :disabled="userStore.user.roles.includes('admin')">
-          普通管理员
-        </n-button>
-        <n-button :disabled="userStore.user.roles.includes('user')">
-          普通用户
+        <n-button
+          v-for="account in accounts"
+          :key="account.username"
+          :disabled="userStore.user.roles.includes(account.role)"
+          @click="handleAccount(account)"
+        >
+          {{ account.roleName }}
         </n-button>
       </div>
     </n-card>

@@ -65,7 +65,7 @@ function handleSelect(key: string) {
       negativeText: '取 消',
       positiveText: '确 认',
       onPositiveClick: () => {
-        userStore.logout()
+        userStore.logoutWithQueryRedirect()
       },
     })
   }

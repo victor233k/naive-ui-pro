@@ -14,6 +14,83 @@ const users = [
     roles: ['super'],
     name: 'Super',
     codes: ['1001', '1002', '1003', '1004'],
+    menus: [
+      {
+        path: '/home',
+        name: 'Home',
+        component: '/home/index.vue',
+        meta: {
+          title: '首页',
+          icon: 'material-symbols:dashboard-outline-rounded',
+        },
+      },
+      {
+        path: '/demos',
+        name: 'Demos',
+        children: [
+          {
+            path: 'access',
+            name: 'Access',
+            children: [
+              {
+                path: 'toggle',
+                name: 'Toggle',
+                component: '/demos/access/toggle/index.vue',
+                meta: {
+                  title: '权限切换',
+                  icon: 'mdi:page-previous-outline',
+                },
+              },
+            ],
+            meta: {
+              title: '权限',
+              icon: 'material-symbols:lock-outline',
+            },
+          },
+        ],
+        meta: {
+          title: '演示',
+          icon: 'hugeicons:codesandbox',
+        },
+      },
+      {
+        name: 'System',
+        path: '/system',
+        children: [
+          {
+            name: 'User',
+            path: 'user',
+            component: '/system/user/index.vue',
+            meta: {
+              title: '用户管理',
+              icon: 'ant-design:user-outlined',
+            },
+          },
+          {
+            name: 'Role',
+            path: 'role',
+            component: '/system/role/index.vue',
+            meta: {
+              title: '角色管理',
+              icon: 'carbon:user-role',
+            },
+          },
+          {
+            name: 'Menu',
+            path: 'menu',
+            component: '/system/menu/index.vue',
+            meta: {
+              title: '菜单管理',
+              icon: 'ant-design:menu-outlined',
+            },
+          },
+        ],
+        meta: {
+          title: '系统管理',
+          icon: 'ant-design:setting-outlined',
+        },
+      },
+    ],
   },
   {
     username: 'admin',
@@ -23,6 +100,65 @@ const users = [
     roles: ['admin'],
     name: 'Admin',
     codes: ['1003'],
+    menus: [
+      {
+        path: '/home',
+        name: 'Home',
+        component: '/home/index.vue',
+        meta: {
+          title: '首页',
+          icon: 'material-symbols:dashboard-outline-rounded',
+        },
+      },
+      {
+        path: '/demos',
+        name: 'Demos',
+        children: [
+          {
+            path: 'access',
+            name: 'Access',
+            children: [
+              {
+                path: 'toggle',
+                name: 'Toggle',
+                component: '/demos/access/toggle/index.vue',
+                meta: {
+                  title: '权限切换',
+                  icon: 'mdi:page-previous-outline',
+                },
+              },
+            ],
+            meta: {
+              title: '权限',
+              icon: 'material-symbols:lock-outline',
+            },
+          },
+        ],
+        meta: {
+          title: '演示',
+          icon: 'hugeicons:codesandbox',
+        },
+      },
+      {
+        name: 'System',
+        path: '/system',
+        children: [
+          {
+            name: 'User',
+            path: 'user',
+            component: '/system/user/index.vue',
+            meta: {
+              title: '用户管理',
+              icon: 'ant-design:user-outlined',
+            },
+          },
+        ],
+        meta: {
+          title: '系统管理',
+          icon: 'ant-design:setting-outlined',
+        },
+      },
+    ],
   },
   {
     username: 'user',
@@ -32,6 +168,46 @@ const users = [
     roles: ['user'],
     name: 'User',
     codes: [],
+    menus: [
+      {
+        path: '/home',
+        name: 'Home',
+        component: '/home/index.vue',
+        meta: {
+          title: '首页',
+          icon: 'material-symbols:dashboard-outline-rounded',
+        },
+      },
+      {
+        path: '/demos',
+        name: 'Demos',
+        children: [
+          {
+            path: 'access',
+            name: 'Access',
+            children: [
+              {
+                path: 'toggle',
+                name: 'Toggle',
+                component: '/demos/access/toggle/index.vue',
+                meta: {
+                  title: '权限切换',
+                  icon: 'mdi:page-previous-outline',
+                },
+              },
+            ],
+            meta: {
+              title: '权限',
+              icon: 'material-symbols:lock-outline',
+            },
+          },
+        ],
+        meta: {
+          title: '演示',
+          icon: 'hugeicons:codesandbox',
+        },
+      },
+    ],
   },
 ]
 
@@ -91,6 +267,21 @@ export default defineFakeRoute([
         roles: user.roles,
         codes: user.codes,
       })
+    },
+  },
+  {
+    url: '/menus/all',
+    method: 'get',
+    response: ({ headers }) => {
+      const token = (headers.authorization ?? '').slice(7)
+      if (isInvalidToken(token)) {
+        return createErrorResponse('token 无效')
+      }
+      const user = users.find(user => user.token === token)
+      if (!user) {
+        return createErrorResponse('用户名或密码错误')
+      }
+      return createSuccessResponse(user.menus)
     },
   },
 ])

@@ -2,21 +2,17 @@
 import { useNotification } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { createProForm } from 'pro-naive-ui'
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { HOME_ROUTE_PATH } from '@/router/routes'
+import { computed } from 'vue'
 import { useAppStore } from '@/store/use-app-store'
 import { useThemeStore } from '@/store/use-theme-store'
 import { useUserStore } from '@/store/use-user-store'
 import IKun from './ikun.vue'
 
-const route = useRoute()
-const router = useRouter()
-const loading = ref(false)
 const userStore = useUserStore()
 const notification = useNotification()
 const { title } = storeToRefs(useAppStore())
 const { isDark } = storeToRefs(useThemeStore())
+const { loginLoading: loading } = storeToRefs(userStore)
 
 const via = computed(() => {
   return isDark.value ? '#07070915' : '#D5E6FF'
@@ -30,10 +26,7 @@ const form = createProForm({
   },
   onSubmit: async (values) => {
     try {
-      loading.value = true
       const user = await userStore.login(values)
-      const redirect = route.query.redirect as string ?? HOME_ROUTE_PATH
-      await router.push(redirect)
       notification.success({
         title: '登录成功',
         content: `欢迎回来，${user.name}`,
@@ -46,9 +39,6 @@ const form = createProForm({
         content: error.message,
         duration: 2000,
       })
-    }
-    finally {
-      loading.value = false
     }
   },
 })
@@ -179,7 +169,8 @@ const form = createProForm({
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {

@@ -1,3 +1,4 @@
+import type { RbacAccessPluginBaseServiceReturned, RbacAccessPluginRouteRecordRawWithStringComponent } from '@pro/router'
 import type { App } from 'vue'
 
 import {
@@ -27,6 +28,8 @@ import {
   useUserStore,
 } from '@/store/use-user-store'
 
+import http from '@/utils/axios'
+
 import {
   layoutFalsyPlugin,
 } from './plugins/layout-falsy-plugin'
@@ -41,6 +44,7 @@ import {
   ignoreAccessRoutes,
   LOGIN_ROUTE_PATH,
   notFoundRoute,
+  pageMap,
 } from './routes'
 
 export async function setupRouter(app: App) {
@@ -107,20 +111,47 @@ export async function setupRouter(app: App) {
        */
       rbacAccessPlugin({
         service: async () => {
-          const store = useUserStore()
-          if (store.user.token && store.user.roles.length <= 0) {
+          const appStore = useAppStore()
+          const userStore = useUserStore()
+          if (userStore.user.token && userStore.user.roles.length <= 0) {
             // 初始化数据
-            await store.fetchUpdateUserInfo()
+            await userStore.fetchUpdateUserInfo()
           }
-          return {
-            mode: 'frontend',
-            routes: accessRoutes,
-            roles: store.user.roles,
-            logined: !!store.user.token,
+          const baseInfo: RbacAccessPluginBaseServiceReturned = {
+            logined: !!userStore.user.token,
             homePath: HOME_ROUTE_PATH,
             loginPath: LOGIN_ROUTE_PATH,
             parentNameForAddRoute: 'Root',
             ignoreAccessRouteNames: ignoreAccessRoutes.map(t => t.name as string),
+            onRoutesBuilt: (routes) => {
+              userStore.routes = routes
+            },
+          }
+          if (appStore.accessMode === 'frontend') {
+            return {
+              ...baseInfo,
+              mode: 'frontend',
+              routes: accessRoutes,
+              roles: userStore.user.roles,
+            }
+          }
+          return {
+            ...baseInfo,
+            mode: 'backend',
+            fetchRoutes: async () => {
+              const res = await http.get<RbacAccessPluginRouteRecordRawWithStringComponent[]>('/menus/all')
+              return res.data
+            },
+            resolveComponent: (component) => {
+              let dynamicComponent = pageMap[component]
+              if (!dynamicComponent) {
+                dynamicComponent = () => import('@/views/demos/fallback/404.vue')
+                if (__DEV__) {
+                  console.warn(`[Router] 未找到组件: ${component}，替换成 404 页面`)
+                }
+              }
+              return dynamicComponent
+            },
           }
         },
       }),
@@ -129,8 +160,9 @@ export async function setupRouter(app: App) {
        */
       nMenuPlugin({
         service: () => {
+          const store = useUserStore()
           return {
-            routes: accessRoutes,
+            routes: store.routes,
           }
         },
       }),

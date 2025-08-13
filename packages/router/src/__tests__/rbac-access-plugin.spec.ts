@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import type { RbacAccessPluginServiceReturned } from '../plugins/rbac-access-plugin'
+import type { RbacAccessPluginBackendServiceReturned, RbacAccessPluginFrontendServiceReturned } from '../types'
 import { describe, expect, it } from 'vitest'
 import { createApp } from 'vue'
 import { createWebHashHistory } from 'vue-router'
@@ -13,6 +13,8 @@ const NotFound = { template: `<div>NotFound</div>` }
 const Register = { template: `<div>Register</div>` }
 const BasicInfo = { template: `<div>BasicInfo</div>` }
 const BasicList = { template: `<div>BasicList</div>` }
+
+type RbacAccessPluginServiceReturned = RbacAccessPluginBackendServiceReturned | RbacAccessPluginFrontendServiceReturned
 
 const ignoreAccessRoutes: RouteRecordRaw[] = [
   {

@@ -1,7 +1,8 @@
+import type { RouteRecordRaw } from 'vue-router'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { LOGIN_ROUTE_PATH } from '@/router/routes'
+import { useRoute, useRouter } from 'vue-router'
+import { HOME_ROUTE_PATH, LOGIN_ROUTE_PATH } from '@/router/routes'
 import { apiLogin, apiQueryUserInfo } from './api/user.api'
 
 export interface UserInfo {
@@ -18,8 +19,10 @@ export interface UserLoginPayload {
 }
 
 export const useUserStore = defineStore('user', () => {
+  const route = useRoute()
   const router = useRouter()
   const loading = ref(false)
+  const routes = ref<RouteRecordRaw[]>([]) // 当前角色拥有的路由
 
   const user = ref<UserInfo>({
     name: '',
@@ -50,7 +53,10 @@ export const useUserStore = defineStore('user', () => {
       const res = await apiLogin(payload)
       const token = user.value.token = res.data.token
       localStorage.setItem('token', token)
-      return fetchUpdateUserInfo()
+      const info = await fetchUpdateUserInfo()
+      const redirect = route.query.redirect as string ?? HOME_ROUTE_PATH
+      await router.push(redirect)
+      return info
     }
     finally {
       loading.value = false
@@ -65,14 +71,25 @@ export const useUserStore = defineStore('user', () => {
       codes: [],
     }
     localStorage.removeItem('token')
-    router.push(LOGIN_ROUTE_PATH)
+  }
+
+  async function logoutWithQueryRedirect(redirect?: string) {
+    logout()
+    return router.push({
+      path: LOGIN_ROUTE_PATH,
+      query: {
+        redirect: redirect ?? route.fullPath,
+      },
+    })
   }
 
   return {
     login,
     logout,
+    routes,
     fetchUpdateUserInfo,
     loginLoading: loading,
+    logoutWithQueryRedirect,
     user: computed(() => user.value),
   }
 })

@@ -160,6 +160,38 @@ const accessRoutes: RouteRecordRaw[] = [
         },
         children: [
           {
+            name: 'iframe',
+            path: 'iframe',
+            children: [
+              {
+                path: 'form',
+                name: 'form',
+                component: {},
+                meta: {
+                  title: '复杂表单',
+                  icon: 'lets-icons:form',
+                  link: 'https://naive-ui.pro-components.cn/zh-CN/os-theme/components/form-list#list-nest.vue',
+                  linkMode: 'iframe',
+                },
+              },
+              {
+                path: 'edit-data-table',
+                name: 'EditDataTable',
+                component: {},
+                meta: {
+                  title: '编辑表格',
+                  icon: 'material-symbols:table-outline',
+                  link: 'https://naive-ui.pro-components.cn/zh-CN/os-theme/components/edit-data-table#async.vue',
+                  linkMode: 'iframe',
+                },
+              },
+            ],
+            meta: {
+              title: '内嵌',
+              icon: 'material-symbols:iframe',
+            },
+          },
+          {
             name: 'Link',
             path: 'link',
             children: [
@@ -257,6 +289,15 @@ const accessRoutes: RouteRecordRaw[] = [
           },
         ],
       },
+      {
+        path: 'icon',
+        name: 'Icon',
+        component: () => import('@/views/demos/icon/index.vue'),
+        meta: {
+          title: '图标选择器',
+          icon: 'mdi:image-outline',
+        },
+      },
     ],
     meta: {
       title: '演示',
@@ -274,6 +315,7 @@ const accessRoutes: RouteRecordRaw[] = [
         meta: {
           title: '用户管理',
           icon: 'ant-design:user-outlined',
+          roles: ['super', 'admin'],
         },
       },
       {
@@ -283,6 +325,7 @@ const accessRoutes: RouteRecordRaw[] = [
         meta: {
           title: '角色管理',
           icon: 'carbon:user-role',
+          roles: ['super'],
         },
       },
       {
@@ -292,12 +335,14 @@ const accessRoutes: RouteRecordRaw[] = [
         meta: {
           title: '菜单管理',
           icon: 'ant-design:menu-outlined',
+          roles: ['super'],
         },
       },
     ],
     meta: {
       title: '系统管理',
       icon: 'ant-design:setting-outlined',
+      roles: ['super', 'admin'],
     },
   },
 ]
@@ -305,11 +350,9 @@ const accessRoutes: RouteRecordRaw[] = [
 /**
  * 页面组件映射，后端权限模式下会使用该数据
  */
-const matchedPageMap = import.meta.glob('@/views/**/*.vue')
-const pageMap = Object.entries(matchedPageMap).reduce<Record<string, Component>>((p, [path, value]) => {
-  const paths = path.split('/')
-  const lastPath = paths[paths.length - 1]
-  const finalPath = lastPath.split('.').slice(0, -1).join('.')
+const matched = import.meta.glob('@/views/**/*.vue')
+const pageMap = Object.entries(matched).reduce<Record<string, Component>>((p, [path, value]) => {
+  const finalPath = `/${path.split('/').slice(3).join('/')}`
   p[finalPath] = value
   return p
 }, {})

@@ -3,7 +3,7 @@ import type { Merge } from 'type-fest'
 import type { Router, RouteRecordRaw } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { createEventHook } from '@vueuse/core'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, noop } from 'lodash-es'
 import { eachTree, mapTree } from 'pro-composables'
 
 declare module 'vue-router' {
@@ -18,14 +18,14 @@ declare module 'vue-router' {
 type RouteName = string | symbol
 type MaybePromise<T> = T | Promise<T>
 
-type RouteRecordRawStringComponent = Merge<RouteRecordRaw, {
+export type RouteRecordRawWithStringComponent = Merge<RouteRecordRaw, {
   component?: string
-  children?: RouteRecordRawStringComponent[]
+  children?: RouteRecordRawWithStringComponent[]
 }>
 
 type ResolveComponent = (component: string) => NonNullable<RouteRecordRaw['component']>
 
-interface RbacAccessPluginBaseServiceReturned {
+export interface BaseServiceReturned {
   /**
    * 首页路径，如果登录，会跳转到此路径
    * @default '/home'
@@ -48,14 +48,29 @@ interface RbacAccessPluginBaseServiceReturned {
    * 是否已登录
    */
   logined: boolean
+  /**
+   * 路由构建完成后回调
+   * @param routes 构建后最终的 vue-router 路由
+   */
+  onRoutesBuilt?: (routes: RouteRecordRaw[]) => void
 }
 
-type RbacAccessPluginService<Returned extends Record<string, any>> = () => MaybePromise<Merge<
-    Returned,
-    RbacAccessPluginBaseServiceReturned
->>
+export interface BackendServiceReturned extends BaseServiceReturned {
+  /**
+   * 权限模式为后端权限控制
+   */
+  mode: 'backend'
+  /**
+   * routes 中的组件名称是字符串，外部需要将字符串解析成组件
+   */
+  resolveComponent: ResolveComponent
+  /**
+   * 需要动态生成的路由列表
+   */
+  fetchRoutes: () => MaybePromise<RouteRecordRawWithStringComponent[]>
+}
 
-type RbacAccessPluginFrontendService = RbacAccessPluginService<{
+export interface FrontendServiceReturned extends BaseServiceReturned {
   /**
    * 权限模式为前端权限控制
    */
@@ -69,40 +84,21 @@ type RbacAccessPluginFrontendService = RbacAccessPluginService<{
    * 需要动态生成的路由列表，会根据角色过滤路由
    */
   routes: RouteRecordRaw[]
-}>
-
-type RbacAccessPluginBackendService = RbacAccessPluginService<{
-  /**
-   * 权限模式为后端权限控制
-   */
-  mode: 'backend'
-  /**
-   * 需要动态生成的路由列表
-   */
-  routes: RouteRecordRawStringComponent[]
-  /**
-   * routes 中的组件名称是字符串，外部需要将字符串解析成组件
-   */
-  resolveComponent: ResolveComponent
-}>
-
-export type RbacAccessPluginServiceReturned
-= | Awaited<ReturnType<RbacAccessPluginBackendService>>
-  | Awaited<ReturnType<RbacAccessPluginFrontendService>>
+}
 
 export interface RbacAccessPluginOptions {
-  service: RbacAccessPluginBackendService | RbacAccessPluginFrontendService
+  service: () => MaybePromise<BackendServiceReturned | FrontendServiceReturned>
 }
 
 let cachedRouteNames: RouteName[] | null = null
-let resolvedOptions: Required<RbacAccessPluginServiceReturned> = null
+let resolvedOptions: Required<BackendServiceReturned | FrontendServiceReturned> = null
 async function resolveOptions(
   options: RbacAccessPluginOptions,
   { router, onCleanup }: {
     router: Router
     onCleanup: EventHookOn
   },
-): Promise<Required<RbacAccessPluginServiceReturned>> {
+): Promise<Required<BackendServiceReturned | FrontendServiceReturned>> {
   if (!resolvedOptions) {
     onCleanup(() => {
       resolvedOptions = null
@@ -112,6 +108,7 @@ async function resolveOptions(
   const {
     homePath,
     loginPath,
+    onRoutesBuilt,
     parentNameForAddRoute,
     ignoreAccessRouteNames,
     ...rest
@@ -120,6 +117,7 @@ async function resolveOptions(
     ...rest,
     homePath: homePath ?? '/home',
     loginPath: loginPath ?? '/login',
+    onRoutesBuilt: onRoutesBuilt ?? noop,
     parentNameForAddRoute: parentNameForAddRoute ?? null,
     ignoreAccessRouteNames: ignoreAccessRouteNames ?? (cachedRouteNames ||= getRoutesNames((router.options.routes ?? []) as RouteRecordRaw[])),
   }
@@ -128,8 +126,8 @@ async function resolveOptions(
 
 let registeredRoutes = false
 const removeRouteHandlers: (() => void)[] = []
-function resolveRoutes(
-  options: Required<RbacAccessPluginServiceReturned>,
+async function resolveRoutes(
+  options: Required<BackendServiceReturned | FrontendServiceReturned>,
   { router, onCleanup }: {
     router: Router
     onCleanup: EventHookOn
@@ -138,7 +136,6 @@ function resolveRoutes(
   const {
     mode,
     logined,
-    routes,
     parentNameForAddRoute,
   } = options
 
@@ -146,12 +143,15 @@ function resolveRoutes(
     return
   }
 
-  const finalRoutes = buildRoutes({
+  const finalRoutes = await buildRoutes({
     mode,
-    routes,
-    roles: (options as any).roles,
+    roles: (options as any).roles ?? [],
+    routes: (options as any).routes ?? [],
     resolveComponent: (options as any).resolveComponent,
+    fetchRoutes: (options as any).fetchRoutes ?? (() => []),
   })
+
+  options.onRoutesBuilt(finalRoutes)
 
   finalRoutes.forEach((route) => {
     removeRouteHandlers.push(
@@ -182,7 +182,7 @@ export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlu
         onCleanup,
       })
 
-      const shouldRedirect = resolveRoutes(resolvedOptions, {
+      const shouldRedirect = await resolveRoutes(resolvedOptions, {
         router,
         onCleanup,
       })
@@ -247,18 +247,19 @@ function getRoutesNames(routes: RouteRecordRaw[]) {
 }
 
 function buildRoutes(options: {
+  roles: string[]
+  routes: RouteRecordRaw[]
   mode: 'frontend' | 'backend'
-  roles?: string[] | void
   resolveComponent?: ResolveComponent | void
-  routes: Array<RouteRecordRaw | RouteRecordRawStringComponent>
+  fetchRoutes: () => MaybePromise<RouteRecordRawWithStringComponent[]>
 }) {
   return options.mode === 'frontend'
     ? buildRoutesByFrontend(
-        options.routes as RouteRecordRaw[],
-        options.roles as string[],
+        options.routes,
+        options.roles,
       )
     : buildRoutesByBackend(
-        options.routes as RouteRecordRawStringComponent[],
+        options.fetchRoutes,
         options.resolveComponent as ResolveComponent,
       )
 }
@@ -290,10 +291,18 @@ function buildRoutesByFrontend(
   return filterRoutes(routes)
 }
 
-function buildRoutesByBackend(
-  routes: RouteRecordRawStringComponent[],
+async function buildRoutesByBackend(
+  fetchRoutes: () => MaybePromise<RouteRecordRawWithStringComponent[]>,
   resolveComponent: ResolveComponent,
 ) {
+  let routes: RouteRecordRawWithStringComponent[] = []
+  try {
+    routes = await fetchRoutes()
+  }
+  catch (error) {
+    routes = []
+    console.error(error)
+  }
   return mapTree(routes, (route) => {
     if (!route.component) {
       return route

@@ -1,8 +1,10 @@
 import type { MenuOption } from 'naive-ui'
+import type { Merge } from 'type-fest'
 import type { VNodeChild } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { Icon } from '@iconify/vue'
+import { isNil } from 'lodash-es'
 import { mapTree } from 'pro-composables'
 import { computed, h } from 'vue'
 import { normalizeRouteName } from '../utils/normalize-route-name'
@@ -36,34 +38,26 @@ declare module 'vue-router' {
   }
 }
 
-type MaybePromise<T> = T | Promise<T>
-
 interface NMenuPluginOptions {
-  service: () => MaybePromise<{
-    routes: Omit<RouteRecordRaw, 'component'>[]
+  service: () => {
     resolveIcon?: (icon: string) => VNodeChild
-  }>
+    routes: Merge<RouteRecordRaw, { component?: any, children?: any[] }>[]
+  }
 }
 
 export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
   return ({ router, onUnmount }) => {
-    router.beforeResolve(async () => {
-      const {
-        routes,
-        resolveIcon,
-      } = await service()
-
+    router.beforeResolve(() => {
       if (!router.buildMenus) {
-        const routeNameToPathMap = computed(() => {
-          return router
+        const finalMenus = computed(() => {
+          const { routes, resolveIcon } = service()
+          const routeNameToPathMap = router
             .getRoutes()
             .reduce<Map<string, string>>((p, { name, path }) => {
               p.set(normalizeRouteName(name), path)
               return p
             }, new Map())
-        })
 
-        const finalMenus = computed(() => {
           return mapTree(sortRoutesByMetaOrder([...routes]), ({
             name,
             meta,
@@ -75,10 +69,12 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
               hideInMenu = false,
             } = meta ?? {}
             const normalizedName = normalizeRouteName(name)
+            const menuKey = routeNameToPathMap.get(normalizedName)
+            const showMenu = !hideInMenu && !isNil(menuKey)
             const menu: MenuOption = {
-              show: !hideInMenu,
+              key: menuKey,
+              show: showMenu,
               label: title ?? normalizedName,
-              key: routeNameToPathMap.value.get(normalizedName),
             }
             if (icon) {
               menu.icon = () => {
