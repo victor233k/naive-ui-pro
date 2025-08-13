@@ -14,18 +14,18 @@ const { data: roleOptions } = useProRequest(async () => {
 
 <template>
   <pro-input
-    title="用户名"
+    :title="$t('pages.system.user.username')"
     path="username"
-    tooltip="用户名"
+    :tooltip="$t('pages.system.user.usernameTooltip')"
     required
   />
   <pro-input
-    title="用户昵称"
+    :title="$t('pages.system.user.nickname')"
     path="nickname"
     required
   />
   <pro-radio-group
-    title="性别"
+    :title="$t('pages.system.user.gender')"
     path="gender"
     required
     :field-props="{
@@ -33,7 +33,7 @@ const { data: roleOptions } = useProRequest(async () => {
     }"
   />
   <pro-password
-    title="密码"
+    :title="$t('pages.system.user.password')"
     path="password"
     required
     :field-props="{
@@ -41,7 +41,7 @@ const { data: roleOptions } = useProRequest(async () => {
     }"
   />
   <pro-select
-    title="所属角色"
+    :title="$t('pages.system.user.role')"
     path="roleIds"
     required
     :field-props="{
@@ -50,7 +50,7 @@ const { data: roleOptions } = useProRequest(async () => {
     }"
   />
   <pro-radio-group
-    title="状态"
+    :title="$t('pages.system.user.status')"
     path="status"
     required
     :field-props="{
@@ -58,15 +58,15 @@ const { data: roleOptions } = useProRequest(async () => {
     }"
   />
   <pro-input
-    title="邮箱"
+    :title="$t('pages.system.user.email')"
     path="email"
   />
   <pro-input
-    title="手机号"
+    :title="$t('pages.system.user.phone')"
     path="phone"
   />
   <pro-textarea
-    title="备注"
+    :title="$t('pages.system.user.remark')"
     path="remark"
     :field-props="{
       autosize: {

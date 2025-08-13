@@ -2,6 +2,7 @@
 import { Icon as icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
+import { $t } from '@/locales/locales'
 import { useUserStore } from '@/store/use-user-store'
 
 const {
@@ -20,9 +21,9 @@ const formattedDate = computed(() => {
 })
 
 // 统计卡片数据
-const statCards = [
+const statCards = computed(() => [
   {
-    title: '总访问量',
+    title: $t('pages.home.totalVisits'),
     value: '12,846',
     icon: 'mdi:eye-outline',
     trend: 'up',
@@ -31,7 +32,7 @@ const statCards = [
     iconColor: '#1677ff',
   },
   {
-    title: '用户总数',
+    title: $t('pages.home.totalUsers'),
     value: '3,275',
     icon: 'mdi:account-outline',
     trend: 'up',
@@ -40,7 +41,7 @@ const statCards = [
     iconColor: '#52c41a',
   },
   {
-    title: '订单总数',
+    title: $t('pages.home.totalOrders'),
     value: '1,592',
     icon: 'mdi:cart-outline',
     trend: 'down',
@@ -49,7 +50,7 @@ const statCards = [
     iconColor: '#fa8c16',
   },
   {
-    title: '总收入',
+    title: $t('pages.home.totalRevenue'),
     value: '¥25,648',
     icon: 'mdi:credit-card-outline',
     trend: 'up',
@@ -57,121 +58,121 @@ const statCards = [
     bgColor: 'bg-purple-100 dark:bg-purple-900/30',
     iconColor: '#722ed1',
   },
-]
+])
 
 // 最近活动数据
-const recentActivities = [
+const recentActivities = computed(() => [
   {
-    user: '张三',
+    user: 'Zhang San',
     avatar: 'mdi:account-circle',
-    action: '完成了任务',
-    target: '系统架构设计',
-    time: '10分钟前',
+    action: $t('pages.home.activities.completedTask'),
+    target: $t('pages.home.targets.systemArchitectureDesign'),
+    time: `10${$t('pages.home.time.minutesAgo')}`,
     color: '#1677ff',
   },
   {
-    user: '李四',
+    user: 'Li Si',
     avatar: 'mdi:account-circle',
-    action: '评论了文档',
-    target: '产品需求说明',
-    time: '30分钟前',
+    action: $t('pages.home.activities.commentedDocument'),
+    target: $t('pages.home.targets.productRequirements'),
+    time: `30${$t('pages.home.time.minutesAgo')}`,
     color: '#52c41a',
   },
   {
-    user: '王五',
+    user: 'Wang Wu',
     avatar: 'mdi:account-circle',
-    action: '上传了文件',
-    target: '测试报告.pdf',
-    time: '1小时前',
+    action: $t('pages.home.activities.uploadedFile'),
+    target: $t('pages.home.targets.databaseDesign'),
+    time: `1${$t('pages.home.time.hourAgo')}`,
     color: '#722ed1',
   },
   {
-    user: '赵六',
+    user: 'Zhao Liu',
     avatar: 'mdi:account-circle',
-    action: '创建了任务',
-    target: '用户反馈处理',
-    time: '2小时前',
+    action: $t('pages.home.activities.createdTask'),
+    target: $t('pages.home.targets.frontendDevelopment'),
+    time: `2${$t('pages.home.time.hourAgo')}`,
     color: '#fa8c16',
   },
   {
-    user: '陈七',
+    user: 'Chen Qi',
     avatar: 'mdi:account-circle',
-    action: '更新了状态',
-    target: '服务器部署',
-    time: '3小时前',
+    action: $t('pages.home.activities.updatedStatus'),
+    target: $t('pages.home.targets.backendDevelopment'),
+    time: `3${$t('pages.home.time.hourAgo')}`,
     color: '#13c2c2',
   },
   {
-    user: '周八',
+    user: 'Zhou Ba',
     avatar: 'mdi:account-circle',
-    action: '解决了问题',
-    target: '登录验证失败',
-    time: '4小时前',
+    action: $t('pages.home.activities.solvedProblem'),
+    target: $t('pages.home.targets.testingAndDeployment'),
+    time: `4${$t('pages.home.time.hourAgo')}`,
     color: '#eb2f96',
   },
   {
-    user: '吴九',
+    user: 'Wu Jiu',
     avatar: 'mdi:account-circle',
-    action: '合并了代码',
-    target: '功能分支',
-    time: '昨天',
+    action: $t('pages.home.activities.mergedCode'),
+    target: $t('pages.home.targets.documentation'),
+    time: $t('pages.home.time.yesterday'),
     color: '#faad14',
   },
   {
-    user: '郑十',
+    user: 'Zheng Shi',
     avatar: 'mdi:account-circle',
-    action: '关闭了问题',
-    target: '性能优化',
-    time: '昨天',
+    action: $t('pages.home.activities.closedIssue'),
+    target: $t('pages.home.targets.documentation'),
+    time: $t('pages.home.time.yesterday'),
     color: '#597ef7',
   },
-]
+])
 
 // 项目动态数据
-const projectUpdates = [
+const projectUpdates = computed(() => [
   {
-    title: '新版本发布',
-    desc: 'v2.3.0 版本已成功发布，修复了多个已知问题',
-    time: '今天 10:30',
+    title: $t('pages.home.updates.newVersionRelease'),
+    desc: $t('pages.home.updates.newVersionDesc'),
+    time: `${$t('pages.home.time.today')} 10:30`,
     icon: 'mdi:tag-outline',
     color: '#1677ff',
   },
   {
-    title: '系统维护通知',
-    desc: '系统将于本周六进行例行维护，预计耗时2小时',
-    time: '昨天 14:20',
+    title: $t('pages.home.updates.systemMaintenanceNotice'),
+    desc: $t('pages.home.updates.systemMaintenanceDesc'),
+    time: `${$t('pages.home.time.yesterday')} 14:20`,
     icon: 'mdi:tools',
     color: '#fa8c16',
   },
   {
-    title: '功能更新预告',
-    desc: '下个版本将新增数据分析模块，敬请期待',
-    time: '3天前',
+    title: $t('pages.home.updates.featureUpdatePreview'),
+    desc: $t('pages.home.updates.featureUpdateDesc'),
+    time: `3${$t('pages.home.time.daysAgo')}`,
     icon: 'mdi:lightbulb-outline',
     color: '#52c41a',
   },
   {
-    title: '安全更新提醒',
-    desc: '请所有用户及时更新密码，增强账户安全性',
-    time: '4天前',
+    title: $t('pages.home.updates.securityUpdateReminder'),
+    desc: $t('pages.home.updates.securityUpdateDesc'),
+    time: `4${$t('pages.home.time.daysAgo')}`,
     icon: 'mdi:shield-alert-outline',
     color: '#ff4d4f',
   },
   {
-    title: '用户反馈改进',
-    desc: '根据用户反馈，优化了界面交互和响应速度',
-    time: '5天前',
+    title: $t('pages.home.updates.userFeedbackImprovement'),
+    desc: $t('pages.home.updates.userFeedbackDesc'),
+    time: `5${$t('pages.home.time.daysAgo')}`,
     icon: 'mdi:comment-text-outline',
     color: '#13c2c2',
   },
   {
-    title: '新功能调研',
-    desc: '正在调研AI智能分析功能，欢迎提供建议',
-    time: '1周前',
+    title: $t('pages.home.updates.newFeatureResearch'),
+    desc: $t('pages.home.updates.newFeatureDesc'),
+    time: `1${$t('pages.home.time.weekAgo')}`,
     icon: 'mdi:flask-outline',
     color: '#722ed1',
   },
-]
+])
 </script>
 
 <template>
@@ -190,10 +191,10 @@ const projectUpdates = [
             </div>
             <div>
               <h1 class="text-xl md:text-2xl font-medium mb-2">
-                欢迎回来，{{ user.name }}
+                {{ $t('pages.home.welcomeBack') }}，{{ user.name }}
               </h1>
               <p class="text-gray-500 dark:text-gray-400">
-                今天是{{ formattedDate }}
+                {{ $t('pages.home.today') }}{{ formattedDate }}
               </p>
             </div>
           </div>
@@ -204,7 +205,7 @@ const projectUpdates = [
                   18
                 </div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  已完成
+                  {{ $t('pages.home.completed') }}
                 </div>
               </div>
               <div class="h-10 w-px bg-gray-200 dark:bg-gray-700 mx-2" />
@@ -213,7 +214,7 @@ const projectUpdates = [
                   6
                 </div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  进行中
+                  {{ $t('pages.home.inProgress') }}
                 </div>
               </div>
               <div class="h-10 w-px bg-gray-200 dark:bg-gray-700 mx-2" />
@@ -222,7 +223,7 @@ const projectUpdates = [
                   3
                 </div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  新消息
+                  {{ $t('pages.home.newMessages') }}
                 </div>
               </div>
             </div>
@@ -258,7 +259,7 @@ const projectUpdates = [
                 />
                 {{ card.rate }}
               </span>
-              <span class="text-gray-500 dark:text-gray-400 ml-1">较上周</span>
+              <span class="text-gray-500 dark:text-gray-400 ml-1">{{ $t('pages.home.comparedToLastWeek') }}</span>
             </div>
           </div>
           <div
@@ -279,7 +280,7 @@ const projectUpdates = [
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-3">
       <!-- 活动记录 -->
       <n-card
-        title="活动记录"
+        :title="$t('pages.home.activityLog')"
         class="h-full shadow-sm border-0"
       >
         <div class="flex items-center justify-between mb-3">
@@ -290,14 +291,14 @@ const projectUpdates = [
               width="20"
               class="mr-2"
             />
-            <span class="text-sm font-medium">最近用户活动</span>
+            <span class="text-sm font-medium">{{ $t('pages.home.recentUserActivity') }}</span>
           </div>
           <n-button
             text
             size="small"
           >
             <span class="flex items-center text-xs">
-              查看全部
+              {{ $t('pages.home.viewAll') }}
               <icon
                 icon="mdi:chevron-right"
                 width="14"
@@ -355,7 +356,7 @@ const projectUpdates = [
 
       <!-- 项目动态 -->
       <n-card
-        title="项目动态"
+        :title="$t('pages.home.projectUpdates')"
         class="h-full shadow-sm border-0"
       >
         <div class="flex items-center justify-between mb-3">
@@ -366,14 +367,14 @@ const projectUpdates = [
               width="20"
               class="mr-2"
             />
-            <span class="text-sm font-medium">系统公告与更新</span>
+            <span class="text-sm font-medium">{{ $t('pages.home.systemAnnouncementsAndUpdates') }}</span>
           </div>
           <n-button
             text
             size="small"
           >
             <span class="flex items-center text-xs">
-              查看全部
+              {{ $t('pages.home.viewAll') }}
               <icon
                 icon="mdi:chevron-right"
                 width="14"

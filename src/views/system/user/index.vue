@@ -9,6 +9,7 @@ import {
 } from 'pro-naive-ui'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
+import { $t } from '@/locales/locales'
 import UserModalForm from './components/user-modal-form.vue'
 import { Api } from './index.api'
 import {
@@ -55,7 +56,7 @@ const modalForm = createProModalForm<Api.insertOrUpdate.RequestData>({
 
 const { run: runDeleteUsers } = useProRequest(Api.del, {
   manual: true,
-  successTip: '删除成功',
+  successTip: $t('common.often.deleteSuccess'), // TODO
   onSuccess() {
     onChange({ page: 1 })
   },
@@ -71,15 +72,15 @@ const { run: handleEditUser } = useProRequest(Api.get, {
 
 const searchColumns: ProSearchFormColumns<Api.page.RequestData> = [
   {
-    title: '用户名',
+    title: $t('pages.system.user.username'),
     path: 'username',
   },
   {
-    title: '用户昵称',
+    title: $t('pages.system.user.nickname'),
     path: 'nickname',
   },
   {
-    title: '性别',
+    title: $t('pages.system.user.gender'),
     path: 'gender',
     field: 'select',
     fieldProps: {
@@ -87,7 +88,7 @@ const searchColumns: ProSearchFormColumns<Api.page.RequestData> = [
     },
   },
   {
-    title: '状态',
+    title: $t('common.often.status'),
     path: 'status',
     field: 'select',
     fieldProps: {
@@ -98,21 +99,21 @@ const searchColumns: ProSearchFormColumns<Api.page.RequestData> = [
 
 const tableColumns: ProDataTableColumns<Api.Model> = [
   {
-    title: '序号',
+    title: $t('common.often.serialNumber'),
     type: 'index',
   },
   {
-    title: '用户名',
+    title: $t('pages.system.user.username'),
     path: 'username',
     width: 120,
   },
   {
-    title: '昵称',
+    title: $t('pages.system.user.nicknameShort'),
     path: 'nickname',
     width: 100,
   },
   {
-    title: '性别',
+    title: $t('pages.system.user.gender'),
     width: 100,
     render: (row) => {
       return renderProTags({
@@ -122,17 +123,17 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     },
   },
   {
-    title: '邮箱',
+    title: $t('pages.system.user.email'),
     path: 'email',
     width: 220,
   },
   {
-    title: '手机号',
+    title: $t('pages.system.user.phone'),
     path: 'phone',
     width: 140,
   },
   {
-    title: '状态',
+    title: $t('common.often.status'),
     width: 100,
     render: (row) => {
       return renderProTags({
@@ -142,17 +143,17 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     },
   },
   {
-    title: '备注',
+    title: $t('common.often.remark'),
     path: 'remark',
     width: 230,
   },
   {
-    title: '更新时间',
+    title: $t('common.often.updateTime'),
     width: 220,
     render: row => renderProDateText(row.updateTime),
   },
   {
-    title: '操作',
+    title: $t('common.often.operation'),
     width: 120,
     render: (row) => {
       return (
@@ -163,15 +164,15 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
             text={true}
             onClick={() => handleEditUser(row.id)}
           >
-            编辑
+            {$t('common.often.edit')}
           </n-button>
           <n-popconfirm onPositiveClick={() => runDeleteUsers(row.id)}>
             {{
               default: () => (
                 <span>
-                  确定删除
+                  {$t('common.often.deleteConfirm')}
                   <span class="c-red-500 font-bold">{row.nickname}</span>
-                  吗？
+                  {$t('common.often.deleteQuestion')}
                 </span>
               ),
               trigger: () => {
@@ -181,7 +182,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
                     size="small"
                     text={true}
                   >
-                    删除
+                    {$t('common.often.delete')}
                   </n-button>
                 )
               },
@@ -208,7 +209,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
       />
     </pro-card>
     <pro-data-table
-      title="用户列表"
+      :title="$t('pages.system.user.title')"
       row-key="id"
       flex-height
       :scroll-x="1440"
@@ -227,7 +228,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
                 <icon icon="ant-design:plus-outlined" />
               </n-icon>
             </template>
-            新增
+            {{ $t('common.often.add') }}
           </n-button>
         </n-flex>
       </template>
@@ -235,7 +236,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     <pro-modal-form
       :form="modalForm"
       :loading="insertOrUpdateLoading"
-      :title="`${modalForm.values.value.id ? `编辑` : '新增'}用户`"
+      :title="`${modalForm.values.value.id ? $t('pages.system.user.editUser') : $t('pages.system.user.addUser')}`"
     >
       <user-modal-form />
     </pro-modal-form>

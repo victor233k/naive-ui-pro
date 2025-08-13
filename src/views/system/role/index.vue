@@ -9,6 +9,7 @@ import {
 } from 'pro-naive-ui'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
+import { $t } from '@/locales/locales'
 import RoleModalForm from './components/role-modal-form.vue'
 import { Api } from './index.api'
 import {
@@ -54,7 +55,7 @@ const modalForm = createProModalForm<Api.insertOrUpdate.RequestData>({
 
 const { run: runDeleteRoles } = useProRequest(Api.del, {
   manual: true,
-  successTip: '删除成功',
+  successTip: $t('common.often.deleteSuccess'), // TODO
   onSuccess() {
     onChange({ page: 1 })
   },
@@ -70,15 +71,15 @@ const { run: handleEditRole } = useProRequest(Api.get, {
 
 const searchColumns: ProSearchFormColumns<Api.page.RequestData> = [
   {
-    title: '角色名',
+    title: $t('pages.system.role.roleName'),
     path: 'name',
   },
   {
-    title: '角色编码',
+    title: $t('pages.system.role.roleCode'),
     path: 'code',
   },
   {
-    title: '状态',
+    title: $t('common.often.status'),
     path: 'status',
     field: 'select',
     fieldProps: {
@@ -89,21 +90,21 @@ const searchColumns: ProSearchFormColumns<Api.page.RequestData> = [
 
 const tableColumns: ProDataTableColumns<Api.Model> = [
   {
-    title: '序号',
+    title: $t('common.often.serialNumber'),
     type: 'index',
   },
   {
-    title: '角色名',
+    title: $t('pages.system.role.roleName'),
     path: 'name',
     width: 120,
   },
   {
-    title: '角色编码',
+    title: $t('pages.system.role.roleCode'),
     path: 'code',
     width: 120,
   },
   {
-    title: '状态',
+    title: $t('common.often.status'),
     width: 100,
     render: (row) => {
       return renderProTags({
@@ -113,7 +114,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     },
   },
   {
-    title: '备注',
+    title: $t('common.often.remark'),
     path: 'remark',
     ellipsis: {
       tooltip: true,
@@ -121,12 +122,12 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     width: 230,
   },
   {
-    title: '更新时间',
+    title: $t('common.often.updateTime'),
     width: 220,
     render: row => renderProDateText(row.updateTime),
   },
   {
-    title: '操作',
+    title: $t('common.often.operation'),
     width: 120,
     render: (row) => {
       return (
@@ -137,15 +138,15 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
             text={true}
             onClick={() => handleEditRole(row.id)}
           >
-            编辑
+            {$t('common.often.edit')}
           </n-button>
           <n-popconfirm onPositiveClick={() => runDeleteRoles(row.id)}>
             {{
               default: () => (
                 <span>
-                  确定删除
+                  {$t('common.often.deleteConfirm')}
                   <span class="c-red-500 font-bold">{row.name}</span>
-                  吗？
+                  {$t('common.often.deleteQuestion')}
                 </span>
               ),
               trigger: () => {
@@ -155,7 +156,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
                     size="small"
                     text={true}
                   >
-                    删除
+                    {$t('common.often.delete')}
                   </n-button>
                 )
               },
@@ -182,7 +183,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
       />
     </pro-card>
     <pro-data-table
-      title="角色列表"
+      :title="$t('pages.system.role.title')"
       row-key="id"
       flex-height
       :scroll-x="970"
@@ -201,7 +202,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
                 <icon icon="ant-design:plus-outlined" />
               </n-icon>
             </template>
-            新增
+            {{ $t('common.often.add') }}
           </n-button>
         </n-flex>
       </template>
@@ -209,7 +210,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     <pro-modal-form
       :form="modalForm"
       :loading="insertOrUpdateLoading"
-      :title="`${modalForm.values.value.id ? `编辑` : '新增'}角色`"
+      :title="`${modalForm.values.value.id ? $t('pages.system.role.editRole') : $t('pages.system.role.addRole')}`"
     >
       <role-modal-form />
     </pro-modal-form>

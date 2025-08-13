@@ -4,19 +4,19 @@ import { statusOptions } from '../utils/constants'
 
 <template>
   <pro-input
-    title="角色名"
+    :title="$t('pages.system.role.roleName')"
     path="name"
-    tooltip="角色名"
+    :tooltip="$t('pages.system.role.roleNameTooltip')"
     required
   />
   <pro-input
-    title="角色编码"
+    :title="$t('pages.system.role.roleCode')"
     path="code"
-    tooltip="角色编码"
+    :tooltip="$t('pages.system.role.roleCodeTooltip')"
     required
   />
   <pro-radio-group
-    title="状态"
+    :title="$t('pages.system.role.status')"
     path="status"
     required
     :field-props="{
@@ -24,7 +24,7 @@ import { statusOptions } from '../utils/constants'
     }"
   />
   <pro-textarea
-    title="备注"
+    :title="$t('pages.system.role.remark')"
     path="remark"
     :field-props="{
       autosize: {

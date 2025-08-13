@@ -2,37 +2,38 @@
 import type { IDomEditor } from '@wangeditor/editor'
 import { computed, ref } from 'vue'
 import { ProWangEditor } from '@/components/wang-editor'
+import { $t } from '@/locales/locales'
 
 defineOptions({
   name: 'EditorDemo',
 })
 
 // 基础编辑器内容
-const basicContent = ref('<p>欢迎使用 ProWangEditor 富文本编辑器！</p><p>这是一个基础的使用示例。</p>')
+const basicContent = computed(() => `<p>${$t('pages.demos.access.editor.welcomeMessage')}</p><p>${$t('pages.demos.access.editor.basicExample')}</p>`)
 
 // 高级编辑器内容
-const advancedContent = ref(`
-<h2>高级编辑器示例</h2>
-<p>这个编辑器展示了更多功能：</p>
+const advancedContent = computed(() => `
+<h2>${$t('pages.demos.access.editor.advancedExample')}</h2>
+<p>${$t('pages.demos.access.editor.advancedDescription')}</p>
 <ul>
-  <li>支持多种文本格式</li>
-  <li>支持插入图片和链接</li>
-  <li>支持表格和代码块</li>
-  <li>支持自定义工具栏</li>
+  <li>${$t('pages.demos.access.editor.feature1')}</li>
+  <li>${$t('pages.demos.access.editor.feature2')}</li>
+  <li>${$t('pages.demos.access.editor.feature3')}</li>
+  <li>${$t('pages.demos.access.editor.feature4')}</li>
 </ul>
 <blockquote>
-  <p>这是一个引用块的示例</p>
+  <p>${$t('pages.demos.access.editor.quoteExample')}</p>
 </blockquote>
 `)
 
 // 简化编辑器内容
-const simpleContent = ref('<p>这是一个简化版的编辑器，只包含基本功能。</p>')
+const simpleContent = computed(() => `<p>${$t('pages.demos.access.editor.simplifiedDescription')}</p>`)
 
 // 只读编辑器内容
-const readOnlyContent = ref(`
-<h3>只读编辑器示例</h3>
-<p>这个编辑器处于只读模式，内容无法编辑。</p>
-<p>适用于内容展示场景。</p>
+const readOnlyContent = computed(() => `
+<h3>${$t('pages.demos.access.editor.readOnlyDescription')}</h3>
+<p>${$t('pages.demos.access.editor.readOnlyDescription')}</p>
+<p>${$t('pages.demos.access.editor.readOnlyUsage')}</p>
 `)
 
 // 编辑器配置选项
@@ -41,16 +42,16 @@ const isDisabled = ref(false)
 const editorMode = ref<'default' | 'simple'>('default')
 const editorTheme = ref<'auto' | 'light' | 'dark'>('auto')
 
-const modeOptions = [
-  { label: '默认模式', value: 'default' },
-  { label: '简化模式', value: 'simple' },
-]
+const modeOptions = computed(() => [
+  { label: $t('pages.demos.access.editor.defaultMode'), value: 'default' },
+  { label: $t('pages.demos.access.editor.simpleMode'), value: 'simple' },
+])
 
-const themeOptions = [
-  { label: '跟随系统', value: 'auto' },
-  { label: '明亮主题', value: 'light' },
-  { label: '暗黑主题', value: 'dark' },
-]
+const themeOptions = computed(() => [
+  { label: $t('pages.demos.access.editor.autoTheme'), value: 'auto' },
+  { label: $t('pages.demos.access.editor.lightTheme'), value: 'light' },
+  { label: $t('pages.demos.access.editor.darkTheme'), value: 'dark' },
+])
 
 // 自定义工具栏配置
 const customToolbarConfig = computed(() => ({
@@ -61,7 +62,7 @@ const customToolbarConfig = computed(() => ({
 
 // 自定义编辑器配置
 const customEditorConfig = computed(() => ({
-  placeholder: `请输入内容... (${editorMode.value === 'default' ? '完整功能' : '简化功能'})`,
+  placeholder: `${$t('pages.demos.access.editor.placeholder')} (${editorMode.value === 'default' ? $t('pages.demos.access.editor.completeFunctionality') : $t('pages.demos.access.editor.simplifiedFunctionality')})`,
   onChange: (editor: IDomEditor) => {
     console.log('编辑器内容变化：', editor.getHtml())
   },
@@ -107,10 +108,10 @@ const codeExamples = {
   <div class="p-4">
     <div class="mb-6">
       <h1 class="text-2xl font-bold mb-2">
-        ProWangEditor 富文本编辑器示例
+        {{ $t('pages.demos.access.editor.title') }}
       </h1>
       <p class="text-gray-600 dark:text-gray-400">
-        展示 ProWangEditor 全局组件的各种用法和配置选项
+        {{ $t('pages.demos.access.editor.subtitle') }}
       </p>
     </div>
 
@@ -119,9 +120,9 @@ const codeExamples = {
       class="mb-6"
     >
       <template #header>
-        使用说明
+        {{ $t('pages.demos.access.editor.usageInstruction') }}
       </template>
-      ProWangEditor 已注册为全局组件，可以在任何页面中直接使用。支持 v-model 双向绑定、自定义配置等功能。
+      {{ $t('pages.demos.access.editor.tip1') }}
     </n-alert>
 
     <n-tabs
@@ -131,7 +132,7 @@ const codeExamples = {
       <!-- 基础示例 -->
       <n-tab-pane
         name="basic"
-        tab="基础用法"
+        :tab="$t('pages.demos.access.editor.basicUsage')"
       >
         <div class="space-y-6">
           <n-card title="基础编辑器">
@@ -143,7 +144,7 @@ const codeExamples = {
 
             <pro-wang-editor
               v-model="basicContent"
-              placeholder="请输入内容..."
+              :placeholder="$t('pages.demos.access.editor.placeholder')"
             />
 
             <n-divider />
@@ -170,7 +171,7 @@ const codeExamples = {
       <!-- 高级示例 -->
       <n-tab-pane
         name="advanced"
-        tab="高级配置"
+        :tab="$t('pages.demos.access.editor.advancedConfig')"
       >
         <div class="space-y-6">
           <n-card title="配置选项">
@@ -241,7 +242,7 @@ const codeExamples = {
       <!-- 模式对比 -->
       <n-tab-pane
         name="modes"
-        tab="模式对比"
+        :tab="$t('pages.demos.access.editor.modeComparison')"
       >
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <n-card title="默认模式">
@@ -282,7 +283,7 @@ const codeExamples = {
       <!-- 特殊用例 -->
       <n-tab-pane
         name="special"
-        tab="特殊用例"
+        :tab="$t('pages.demos.access.editor.specialCases')"
       >
         <div class="space-y-6">
           <n-card title="只读编辑器">
@@ -322,7 +323,7 @@ const codeExamples = {
       <!-- API 文档 -->
       <n-tab-pane
         name="api"
-        tab="API 文档"
+        :tab="$t('pages.demos.access.editor.apiDoc')"
       >
         <div class="space-y-6">
           <n-card title="Props 属性">

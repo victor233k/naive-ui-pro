@@ -62,7 +62,7 @@ function isDisabled(item: Api.Model | undefined): boolean {
 
 <template>
   <pro-radio-group
-    title="菜单类型"
+    :title="$t('pages.system.menu.menuType')"
     path="type"
     :field-props="{
       type: 'button',
@@ -70,7 +70,7 @@ function isDisabled(item: Api.Model | undefined): boolean {
     }"
   />
   <pro-cascader
-    title="上级菜单"
+    :title="$t('pages.system.menu.parentMenu')"
     path="parentId"
     :field-props="{
       remote: true,
@@ -79,47 +79,47 @@ function isDisabled(item: Api.Model | undefined): boolean {
     }"
   />
   <pro-iconify-icons
-    title="菜单图标"
+    :title="$t('pages.system.menu.menuIcon')"
     path="icon"
     required
     :hidden="values.type === '3'"
   />
   <pro-input
-    title="菜单标题"
+    :title="$t('pages.system.menu.menuTitle')"
     path="title"
     required
   />
   <pro-input
-    title="菜单编码"
+    :title="$t('pages.system.menu.menuCode')"
     path="code"
     required
   />
   <template v-if="values.type !== '3'">
     <pro-input
-      title="路由路径"
+      :title="$t('pages.system.menu.routePath')"
       path="routePath"
       required
     />
     <pro-input
-      title="路由文件"
+      :title="$t('pages.system.menu.routeFile')"
       path="routeFile"
-      :tooltip="values.type === '1' ? '未设置外链时必填' : undefined"
+      :tooltip="values.type === '1' ? $t('pages.system.menu.requiredWhenNoLink') : undefined"
       :hidden="!['1', '2'].includes(values.type)"
       :required="values.type !== '1'"
     />
     <pro-digit
-      title="菜单排序"
+      :title="$t('pages.system.menu.menuSort')"
       path="sort"
       required
     />
     <template v-if="values.type === '1'">
       <pro-input
-        title="外链地址"
+        :title="$t('pages.system.menu.linkAddress')"
         path="link"
       />
       <pro-radio-group
-        title="外链方式"
-        tooltip="iframe 打开时若同时设置了路由文件，则优先使用路由文件"
+        :title="$t('pages.system.menu.linkMethod')"
+        :tooltip="$t('pages.system.menu.linkMethodTooltip')"
         path="linkMode"
         required
         :field-props="{
@@ -129,12 +129,12 @@ function isDisabled(item: Api.Model | undefined): boolean {
     </template>
   </template>
   <pro-checkbox
-    title="支持缓存"
+    :title="$t('pages.system.menu.supportCache')"
     path="keepAlive"
     :hidden="['0', '3'].includes(values.type)"
   />
   <pro-radio-group
-    title="状态"
+    :title="$t('common.often.status')"
     path="status"
     required
     :field-props="{
@@ -142,7 +142,7 @@ function isDisabled(item: Api.Model | undefined): boolean {
     }"
   />
   <pro-textarea
-    title="备注"
+    :title="$t('common.often.remark')"
     path="remark"
     :field-props="{
       autosize: {

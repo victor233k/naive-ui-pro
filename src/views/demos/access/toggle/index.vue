@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { NCard } from 'naive-ui'
 import { computed } from 'vue'
+import { $t } from '@/locales/locales'
 import { useAppStore } from '@/store/use-app-store'
 import { useUserStore } from '@/store/use-user-store'
 
@@ -9,16 +10,16 @@ const userStore = useUserStore()
 
 const accessModes = computed(() => {
   return [
-    { label: '前端权限控制', value: 'frontend' },
-    { label: '后端权限控制', value: 'backend' },
+    { label: $t('pages.demos.access.toggle.frontendControl'), value: 'frontend' },
+    { label: $t('pages.demos.access.toggle.backendControl'), value: 'backend' },
   ]
 })
 
 const accounts = computed(() => {
   return [
-    { username: 'super', password: '123456', role: 'super', roleName: '超级管理员' },
-    { username: 'admin', password: '123456', role: 'admin', roleName: '普通管理员' },
-    { username: 'user', password: '123456', role: 'user', roleName: '普通用户' },
+    { username: 'super', password: '123456', role: 'super', roleName: $t('pages.demos.access.toggle.superAdmin') },
+    { username: 'admin', password: '123456', role: 'admin', roleName: $t('pages.demos.access.toggle.admin') },
+    { username: 'user', password: '123456', role: 'user', roleName: $t('pages.demos.access.toggle.user') },
   ]
 })
 
@@ -37,9 +38,9 @@ async function handleAccessMode(accessMode: string) {
 
 <template>
   <div class="flex flex-col gap-16px">
-    <n-card title="切换权限模式">
+    <n-card :title="$t('pages.demos.access.toggle.toggleMode')">
       <div class="mb-8px font-bold">
-        切换权限模式后查看【左侧菜单->系统管理】
+        {{ $t('pages.demos.access.toggle.afterToggleCheck') }}
       </div>
       <div class="flex gap-8px">
         <n-button
@@ -52,9 +53,9 @@ async function handleAccessMode(accessMode: string) {
         </n-button>
       </div>
     </n-card>
-    <n-card title="切换账号">
+    <n-card :title="$t('pages.demos.access.toggle.toggleAccount')">
       <div class="mb-8px font-bold">
-        切换账号后查看【左侧菜单->系统管理】
+        {{ $t('pages.demos.access.toggle.afterAccountCheck') }}
       </div>
       <div class="flex gap-8px">
         <n-button

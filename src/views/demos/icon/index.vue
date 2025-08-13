@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { createProForm } from 'pro-naive-ui'
+import { $t } from '@/locales/locales'
 
 const form = createProForm()
 </script>
@@ -8,16 +9,16 @@ const form = createProForm()
   <pro-form :form="form">
     <div class="flex flex-col gap-4">
       <pro-card
-        title="远程搜索-风格1"
-        tooltip="回显时远程搜索 options"
+        :title="$t('pages.demos.icon.remoteSearch1')"
+        :tooltip="$t('pages.demos.icon.remoteSearchTooltip1')"
         :show-collapse="false"
       >
         <pro-iconify-icons
-          title="单选图标"
+          :title="$t('pages.demos.icon.singleIcon')"
           path="icon"
         />
         <pro-iconify-icons
-          title="多选图标"
+          :title="$t('pages.demos.icon.multipleIcon')"
           path="icon-multiple"
           :field-props="{
             multiple: true,
@@ -25,16 +26,16 @@ const form = createProForm()
         />
       </pro-card>
       <pro-card
-        title="远程搜索-风格2"
-        tooltip="回显时合并 options"
+        :title="$t('pages.demos.icon.remoteSearch2')"
+        :tooltip="$t('pages.demos.icon.remoteSearchTooltip2')"
         :show-collapse="false"
       >
         <pro-iconify-icons2
-          title="单选图标"
+          :title="$t('pages.demos.icon.singleIcon')"
           path="icon"
         />
         <pro-iconify-icons2
-          title="多选图标"
+          :title="$t('pages.demos.icon.multipleIcon')"
           path="icon-multiple"
           :field-props="{
             multiple: true,

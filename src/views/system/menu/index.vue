@@ -1,6 +1,8 @@
 <script setup lang="tsx">
+import type { FormRules } from 'naive-ui'
 import type { ProDataTableColumns, ProSearchFormColumns } from 'pro-naive-ui'
 import { Icon } from '@iconify/vue'
+import { orderBy } from 'lodash-es'
 import {
   createProModalForm,
   createProSearchForm,
@@ -9,6 +11,7 @@ import {
 } from 'pro-naive-ui'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
+import { $t } from '@/locales/locales'
 import MenuModalForm from './components/menu-modal-form.vue'
 import { Api } from './index.api'
 import { buildTree } from './utils'
@@ -20,13 +23,11 @@ import {
   typeOptions,
   typeToColorMapping,
 } from './utils/constants'
-import type { FormRules } from 'naive-ui'
-import { orderBy } from 'lodash-es'
 
 const searchForm = createProSearchForm()
 
-const { loading: insertOrUpdateLoading, runAsync: runAsyncInsertOrUpdate } =
-  useProRequest(Api.insertOrUpdate, {
+const { loading: insertOrUpdateLoading, runAsync: runAsyncInsertOrUpdate }
+  = useProRequest(Api.insertOrUpdate, {
     manual: true,
     successTip: true,
   })
@@ -104,7 +105,7 @@ const rules: FormRules = {
         const value = modalForm.values.value
         return value.routeFile || (value.type === '1' && value.link)
           ? true
-          : new Error('未设置外链时该项必填')
+          : new Error($t('pages.system.menu.requiredWhenNoLink'))
       },
     },
   ],
@@ -112,7 +113,7 @@ const rules: FormRules = {
 
 const { run: runDeleteMenus } = useProRequest(Api.del, {
   manual: true,
-  successTip: '删除成功',
+  successTip: $t('common.often.deleteSuccess'), // TODO
   onSuccess() {
     onChange({ page: 1 })
   },
@@ -128,11 +129,11 @@ const { run: handleEditMenu } = useProRequest(Api.get, {
 
 const searchColumns: ProSearchFormColumns<Api.list.RequestData> = [
   {
-    title: '菜单标题',
+    title: $t('pages.system.menu.menuTitle'),
     path: 'title',
   },
   {
-    title: '菜单类型',
+    title: $t('pages.system.menu.menuType'),
     path: 'type',
     field: 'select',
     fieldProps: {
@@ -140,11 +141,11 @@ const searchColumns: ProSearchFormColumns<Api.list.RequestData> = [
     },
   },
   {
-    title: '路由名称',
+    title: $t('pages.system.menu.routeName'),
     path: 'code',
   },
   {
-    title: '状态',
+    title: $t('common.often.status'),
     path: 'status',
     field: 'select',
     fieldProps: {
@@ -155,7 +156,7 @@ const searchColumns: ProSearchFormColumns<Api.list.RequestData> = [
 
 const tableColumns: ProDataTableColumns<Api.Model> = [
   {
-    title: '菜单标题',
+    title: $t('pages.system.menu.menuTitle'),
     path: 'title',
     width: 180,
     render: (row) => {
@@ -171,7 +172,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     },
   },
   {
-    title: '菜单类型',
+    title: $t('pages.system.menu.menuType'),
     path: 'type',
     width: 100,
     render: (row) => {
@@ -182,27 +183,27 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     },
   },
   {
-    title: '菜单编码',
+    title: $t('pages.system.menu.menuCode'),
     path: 'code',
     width: 150,
   },
   {
-    title: '路由路径',
+    title: $t('pages.system.menu.routePath'),
     path: 'routePath',
     width: 150,
   },
   {
-    title: '路由文件',
+    title: $t('pages.system.menu.routeFile'),
     path: 'routeFile',
     width: 150,
   },
   {
-    title: '排序',
+    title: $t('pages.system.menu.sort'),
     path: 'sort',
     width: 120,
   },
   {
-    title: '状态',
+    title: $t('common.often.status'),
     width: 100,
     render: (row) => {
       return renderProTags({
@@ -212,19 +213,19 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     },
   },
   {
-    title: '备注',
+    title: $t('common.often.remark'),
     path: 'remark',
     ellipsis: {
       tooltip: true,
     },
   },
   {
-    title: '更新时间',
+    title: $t('common.often.updateTime'),
     width: 220,
-    render: (row) => renderProDateText(row.updateTime),
+    render: row => renderProDateText(row.updateTime),
   },
   {
-    title: '操作',
+    title: $t('common.often.operation'),
     width: 150,
     render: (row) => {
       return (
@@ -238,7 +239,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
               modalForm.show.value = true
             }}
           >
-            新增
+            {$t('common.often.add')}
           </n-button>
           <n-button
             type="primary"
@@ -246,15 +247,15 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
             text={true}
             onClick={() => handleEditMenu(row.id)}
           >
-            编辑
+            {$t('common.often.edit')}
           </n-button>
           <n-popconfirm onPositiveClick={() => runDeleteMenus(row.id)}>
             {{
               default: () => (
                 <span>
-                  确定删除
+                  {$t('common.often.deleteConfirm')}
                   <span class="c-red-500 font-bold">{row.title}</span>
-                  吗？
+                  {$t('common.often.deleteQuestion')}
                 </span>
               ),
               trigger: () => {
@@ -264,7 +265,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
                     size="small"
                     text={true}
                   >
-                    删除
+                    {$t('common.often.delete')}
                   </n-button>
                 )
               },
@@ -291,7 +292,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
       />
     </pro-card>
     <pro-data-table
-      title="菜单列表"
+      :title="$t('pages.system.menu.title')"
       row-key="id"
       flex-height
       :scroll-x="970"
@@ -310,7 +311,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
                 <icon icon="ant-design:plus-outlined" />
               </n-icon>
             </template>
-            新增
+            {{ $t('common.often.add') }}
           </n-button>
         </n-flex>
       </template>
@@ -318,7 +319,7 @@ const tableColumns: ProDataTableColumns<Api.Model> = [
     <pro-modal-form
       :form="modalForm"
       :loading="insertOrUpdateLoading"
-      :title="`${modalForm.values.value.id ? `编辑` : '新增'}菜单`"
+      :title="`${modalForm.values.value.id ? $t('pages.system.menu.editMenu') : $t('pages.system.menu.addMenu')}`"
       :rules
     >
       <menu-modal-form :values="modalForm.values.value" />

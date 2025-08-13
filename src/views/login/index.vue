@@ -3,6 +3,7 @@ import { useNotification } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { createProForm } from 'pro-naive-ui'
 import { computed } from 'vue'
+import { $t } from '@/locales/locales'
 import { useAppStore } from '@/store/use-app-store'
 import { useThemeStore } from '@/store/use-theme-store'
 import { useUserStore } from '@/store/use-user-store'
@@ -28,14 +29,14 @@ const form = createProForm({
     try {
       const user = await userStore.login(values)
       notification.success({
-        title: '登录成功',
-        content: `欢迎回来，${user.name}`,
+        title: $t('pages.login.loginSuccess'),
+        content: `${$t('pages.login.welcomeBack')}，${user.name}`,
         duration: 2000,
       })
     }
     catch (error: any) {
       notification.error({
-        title: '登录失败',
+        title: $t('pages.login.loginFailed'),
         content: error.message,
         duration: 2000,
       })
@@ -91,10 +92,10 @@ const form = createProForm({
 
           <div class="mb-12">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              账号登录
+              {{ $t('pages.login.accountLogin') }}
             </h1>
             <p class="mt-3 text-base text-gray-500 dark:text-gray-400">
-              请使用您的账号密码登录系统
+              {{ $t('pages.login.subTitle') }}
             </p>
           </div>
 
@@ -107,12 +108,12 @@ const form = createProForm({
             <pro-input
               required
               path="username"
-              placeholder="请输入用户名"
+              :placeholder="$t('pages.login.usernamePlaceholder')"
             />
             <pro-password
               required
               path="password"
-              placeholder="请输入密码"
+              :placeholder="$t('pages.login.passwordPlaceholder')"
               :field-props="{
                 showPasswordOn: 'click',
               }"
@@ -123,13 +124,13 @@ const form = createProForm({
                 size="small"
                 :show-feedback="false"
               >
-                记住我
+                {{ $t('pages.login.rememberMe') }}
               </pro-checkbox>
               <n-button
                 text
                 type="primary"
               >
-                忘记密码？
+                {{ $t('pages.login.forgotPassword') }}
               </n-button>
             </div>
 
@@ -140,16 +141,16 @@ const form = createProForm({
               :loading="loading"
               @click="form.submit"
             >
-              {{ loading ? '登录中...' : '登录' }}
+              {{ loading ? $t('pages.login.loginButtonLoading') : $t('pages.login.loginButton') }}
             </n-button>
             <div class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-              还没有账号？
+              {{ $t('pages.login.noAccount') }}
               <n-button
                 text
                 type="primary"
                 class="font-medium"
               >
-                立即注册
+                {{ $t('pages.login.register') }}
               </n-button>
             </div>
           </pro-form>
