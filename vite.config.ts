@@ -97,6 +97,7 @@ export default defineConfig(({ mode }) => {
       transformer: 'lightningcss',
     },
     server: {
+      host: true,
       proxy: {
         '/iconify': {
           target: 'https://api.iconify.design',
