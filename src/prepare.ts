@@ -3,6 +3,7 @@ import { preferenceConfig } from '@root/preference'
 import { merge } from 'lodash-es'
 import { create, ProInput, ProSelect } from 'pro-naive-ui'
 import { ProIconifyIcons, ProIconifyIcons2 } from './components/iconify-icons'
+import { setupI18n } from './locales/locales'
 import { setupRouter } from './router'
 import { setupPinia } from './store'
 import 'virtual:uno.css'
@@ -15,6 +16,7 @@ export async function prepareCreateApp() {
 export async function prepareMount(app: App) {
   await setupPinia(app)
   await setupRouter(app)
+  setupI18n(app)
   setupComponents(app)
 }
 
