@@ -1,12 +1,19 @@
 <script setup lang='tsx'>
 import type { ProConfigProviderProps } from 'pro-naive-ui'
+import { dateEnUS } from 'naive-ui'
 import { storeToRefs } from 'pinia'
+import { enUS, zhCN } from 'pro-naive-ui'
 import { computed } from 'vue'
+import { useAppStore } from '@/store/use-app-store'
 import { useThemeStore } from '@/store/use-theme-store'
 
 const {
   themeProps,
 } = storeToRefs(useThemeStore())
+
+const {
+  isZhCN,
+} = storeToRefs(useAppStore())
 
 const configProviderProps = computed<ProConfigProviderProps>(() => {
   return {
@@ -25,6 +32,8 @@ const configProviderProps = computed<ProConfigProviderProps>(() => {
         labelWidth: '100',
       },
     },
+    locale: isZhCN.value ? zhCN : enUS,
+    dateLocale: isZhCN.value ? null : dateEnUS,
   }
 })
 </script>

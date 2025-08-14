@@ -1,6 +1,8 @@
 <script setup lang='tsx'>
 import type { ProLayoutMode } from 'pro-naive-ui'
 import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
+import { $t } from '@/locales/locales'
 import { useLayoutStore } from '@/store/use-layout-store'
 
 const {
@@ -23,20 +25,20 @@ const {
   sidebarCollapsedShowMenuTitle,
 } = storeToRefs(useLayoutStore())
 
-const layoutOptions: Array<{ label: string, value: ProLayoutMode }> = [
-  { label: '垂直布局', value: 'vertical' },
-  { label: '水平布局', value: 'horizontal' },
-  { label: '混合双栏布局', value: 'mixed-two-column' },
-  { label: '侧边栏布局', value: 'sidebar' },
-  { label: '混合侧边栏布局', value: 'mixed-sidebar' },
-  { label: '内容全屏布局', value: 'full-content' },
-  { label: '双栏布局', value: 'two-column' },
-]
+const layoutOptions = computed<Array<{ label: string, value: ProLayoutMode }>>(() => [
+  { label: $t('common.preference.layout.vertical'), value: 'vertical' },
+  { label: $t('common.preference.layout.horizontal'), value: 'horizontal' },
+  { label: $t('common.preference.layout.mixedTwoColumn'), value: 'mixed-two-column' },
+  { label: $t('common.preference.layout.sidebar'), value: 'sidebar' },
+  { label: $t('common.preference.layout.mixedSidebar'), value: 'mixed-sidebar' },
+  { label: $t('common.preference.layout.fullContent'), value: 'full-content' },
+  { label: $t('common.preference.layout.twoColumn'), value: 'two-column' },
+])
 
-const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
-  { label: '谷歌', value: 'chrome' },
-  { label: '卡片', value: 'card' },
-]
+const tabbarThemeOptions = computed<Array<{ label: string, value: 'chrome' | 'card' }>>(() => [
+  { label: $t('common.preference.layout.chrome'), value: 'chrome' },
+  { label: $t('common.preference.layout.card'), value: 'card' },
+])
 </script>
 
 <template>
@@ -46,11 +48,11 @@ const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
     class="my-24px"
   >
     <div class="preference-item">
-      <span>显示logo</span>
+      <span>{{ $t('common.preference.layout.showLogo') }}</span>
       <n-switch v-model:value="showLogo" />
     </div>
     <div class="preference-item">
-      <span>布局模式</span>
+      <span>{{ $t('common.preference.layout.layoutMode') }}</span>
       <n-select
         v-model:value="mode"
         class="w-150px"
@@ -65,7 +67,7 @@ const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
     class="my-24px"
   >
     <div class="font-bold text-16px">
-      顶栏
+      {{ $t('common.preference.layout.header') }}
     </div>
     <n-flex
       vertical
@@ -73,19 +75,18 @@ const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
       class="pl-8px"
     >
       <div class="preference-item">
-        <span>显示顶栏</span>
+        <span>{{ $t('common.preference.layout.showHeader') }}</span>
         <n-switch v-model:value="showNav" />
       </div>
       <div class="preference-item">
-        <span>固定顶栏</span>
+        <span>{{ $t('common.preference.layout.fixedHeader') }}</span>
         <n-switch v-model:value="navFixed" />
       </div>
       <div class="preference-item">
-        <span>顶栏高度</span>
+        <span>{{ $t('common.preference.layout.headerHeight') }}</span>
         <n-input-number
           v-model:value="navHeight"
           class="w-120px"
-          placeholder="请输入"
         />
       </div>
     </n-flex>
@@ -97,7 +98,7 @@ const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
     class="my-24px"
   >
     <div class="font-bold text-16px">
-      标签栏
+      {{ $t('common.preference.layout.tabbar') }}
     </div>
     <n-flex
       vertical
@@ -105,26 +106,25 @@ const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
       class="pl-8px"
     >
       <div class="preference-item">
-        <span>显示标签栏</span>
+        <span>{{ $t('common.preference.layout.showTabbar') }}</span>
         <n-switch v-model:value="showTabbar" />
       </div>
       <div class="preference-item">
-        <span>是否缓存标签页</span>
+        <span>{{ $t('common.preference.layout.cacheTab') }}</span>
         <n-switch v-model:value="tabbarCache" />
       </div>
       <div class="preference-item">
-        <span>标签栏高度</span>
+        <span>{{ $t('common.preference.layout.tabbarHeight') }}</span>
         <n-input-number
           v-model:value="tabbarHeight"
           class="w-120px"
-          placeholder="请输入"
         />
       </div>
       <div class="preference-item">
-        <span>标签页主题</span>
+        <span>{{ $t('common.preference.layout.tabbarTheme') }}</span>
         <n-select
           v-model:value="tabbarTheme"
-          class="w-150px"
+          class="w-120px"
           :options="tabbarThemeOptions"
         />
       </div>
@@ -137,7 +137,7 @@ const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
     class="my-24px"
   >
     <div class="font-bold text-16px">
-      侧边栏
+      {{ $t('common.preference.layout.sidebar') }}
     </div>
     <n-flex
       vertical
@@ -145,31 +145,29 @@ const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
       class="pl-8px"
     >
       <div class="preference-item">
-        <span>显示侧边栏</span>
+        <span>{{ $t('common.preference.layout.showSidebar') }}</span>
         <n-switch v-model:value="showSidebar" />
       </div>
       <div class="preference-item">
-        <span>折叠侧边栏</span>
+        <span>{{ $t('common.preference.layout.sidebarCollapsed') }}</span>
         <n-switch v-model:value="collapsed" />
       </div>
       <div class="preference-item">
-        <span>折叠后显示菜单名</span>
+        <span>{{ $t('common.preference.layout.showMenuTitle') }}</span>
         <n-switch v-model:value="sidebarCollapsedShowMenuTitle" />
       </div>
       <div class="preference-item">
-        <span>侧边栏宽度</span>
+        <span>{{ $t('common.preference.layout.sidebarWidth') }}</span>
         <n-input-number
           v-model:value="sidebarWidth"
           class="w-120px"
-          placeholder="请输入"
         />
       </div>
       <div class="preference-item">
-        <span>折叠后宽度</span>
+        <span>{{ $t('common.preference.layout.collapsedWidth') }}</span>
         <n-input-number
           v-model:value="sidebarCollapsedWidth"
           class="w-120px"
-          placeholder="请输入"
         />
       </div>
     </n-flex>
@@ -181,7 +179,7 @@ const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
     class="my-24px"
   >
     <div class="font-bold text-16px">
-      底部
+      {{ $t('common.preference.layout.footer') }}
     </div>
     <n-flex
       vertical
@@ -189,19 +187,18 @@ const tabbarThemeOptions: Array<{ label: string, value: 'chrome' | 'card' }> = [
       class="pl-8px"
     >
       <div class="preference-item">
-        <span>显示底部</span>
+        <span>{{ $t('common.preference.layout.showFooter') }}</span>
         <n-switch v-model:value="showFooter" />
       </div>
       <div class="preference-item">
-        <span>固定底部</span>
+        <span>{{ $t('common.preference.layout.fixedFooter') }}</span>
         <n-switch v-model:value="footerFixed" />
       </div>
       <div class="preference-item">
-        <span>底部高度</span>
+        <span>{{ $t('common.preference.layout.footerHeight') }}</span>
         <n-input-number
           v-model:value="footerHeight"
           class="w-120px"
-          placeholder="请输入"
         />
       </div>
     </n-flex>

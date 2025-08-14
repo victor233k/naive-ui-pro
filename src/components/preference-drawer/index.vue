@@ -1,5 +1,6 @@
 <script setup lang='tsx'>
 import { Icon } from '@iconify/vue'
+import { $t } from '@/locales/locales'
 import { useAppStore } from '@/store/use-app-store'
 import { useLayoutStore } from '@/store/use-layout-store'
 import AppPreference from './app-preference.vue'
@@ -22,7 +23,7 @@ const layoutStore = useLayoutStore()
       }"
     >
       <n-drawer-content
-        title="偏好设置"
+        :title="$t('common.preference.title')"
         closable
         :native-scrollbar="false"
       >
@@ -32,19 +33,19 @@ const layoutStore = useLayoutStore()
         >
           <n-tab-pane
             name="theme"
-            tab="主题"
+            :tab="$t('common.preference.theme.title')"
           >
             <theme-preference />
           </n-tab-pane>
           <n-tab-pane
             name="layout"
-            tab="布局"
+            :tab="$t('common.preference.layout.title')"
           >
             <layout-preference />
           </n-tab-pane>
           <n-tab-pane
             name="other"
-            tab="其他"
+            :tab="$t('common.preference.other')"
           >
             <app-preference />
           </n-tab-pane>
@@ -55,13 +56,13 @@ const layoutStore = useLayoutStore()
             class="w-full"
           >
             <n-button @click="appStore.$resetAllPreference">
-              重置配置
+              {{ $t('common.preference.resetConfig') }}
             </n-button>
             <n-button
               type="primary"
               @click="appStore.$copyAllPreference"
             >
-              复制配置
+              {{ $t('common.preference.copyConfig') }}
             </n-button>
           </n-flex>
         </template>
@@ -89,7 +90,7 @@ const layoutStore = useLayoutStore()
   justify-content: space-between;
   height: calc(var(--preference-item-height) * 1px);
 
-  &>span {
+  & > span {
     user-select: none;
   }
 }

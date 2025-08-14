@@ -1,3 +1,4 @@
+import type { RouteLocationNormalizedGeneric } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { computed } from 'vue'
 import { normalizeRouteName } from '../utils/normalize-route-name'
@@ -33,20 +34,31 @@ interface BreadcrumbItem {
   icon?: string
 }
 
-export function breadcrumbPlugin(): ProRouterPlugin {
+interface BreadcrumbPluginOptions {
+  resolveBreadcrumb?: (item: BreadcrumbItem, to: RouteLocationNormalizedGeneric) => BreadcrumbItem
+}
+
+export function breadcrumbPlugin({
+  resolveBreadcrumb,
+}: BreadcrumbPluginOptions = {}): ProRouterPlugin {
   return ({ router, onUnmount }) => {
-    router.afterEach(() => {
+    router.afterEach((to) => {
       if (!router.buildBreadcrumbs) {
         const breadcrumbs = computed(() => {
           const breadcrumbs: BreadcrumbItem[] = []
           router.currentRoute.value.matched.forEach(({ meta, path, name }) => {
-            const { title, icon, hideInBreadcrumb } = meta ?? {}
+            const {
+              title,
+              icon,
+              hideInBreadcrumb,
+            } = meta ?? {}
             if (title && !hideInBreadcrumb) {
-              breadcrumbs.push({
+              const item: BreadcrumbItem = {
                 path,
                 icon,
                 title: title ?? normalizeRouteName(name),
-              })
+              }
+              breadcrumbs.push(resolveBreadcrumb ? resolveBreadcrumb(item, to) : item)
             }
           })
           return breadcrumbs

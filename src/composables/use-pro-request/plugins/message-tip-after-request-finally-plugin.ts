@@ -1,17 +1,18 @@
 import type { UseProRequestPlugin } from '../types'
 import { isFunction } from 'lodash-es'
 import { useMessage } from 'naive-ui'
+import { $t, isI18nKey } from '@/locales/locales'
 
 declare module '../types' {
   interface UseProRequestOptions<Data, Params extends any[]> {
     /**
      * 请求成功后的消息提示，配置 true 时文案为 "操作成功"
      */
-    successTip?: string | true | ((data: Data, params: Params) => string)
+    successTip?: I18nKeyPath | (string & {}) | true | ((data: Data, params: Params) => string)
     /**
      * 请求失败后的消息提示，配置 false 时禁用消息提示
      */
-    errorTip?: string | false | ((error: Error, params: Params) => string)
+    errorTip?: I18nKeyPath | (string & {}) | false | ((error: Error, params: Params) => string)
   }
 }
 
@@ -29,12 +30,14 @@ export const messageTipAfterRequestFinallyPlugin: UseProRequestPlugin<any, any[]
       return ''
     }
     if (successTip === true) {
-      return '操作成功'
+      return $t('common.often.operationSuccess')
     }
     if (isFunction(successTip)) {
       return successTip(data, params)
     }
-    return successTip
+    return isI18nKey(successTip)
+      ? $t(successTip)
+      : successTip
   }
 
   function resolveErrorMessage(error: Error, params: any[]) {
@@ -48,7 +51,9 @@ export const messageTipAfterRequestFinallyPlugin: UseProRequestPlugin<any, any[]
     if (isFunction(errorTip)) {
       return errorTip(error, params)
     }
-    return errorTip
+    return isI18nKey(errorTip)
+      ? $t(errorTip)
+      : errorTip
   }
 
   return {

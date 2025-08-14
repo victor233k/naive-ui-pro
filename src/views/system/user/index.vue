@@ -7,9 +7,11 @@ import {
   renderProDateText,
   renderProTags,
 } from 'pro-naive-ui'
+import { computed } from 'vue'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
 import { $t } from '@/locales/locales'
+import { translateOptions } from '@/utils/common'
 import UserModalForm from './components/user-modal-form.vue'
 import { Api } from './index.api'
 import {
@@ -56,7 +58,7 @@ const modalForm = createProModalForm<Api.insertOrUpdate.RequestData>({
 
 const { run: runDeleteUsers } = useProRequest(Api.del, {
   manual: true,
-  successTip: $t('common.often.deleteSuccess'), // TODO
+  successTip: 'common.often.deleteSuccess',
   onSuccess() {
     onChange({ page: 1 })
   },
@@ -70,129 +72,137 @@ const { run: handleEditUser } = useProRequest(Api.get, {
   },
 })
 
-const searchColumns: ProSearchFormColumns<Api.page.RequestData> = [
-  {
-    title: $t('pages.system.user.username'),
-    path: 'username',
-  },
-  {
-    title: $t('pages.system.user.nickname'),
-    path: 'nickname',
-  },
-  {
-    title: $t('pages.system.user.gender'),
-    path: 'gender',
-    field: 'select',
-    fieldProps: {
-      options: genderOptions,
+const searchColumns = computed<ProSearchFormColumns<Api.page.RequestData>>(() => {
+  return [
+    {
+      title: $t('pages.system.user.username'),
+      path: 'username',
     },
-  },
-  {
-    title: $t('common.often.status'),
-    path: 'status',
-    field: 'select',
-    fieldProps: {
-      options: statusOptions,
+    {
+      title: $t('pages.system.user.nickname'),
+      path: 'nickname',
     },
-  },
-]
+    {
+      title: $t('pages.system.user.gender'),
+      path: 'gender',
+      field: 'select',
+      fieldProps: () => {
+        return {
+          options: translateOptions(genderOptions),
+        }
+      },
+    },
+    {
+      title: $t('common.often.status'),
+      path: 'status',
+      field: 'select',
+      fieldProps: () => {
+        return {
+          options: translateOptions(statusOptions),
+        }
+      },
+    },
+  ]
+})
 
-const tableColumns: ProDataTableColumns<Api.Model> = [
-  {
-    title: $t('common.often.serialNumber'),
-    type: 'index',
-  },
-  {
-    title: $t('pages.system.user.username'),
-    path: 'username',
-    width: 120,
-  },
-  {
-    title: $t('pages.system.user.nicknameShort'),
-    path: 'nickname',
-    width: 100,
-  },
-  {
-    title: $t('pages.system.user.gender'),
-    width: 100,
-    render: (row) => {
-      return renderProTags({
-        content: genderMapping[row.gender],
-        type: genderToColorMapping[row.gender],
-      })
+const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
+  return [
+    {
+      title: $t('common.often.index'),
+      type: 'index',
     },
-  },
-  {
-    title: $t('pages.system.user.email'),
-    path: 'email',
-    width: 220,
-  },
-  {
-    title: $t('pages.system.user.phone'),
-    path: 'phone',
-    width: 140,
-  },
-  {
-    title: $t('common.often.status'),
-    width: 100,
-    render: (row) => {
-      return renderProTags({
-        content: statusMapping[row.status],
-        type: statusToColorMapping[row.status],
-      })
+    {
+      title: $t('pages.system.user.username'),
+      path: 'username',
+      width: 120,
     },
-  },
-  {
-    title: $t('common.often.remark'),
-    path: 'remark',
-    width: 230,
-  },
-  {
-    title: $t('common.often.updateTime'),
-    width: 220,
-    render: row => renderProDateText(row.updateTime),
-  },
-  {
-    title: $t('common.often.operation'),
-    width: 120,
-    render: (row) => {
-      return (
-        <n-flex>
-          <n-button
-            type="primary"
-            size="small"
-            text={true}
-            onClick={() => handleEditUser(row.id)}
-          >
-            {$t('common.often.edit')}
-          </n-button>
-          <n-popconfirm onPositiveClick={() => runDeleteUsers(row.id)}>
-            {{
-              default: () => (
-                <span>
-                  {$t('common.often.deleteConfirm')}
-                  <span class="c-red-500 font-bold">{row.nickname}</span>
-                  {$t('common.often.deleteQuestion')}
-                </span>
-              ),
-              trigger: () => {
-                return (
-                  <n-button
-                    type="error"
-                    size="small"
-                    text={true}
-                  >
-                    {$t('common.often.delete')}
-                  </n-button>
-                )
-              },
-            }}
-          </n-popconfirm>
-        </n-flex>
-      )
+    {
+      title: $t('pages.system.user.nicknameShort'),
+      path: 'nickname',
+      width: 100,
     },
-  },
-]
+    {
+      title: $t('pages.system.user.gender'),
+      width: 100,
+      render: (row) => {
+        return renderProTags({
+          content: $t(genderMapping[row.gender]),
+          type: genderToColorMapping[row.gender],
+        })
+      },
+    },
+    {
+      title: $t('pages.system.user.email'),
+      path: 'email',
+      width: 220,
+    },
+    {
+      title: $t('pages.system.user.phone'),
+      path: 'phone',
+      width: 140,
+    },
+    {
+      title: $t('common.often.status'),
+      width: 100,
+      render: (row) => {
+        return renderProTags({
+          content: $t(statusMapping[row.status]),
+          type: statusToColorMapping[row.status],
+        })
+      },
+    },
+    {
+      title: $t('common.often.remark'),
+      path: 'remark',
+      width: 230,
+    },
+    {
+      title: $t('common.often.updateTime'),
+      width: 220,
+      render: row => renderProDateText(row.updateTime),
+    },
+    {
+      title: $t('common.often.operation'),
+      width: 120,
+      render: (row) => {
+        return (
+          <n-flex>
+            <n-button
+              type="primary"
+              size="small"
+              text={true}
+              onClick={() => handleEditUser(row.id)}
+            >
+              {$t('common.often.edit')}
+            </n-button>
+            <n-popconfirm onPositiveClick={() => runDeleteUsers(row.id)}>
+              {{
+                default: () => (
+                  <span>
+                    {$t('common.often.deleteConfirm')}
+                    <span class="c-red-500 font-bold">{row.nickname}</span>
+                    {$t('common.often.deleteQuestion')}
+                  </span>
+                ),
+                trigger: () => {
+                  return (
+                    <n-button
+                      type="error"
+                      size="small"
+                      text={true}
+                    >
+                      {$t('common.often.delete')}
+                    </n-button>
+                  )
+                },
+              }}
+            </n-popconfirm>
+          </n-flex>
+        )
+      },
+    },
+  ]
+})
 </script>
 
 <template>

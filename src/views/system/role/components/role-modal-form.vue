@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { translateOptions } from '@/utils/common'
 import { statusOptions } from '../utils/constants'
 </script>
 
@@ -16,15 +17,15 @@ import { statusOptions } from '../utils/constants'
     required
   />
   <pro-radio-group
-    :title="$t('pages.system.role.status')"
+    :title="$t('common.often.status')"
     path="status"
     required
     :field-props="{
-      options: statusOptions,
+      options: translateOptions(statusOptions),
     }"
   />
   <pro-textarea
-    :title="$t('pages.system.role.remark')"
+    :title="$t('common.often.remark')"
     path="remark"
     :field-props="{
       autosize: {

@@ -1,6 +1,7 @@
 <script setup lang='tsx'>
 import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
+import { $t } from '@/locales/locales'
 import { useThemeStore } from '@/store/use-theme-store'
 
 const {
@@ -46,15 +47,15 @@ const {
     :size="12"
   >
     <div class="preference-item">
-      <span>色弱模式</span>
+      <span>{{ $t('common.preference.theme.colorWeakness') }}</span>
       <n-switch v-model:value="colorWeakness" />
     </div>
     <div class="preference-item">
-      <span>灰色模式</span>
+      <span>{{ $t('common.preference.theme.grayMode') }}</span>
       <n-switch v-model:value="grayscale" />
     </div>
     <div class="preference-item">
-      <span>主色</span>
+      <span>{{ $t('common.preference.theme.primaryColor') }}</span>
       <n-color-picker
         v-model:value="primaryColor"
         class="w-90px"

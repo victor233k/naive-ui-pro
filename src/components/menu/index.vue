@@ -57,7 +57,7 @@ const nMenuProps = computed(() => {
   :deep(.n-menu-item-content) {
     padding-left: 0 !important;
     padding-right: 0;
-    transition: height .3s var(--n-bezier);
+    transition: height 0.3s var(--n-bezier);
   }
 
   :deep(.n-menu-item-content__icon) {
@@ -85,7 +85,7 @@ const nMenuProps = computed(() => {
   }
 
   :deep(.n-menu-item-content) {
-    transition: height .3s var(--n-bezier);
+    transition: height 0.3s var(--n-bezier);
   }
 }
 </style>

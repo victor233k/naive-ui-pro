@@ -55,7 +55,6 @@ export default {
         phone: 'Phone Number',
         password: 'Password',
         role: 'Role',
-        serialNumber: 'Serial Number',
         addUser: 'Add User',
         editUser: 'Edit User',
         usernameTooltip: 'Username',
@@ -282,7 +281,12 @@ export default {
 
     // Preference setting components
     preference: {
+      title: 'Preference Settings',
+      resetConfig: 'Reset Config',
+      copyConfig: 'Copy Config',
+      other: 'Other',
       layout: {
+        title: 'Layout',
         vertical: 'Vertical Layout',
         horizontal: 'Horizontal Layout',
         mixedTwoColumn: 'Mixed Two-column Layout',
@@ -290,7 +294,7 @@ export default {
         mixedSidebar: 'Mixed Sidebar Layout',
         fullContent: 'Full Content Layout',
         twoColumn: 'Two-column Layout',
-        google: 'Google',
+        chrome: 'Chrome',
         card: 'Card',
         showLogo: 'Show Logo',
         layoutMode: 'Layout Mode',
@@ -298,7 +302,6 @@ export default {
         showHeader: 'Show Header',
         fixedHeader: 'Fixed Header',
         headerHeight: 'Header Height',
-        inputPlaceholder: 'Please enter',
         tabbar: 'Tab Bar',
         showTabbar: 'Show Tab Bar',
         fixedTabbar: 'Fixed Tab Bar',
@@ -312,6 +315,7 @@ export default {
         sidebarWidth: 'Sidebar Width',
         collapsedWidth: 'Collapsed Width',
         showSidebarTitle: 'Show Sidebar Title',
+        showMenuTitle: 'Show Menu Title When Collapsed',
         sidebarTitleWidth: 'Sidebar Title Width',
         footer: 'Footer',
         showFooter: 'Show Footer',
@@ -327,12 +331,22 @@ export default {
         zoomOut: 'Zoom Out',
       },
       theme: {
+        title: 'Theme',
         followSystem: 'Follow System',
         light: 'Light',
         dark: 'Dark',
         themeColor: 'Theme Color',
+        primaryColor: 'Primary Color',
         grayMode: 'Gray Mode',
         colorWeakness: 'Color Weakness Mode',
+      },
+      app: {
+        routeTransition: 'Route Transition',
+        fade: 'Fade',
+        fadeUp: 'Fade Up',
+        fadeDown: 'Fade Down',
+        fadeSlide: 'Fade Slide',
+        none: 'None',
       },
     },
 
@@ -369,7 +383,7 @@ export default {
       add: 'Add',
       edit: 'Edit',
       delete: 'Delete',
-      serialNumber: 'Serial Number',
+      index: 'Index',
       deleteConfirm: 'Confirm delete',
       deleteQuestion: '?',
       deleteSuccess: 'Delete successful',
@@ -412,4 +426,4 @@ export default {
     externalLink: 'External Link',
     iconSelector: 'Icon Selector',
   },
-}
+} as const

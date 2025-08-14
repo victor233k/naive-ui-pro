@@ -9,9 +9,11 @@ import {
   renderProDateText,
   renderProTags,
 } from 'pro-naive-ui'
+import { computed } from 'vue'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
 import { $t } from '@/locales/locales'
+import { translateOptions } from '@/utils/common'
 import MenuModalForm from './components/menu-modal-form.vue'
 import { Api } from './index.api'
 import { buildTree } from './utils'
@@ -113,7 +115,7 @@ const rules: FormRules = {
 
 const { run: runDeleteMenus } = useProRequest(Api.del, {
   manual: true,
-  successTip: $t('common.often.deleteSuccess'), // TODO
+  successTip: 'common.often.deleteSuccess',
   onSuccess() {
     onChange({ page: 1 })
   },
@@ -127,155 +129,163 @@ const { run: handleEditMenu } = useProRequest(Api.get, {
   },
 })
 
-const searchColumns: ProSearchFormColumns<Api.list.RequestData> = [
-  {
-    title: $t('pages.system.menu.menuTitle'),
-    path: 'title',
-  },
-  {
-    title: $t('pages.system.menu.menuType'),
-    path: 'type',
-    field: 'select',
-    fieldProps: {
-      options: typeOptions,
+const searchColumns = computed<ProSearchFormColumns<Api.list.RequestData>>(() => {
+  return [
+    {
+      title: $t('pages.system.menu.menuTitle'),
+      path: 'title',
     },
-  },
-  {
-    title: $t('pages.system.menu.routeName'),
-    path: 'code',
-  },
-  {
-    title: $t('common.often.status'),
-    path: 'status',
-    field: 'select',
-    fieldProps: {
-      options: statusOptions,
+    {
+      title: $t('pages.system.menu.menuType'),
+      path: 'type',
+      field: 'select',
+      fieldProps: () => {
+        return {
+          options: translateOptions(typeOptions),
+        }
+      },
     },
-  },
-]
+    {
+      title: $t('pages.system.menu.routeName'),
+      path: 'code',
+    },
+    {
+      title: $t('common.often.status'),
+      path: 'status',
+      field: 'select',
+      fieldProps: () => {
+        return {
+          options: translateOptions(statusOptions),
+        }
+      },
+    },
+  ]
+})
 
-const tableColumns: ProDataTableColumns<Api.Model> = [
-  {
-    title: $t('pages.system.menu.menuTitle'),
-    path: 'title',
-    width: 180,
-    render: (row) => {
-      return (
-        <n-flex
-          inline
-          align="center"
-        >
-          {row.icon && <Icon icon={row.icon}></Icon>}
-          <span>{row.title}</span>
-        </n-flex>
-      )
-    },
-  },
-  {
-    title: $t('pages.system.menu.menuType'),
-    path: 'type',
-    width: 100,
-    render: (row) => {
-      return renderProTags({
-        content: typeMapping[row.type],
-        type: typeToColorMapping[row.type],
-      })
-    },
-  },
-  {
-    title: $t('pages.system.menu.menuCode'),
-    path: 'code',
-    width: 150,
-  },
-  {
-    title: $t('pages.system.menu.routePath'),
-    path: 'routePath',
-    width: 150,
-  },
-  {
-    title: $t('pages.system.menu.routeFile'),
-    path: 'routeFile',
-    width: 150,
-  },
-  {
-    title: $t('pages.system.menu.sort'),
-    path: 'sort',
-    width: 120,
-  },
-  {
-    title: $t('common.often.status'),
-    width: 100,
-    render: (row) => {
-      return renderProTags({
-        content: statusMapping[row.status],
-        type: statusToColorMapping[row.status],
-      })
-    },
-  },
-  {
-    title: $t('common.often.remark'),
-    path: 'remark',
-    ellipsis: {
-      tooltip: true,
-    },
-  },
-  {
-    title: $t('common.often.updateTime'),
-    width: 220,
-    render: row => renderProDateText(row.updateTime),
-  },
-  {
-    title: $t('common.often.operation'),
-    width: 150,
-    render: (row) => {
-      return (
-        <n-flex>
-          <n-button
-            type="primary"
-            size="small"
-            text={true}
-            onClick={() => {
-              modalForm.values.value.parentId = row.id
-              modalForm.show.value = true
-            }}
+const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
+  return [
+    {
+      title: $t('pages.system.menu.menuTitle'),
+      path: 'title',
+      width: 180,
+      render: (row) => {
+        return (
+          <n-flex
+            inline
+            align="center"
           >
-            {$t('common.often.add')}
-          </n-button>
-          <n-button
-            type="primary"
-            size="small"
-            text={true}
-            onClick={() => handleEditMenu(row.id)}
-          >
-            {$t('common.often.edit')}
-          </n-button>
-          <n-popconfirm onPositiveClick={() => runDeleteMenus(row.id)}>
-            {{
-              default: () => (
-                <span>
-                  {$t('common.often.deleteConfirm')}
-                  <span class="c-red-500 font-bold">{row.title}</span>
-                  {$t('common.often.deleteQuestion')}
-                </span>
-              ),
-              trigger: () => {
-                return (
-                  <n-button
-                    type="error"
-                    size="small"
-                    text={true}
-                  >
-                    {$t('common.often.delete')}
-                  </n-button>
-                )
-              },
-            }}
-          </n-popconfirm>
-        </n-flex>
-      )
+            {row.icon && <Icon icon={row.icon}></Icon>}
+            <span>{row.title}</span>
+          </n-flex>
+        )
+      },
     },
-  },
-]
+    {
+      title: $t('pages.system.menu.menuType'),
+      path: 'type',
+      width: 100,
+      render: (row) => {
+        return renderProTags({
+          content: $t(typeMapping[row.type]),
+          type: typeToColorMapping[row.type],
+        })
+      },
+    },
+    {
+      title: $t('pages.system.menu.menuCode'),
+      path: 'code',
+      width: 150,
+    },
+    {
+      title: $t('pages.system.menu.routePath'),
+      path: 'routePath',
+      width: 150,
+    },
+    {
+      title: $t('pages.system.menu.routeFile'),
+      path: 'routeFile',
+      width: 150,
+    },
+    {
+      title: $t('pages.system.menu.sort'),
+      path: 'sort',
+      width: 120,
+    },
+    {
+      title: $t('common.often.status'),
+      width: 100,
+      render: (row) => {
+        return renderProTags({
+          content: $t(statusMapping[row.status]),
+          type: statusToColorMapping[row.status],
+        })
+      },
+    },
+    {
+      title: $t('common.often.remark'),
+      path: 'remark',
+      ellipsis: {
+        tooltip: true,
+      },
+    },
+    {
+      title: $t('common.often.updateTime'),
+      width: 220,
+      render: row => renderProDateText(row.updateTime),
+    },
+    {
+      title: $t('common.often.operation'),
+      width: 150,
+      render: (row) => {
+        return (
+          <n-flex>
+            <n-button
+              type="primary"
+              size="small"
+              text={true}
+              onClick={() => {
+                modalForm.values.value.parentId = row.id
+                modalForm.show.value = true
+              }}
+            >
+              {$t('common.often.add')}
+            </n-button>
+            <n-button
+              type="primary"
+              size="small"
+              text={true}
+              onClick={() => handleEditMenu(row.id)}
+            >
+              {$t('common.often.edit')}
+            </n-button>
+            <n-popconfirm onPositiveClick={() => runDeleteMenus(row.id)}>
+              {{
+                default: () => (
+                  <span>
+                    {$t('common.often.deleteConfirm')}
+                    <span class="c-red-500 font-bold">{row.title}</span>
+                    {$t('common.often.deleteQuestion')}
+                  </span>
+                ),
+                trigger: () => {
+                  return (
+                    <n-button
+                      type="error"
+                      size="small"
+                      text={true}
+                    >
+                      {$t('common.often.delete')}
+                    </n-button>
+                  )
+                },
+              }}
+            </n-popconfirm>
+          </n-flex>
+        )
+      },
+    },
+  ]
+})
 </script>
 
 <template>

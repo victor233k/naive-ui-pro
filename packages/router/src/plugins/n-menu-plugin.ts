@@ -1,6 +1,5 @@
 import type { MenuOption } from 'naive-ui'
 import type { Merge } from 'type-fest'
-import type { VNodeChild } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { Icon } from '@iconify/vue'
@@ -38,10 +37,20 @@ declare module 'vue-router' {
   }
 }
 
+type ServiceRoute = Merge<
+  RouteRecordRaw,
+  { component?: any, children?: any[] }
+>
+
 interface NMenuPluginOptions {
   service: () => {
-    resolveIcon?: (icon: string) => VNodeChild
-    routes: Merge<RouteRecordRaw, { component?: any, children?: any[] }>[]
+    routes: ServiceRoute[]
+    /**
+     * 处理菜单项
+     * @param item 处理后的菜单项
+     * @param rawItem 原始菜单项
+     */
+    resolveMenuItem?: (item: MenuOption, rawItem: ServiceRoute) => MenuOption
   }
 }
 
@@ -50,7 +59,7 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
     router.beforeResolve(() => {
       if (!router.buildMenus) {
         const finalMenus = computed(() => {
-          const { routes, resolveIcon } = service()
+          const { routes, resolveMenuItem } = service()
           const routeNameToPathMap = router
             .getRoutes()
             .reduce<Map<string, string>>((p, { name, path }) => {
@@ -58,16 +67,19 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
               return p
             }, new Map())
 
-          return mapTree(sortRoutesByMetaOrder([...routes]), ({
-            name,
-            meta,
-            children = [],
-          }) => {
+          return mapTree(sortRoutesByMetaOrder([...routes]), (item) => {
+            const {
+              name,
+              meta,
+              children = [],
+            } = item
+
             const {
               icon,
               title,
               hideInMenu = false,
             } = meta ?? {}
+
             const normalizedName = normalizeRouteName(name)
             const menuKey = routeNameToPathMap.get(normalizedName)
             const showMenu = !hideInMenu && !isNil(menuKey)
@@ -78,15 +90,15 @@ export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
             }
             if (icon) {
               menu.icon = () => {
-                return resolveIcon
-                  ? resolveIcon(icon)
-                  : builtinResolveIcon(icon)
+                return builtinResolveIcon(icon)
               }
             }
             if (children.filter(item => !item.meta?.hideInMenu).length > 0) {
               menu.children = sortRoutesByMetaOrder(children) as any
             }
-            return menu
+            return resolveMenuItem
+              ? resolveMenuItem(menu, item)
+              : menu
           }, 'children')
         })
 
@@ -110,7 +122,7 @@ function builtinResolveIcon(icon: string) {
   })
 }
 
-function sortRoutesByMetaOrder(routes: Omit<RouteRecordRaw, 'component'>[]) {
+function sortRoutesByMetaOrder(routes: ServiceRoute[]) {
   return routes.sort((a, b) => {
     return (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER)
   })

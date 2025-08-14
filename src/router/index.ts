@@ -1,4 +1,8 @@
-import type { RbacAccessPluginBaseServiceReturned, RbacAccessPluginRouteRecordRawWithStringComponent } from '@pro/router'
+import type {
+  RbacAccessPluginBaseServiceReturned,
+  RbacAccessPluginRouteRecordRawWithStringComponent,
+} from '@pro/router'
+
 import type { App } from 'vue'
 
 import {
@@ -20,6 +24,8 @@ import {
   createWebHistory,
 } from 'vue-router'
 
+import { $t } from '@/locales/locales'
+
 import {
   useAppStore,
 } from '@/store/use-app-store'
@@ -37,7 +43,6 @@ import {
 import {
   stateCleanupPlugin,
 } from './plugins/state-cleanup-plugin'
-
 import {
   accessRoutes,
   HOME_ROUTE_PATH,
@@ -62,11 +67,30 @@ export async function setupRouter(app: App) {
       /**
        * 路由标题插件
        */
-      documentTitlePlugin(),
+      documentTitlePlugin({
+        titleTemplate: (title, to) => {
+          const appStore = useAppStore()
+          const { titleI18nKey } = to.meta ?? {}
+          return titleI18nKey
+            ? $t(titleI18nKey)
+            : title ?? appStore.title
+        },
+      }),
       /**
        * 面包屑插件
        */
-      breadcrumbPlugin(),
+      breadcrumbPlugin({
+        resolveBreadcrumb: (item, to) => {
+          const appStore = useAppStore()
+          const { titleI18nKey } = to.meta ?? {}
+          return {
+            ...item,
+            title: titleI18nKey
+              ? $t(titleI18nKey)
+              : item.title ?? appStore.title,
+          }
+        },
+      }),
       /**
        * 外链插件，用于处理外链跳转
        */
@@ -163,6 +187,15 @@ export async function setupRouter(app: App) {
           const store = useUserStore()
           return {
             routes: store.routes,
+            resolveMenuItem(item, rawItem) {
+              const { titleI18nKey } = rawItem.meta ?? {}
+              return {
+                ...item,
+                label: titleI18nKey
+                  ? $t(titleI18nKey)
+                  : item.label,
+              }
+            },
           }
         },
       }),

@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import { computed } from 'vue'
+import { $t } from '@/locales/locales'
 import { HOME_ROUTE_PATH } from '@/router/routes'
 import Fallback403 from './403.vue'
 import Fallback404 from './404.vue'
@@ -17,26 +18,32 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const title = computed(() => {
+  if (props.title) {
+    return props.title
+  }
   switch (props.type) {
     case '403':
-      return '访问被拒绝'
+      return $t('common.fallback.403.title')
     case '404':
-      return '页面不存在'
+      return $t('common.fallback.404.title')
     case '500':
-      return '服务器错误'
+      return $t('common.fallback.500.title')
     default:
       return ''
   }
 })
 
 const description = computed(() => {
+  if (props.description) {
+    return props.description
+  }
   switch (props.type) {
     case '403':
-      return '您没有权限访问此页面'
+      return $t('common.fallback.403.description')
     case '404':
-      return '您访问的页面未找到'
+      return $t('common.fallback.404.description')
     case '500':
-      return '服务器开小差了，请稍后再试'
+      return $t('common.fallback.500.description')
     default:
       return ''
   }
@@ -70,7 +77,7 @@ const description = computed(() => {
           type="primary"
           @click="$router.push(HOME_ROUTE_PATH)"
         >
-          返回首页
+          {{ $t('common.fallback.backHome') }}
         </n-button>
       </div>
     </div>

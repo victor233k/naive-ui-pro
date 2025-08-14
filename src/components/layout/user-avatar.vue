@@ -3,6 +3,8 @@ import type { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { Icon } from '@iconify/vue'
 import { NIcon, useDialog } from 'naive-ui'
 import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
+import { $t } from '@/locales/locales'
 import { useUserStore } from '@/store/use-user-store'
 
 const dialog = useDialog()
@@ -12,9 +14,9 @@ const {
   user,
 } = storeToRefs(userStore)
 
-const options: DropdownMixedOption[] = [
+const options = computed<DropdownMixedOption[]>(() => [
   {
-    label: '文档',
+    label: $t('common.layout.userAvatar.documentation'),
     key: 'doc',
     icon: () => {
       return (
@@ -39,7 +41,7 @@ const options: DropdownMixedOption[] = [
     type: 'divider',
   },
   {
-    label: '退出登录',
+    label: $t('common.layout.userAvatar.logout'),
     key: 'logout',
     icon: () => {
       return (
@@ -49,7 +51,7 @@ const options: DropdownMixedOption[] = [
       )
     },
   },
-]
+])
 
 function handleSelect(key: string) {
   if (key === 'doc') {
@@ -60,10 +62,10 @@ function handleSelect(key: string) {
   }
   if (key === 'logout') {
     dialog.info({
-      title: '提示',
-      content: '确认退出登录吗？',
-      negativeText: '取 消',
-      positiveText: '确 认',
+      title: $t('common.layout.userAvatar.logoutConfirmTitle'),
+      content: $t('common.layout.userAvatar.logoutConfirmContent'),
+      negativeText: $t('common.often.cancel'),
+      positiveText: $t('common.often.confirm'),
       onPositiveClick: () => {
         userStore.logoutWithQueryRedirect()
       },

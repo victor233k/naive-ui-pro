@@ -5,6 +5,6 @@ export const {
   mapping: statusMapping,
   mapping2: statusToColorMapping,
 } = createOptionsAndMapping([
-  ['1', '启用', 'success'],
-  ['0', '禁用', 'error'],
+  ['1', 'common.often.enable', 'success'],
+  ['0', 'common.often.disable', 'error'],
 ])

@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { Icon as icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
-import { $t } from '@/locales/locales'
+import { $t, Lang } from '@/locales/locales'
+import { useAppStore } from '@/store/use-app-store'
 import { useUserStore } from '@/store/use-user-store'
+
+const {
+  isZhCN,
+} = storeToRefs(useAppStore())
 
 const {
   user,
@@ -12,7 +17,7 @@ const {
 // 当前日期
 const formattedDate = computed(() => {
   const date = new Date()
-  return date.toLocaleDateString('zh-CN', {
+  return date.toLocaleDateString(isZhCN.value ? Lang.ZH_CN : Lang.EN_US, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -194,7 +199,7 @@ const projectUpdates = computed(() => [
                 {{ $t('pages.home.welcomeBack') }}，{{ user.name }}
               </h1>
               <p class="text-gray-500 dark:text-gray-400">
-                {{ $t('pages.home.today') }}{{ formattedDate }}
+                {{ $t('pages.home.today') }} {{ formattedDate }}
               </p>
             </div>
           </div>

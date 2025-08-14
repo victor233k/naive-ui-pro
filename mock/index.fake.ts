@@ -22,6 +22,7 @@ const users = [
         meta: {
           title: '首页',
           icon: 'material-symbols:dashboard-outline-rounded',
+          titleI18nKey: 'routes.home',
         },
       },
       {
@@ -39,18 +40,21 @@ const users = [
                 meta: {
                   title: '权限切换',
                   icon: 'mdi:page-previous-outline',
+                  titleI18nKey: 'routes.accessToggle',
                 },
               },
             ],
             meta: {
               title: '权限',
               icon: 'material-symbols:lock-outline',
+              titleI18nKey: 'routes.access',
             },
           },
         ],
         meta: {
           title: '演示',
           icon: 'hugeicons:codesandbox',
+          titleI18nKey: 'routes.demo',
         },
       },
       {
@@ -64,6 +68,7 @@ const users = [
             meta: {
               title: '用户管理',
               icon: 'ant-design:user-outlined',
+              titleI18nKey: 'routes.userManagement',
             },
           },
           {
@@ -73,6 +78,7 @@ const users = [
             meta: {
               title: '角色管理',
               icon: 'carbon:user-role',
+              titleI18nKey: 'routes.roleManagement',
             },
           },
           {
@@ -82,12 +88,14 @@ const users = [
             meta: {
               title: '菜单管理',
               icon: 'ant-design:menu-outlined',
+              titleI18nKey: 'routes.menuManagement',
             },
           },
         ],
         meta: {
           title: '系统管理',
           icon: 'ant-design:setting-outlined',
+          titleI18nKey: 'routes.system',
         },
       },
     ],
@@ -108,6 +116,7 @@ const users = [
         meta: {
           title: '首页',
           icon: 'material-symbols:dashboard-outline-rounded',
+          titleI18nKey: 'routes.home',
         },
       },
       {
@@ -125,18 +134,21 @@ const users = [
                 meta: {
                   title: '权限切换',
                   icon: 'mdi:page-previous-outline',
+                  titleI18nKey: 'routes.accessToggle',
                 },
               },
             ],
             meta: {
               title: '权限',
               icon: 'material-symbols:lock-outline',
+              titleI18nKey: 'routes.access',
             },
           },
         ],
         meta: {
           title: '演示',
           icon: 'hugeicons:codesandbox',
+          titleI18nKey: 'routes.demo',
         },
       },
       {
@@ -150,12 +162,14 @@ const users = [
             meta: {
               title: '用户管理',
               icon: 'ant-design:user-outlined',
+              titleI18nKey: 'routes.userManagement',
             },
           },
         ],
         meta: {
           title: '系统管理',
           icon: 'ant-design:setting-outlined',
+          titleI18nKey: 'routes.system',
         },
       },
     ],
@@ -176,6 +190,7 @@ const users = [
         meta: {
           title: '首页',
           icon: 'material-symbols:dashboard-outline-rounded',
+          titleI18nKey: 'routes.home',
         },
       },
       {
@@ -193,18 +208,21 @@ const users = [
                 meta: {
                   title: '权限切换',
                   icon: 'mdi:page-previous-outline',
+                  titleI18nKey: 'routes.accessToggle',
                 },
               },
             ],
             meta: {
               title: '权限',
               icon: 'material-symbols:lock-outline',
+              titleI18nKey: 'routes.access',
             },
           },
         ],
         meta: {
           title: '演示',
           icon: 'hugeicons:codesandbox',
+          titleI18nKey: 'routes.demo',
         },
       },
     ],

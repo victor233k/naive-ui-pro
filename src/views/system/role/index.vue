@@ -7,9 +7,11 @@ import {
   renderProDateText,
   renderProTags,
 } from 'pro-naive-ui'
+import { computed } from 'vue'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
 import { $t } from '@/locales/locales'
+import { translateOptions } from '@/utils/common'
 import RoleModalForm from './components/role-modal-form.vue'
 import { Api } from './index.api'
 import {
@@ -55,7 +57,7 @@ const modalForm = createProModalForm<Api.insertOrUpdate.RequestData>({
 
 const { run: runDeleteRoles } = useProRequest(Api.del, {
   manual: true,
-  successTip: $t('common.often.deleteSuccess'), // TODO
+  successTip: 'common.often.deleteSuccess',
   onSuccess() {
     onChange({ page: 1 })
   },
@@ -69,104 +71,110 @@ const { run: handleEditRole } = useProRequest(Api.get, {
   },
 })
 
-const searchColumns: ProSearchFormColumns<Api.page.RequestData> = [
-  {
-    title: $t('pages.system.role.roleName'),
-    path: 'name',
-  },
-  {
-    title: $t('pages.system.role.roleCode'),
-    path: 'code',
-  },
-  {
-    title: $t('common.often.status'),
-    path: 'status',
-    field: 'select',
-    fieldProps: {
-      options: statusOptions,
+const searchColumns = computed<ProSearchFormColumns<Api.page.RequestData>>(() => {
+  return [
+    {
+      title: $t('pages.system.role.roleName'),
+      path: 'name',
     },
-  },
-]
+    {
+      title: $t('pages.system.role.roleCode'),
+      path: 'code',
+    },
+    {
+      title: $t('common.often.status'),
+      path: 'status',
+      field: 'select',
+      fieldProps: () => {
+        return {
+          options: translateOptions(statusOptions),
+        }
+      },
+    },
+  ]
+})
 
-const tableColumns: ProDataTableColumns<Api.Model> = [
-  {
-    title: $t('common.often.serialNumber'),
-    type: 'index',
-  },
-  {
-    title: $t('pages.system.role.roleName'),
-    path: 'name',
-    width: 120,
-  },
-  {
-    title: $t('pages.system.role.roleCode'),
-    path: 'code',
-    width: 120,
-  },
-  {
-    title: $t('common.often.status'),
-    width: 100,
-    render: (row) => {
-      return renderProTags({
-        content: statusMapping[row.status],
-        type: statusToColorMapping[row.status],
-      })
+const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
+  return [
+    {
+      title: $t('common.often.index'),
+      type: 'index',
     },
-  },
-  {
-    title: $t('common.often.remark'),
-    path: 'remark',
-    ellipsis: {
-      tooltip: true,
+    {
+      title: $t('pages.system.role.roleName'),
+      path: 'name',
+      width: 120,
     },
-    width: 230,
-  },
-  {
-    title: $t('common.often.updateTime'),
-    width: 220,
-    render: row => renderProDateText(row.updateTime),
-  },
-  {
-    title: $t('common.often.operation'),
-    width: 120,
-    render: (row) => {
-      return (
-        <n-flex>
-          <n-button
-            type="primary"
-            size="small"
-            text={true}
-            onClick={() => handleEditRole(row.id)}
-          >
-            {$t('common.often.edit')}
-          </n-button>
-          <n-popconfirm onPositiveClick={() => runDeleteRoles(row.id)}>
-            {{
-              default: () => (
-                <span>
-                  {$t('common.often.deleteConfirm')}
-                  <span class="c-red-500 font-bold">{row.name}</span>
-                  {$t('common.often.deleteQuestion')}
-                </span>
-              ),
-              trigger: () => {
-                return (
-                  <n-button
-                    type="error"
-                    size="small"
-                    text={true}
-                  >
-                    {$t('common.often.delete')}
-                  </n-button>
-                )
-              },
-            }}
-          </n-popconfirm>
-        </n-flex>
-      )
+    {
+      title: $t('pages.system.role.roleCode'),
+      path: 'code',
+      width: 120,
     },
-  },
-]
+    {
+      title: $t('common.often.status'),
+      width: 100,
+      render: (row) => {
+        return renderProTags({
+          content: $t(statusMapping[row.status]),
+          type: statusToColorMapping[row.status],
+        })
+      },
+    },
+    {
+      title: $t('common.often.remark'),
+      path: 'remark',
+      ellipsis: {
+        tooltip: true,
+      },
+      width: 230,
+    },
+    {
+      title: $t('common.often.updateTime'),
+      width: 220,
+      render: row => renderProDateText(row.updateTime),
+    },
+    {
+      title: $t('common.often.operation'),
+      width: 120,
+      render: (row) => {
+        return (
+          <n-flex>
+            <n-button
+              type="primary"
+              size="small"
+              text={true}
+              onClick={() => handleEditRole(row.id)}
+            >
+              {$t('common.often.edit')}
+            </n-button>
+            <n-popconfirm onPositiveClick={() => runDeleteRoles(row.id)}>
+              {{
+                default: () => (
+                  <span>
+                    {$t('common.often.deleteConfirm')}
+                    <span class="c-red-500 font-bold">{row.name}</span>
+                    {$t('common.often.deleteQuestion')}
+                  </span>
+                ),
+                trigger: () => {
+                  return (
+                    <n-button
+                      type="error"
+                      size="small"
+                      text={true}
+                    >
+                      {$t('common.often.delete')}
+                    </n-button>
+                  )
+                },
+              }}
+            </n-popconfirm>
+          </n-flex>
+        )
+      },
+    },
+  ]
+})
 </script>
 
 <template>

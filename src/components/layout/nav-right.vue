@@ -4,6 +4,7 @@ import { useFullscreen } from '@vueuse/core'
 import { ref, watch } from 'vue'
 import { useAppStore } from '@/store/use-app-store'
 import { useThemeStore } from '@/store/use-theme-store'
+import LangSwitch from './lang-switch.vue'
 import UserAvatar from './user-avatar.vue'
 
 const rotateDuration = 300
@@ -52,6 +53,7 @@ watch(() => themeStore.isDark, () => {
         </n-icon>
       </template>
     </pro-button>
+    <lang-switch />
     <pro-button
       quaternary
       size="small"

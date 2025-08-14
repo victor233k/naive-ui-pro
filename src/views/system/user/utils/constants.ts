@@ -5,9 +5,9 @@ export const {
   mapping: genderMapping,
   mapping2: genderToColorMapping,
 } = createOptionsAndMapping([
-  ['1', '男', 'success'],
-  ['0', '女', 'error'],
-  ['-1', '其他', 'default'],
+  ['1', 'common.status.male', 'success'],
+  ['0', 'common.status.female', 'error'],
+  ['-1', 'common.status.other', 'default'],
 ])
 
 export const {
@@ -15,6 +15,6 @@ export const {
   mapping: statusMapping,
   mapping2: statusToColorMapping,
 } = createOptionsAndMapping([
-  ['1', '启用', 'success'],
-  ['0', '禁用', 'error'],
+  ['1', 'common.often.enable', 'success'],
+  ['0', 'common.often.disable', 'error'],
 ])

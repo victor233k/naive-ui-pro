@@ -12,6 +12,10 @@ export const preferenceConfig = {
      * 权限模式
      */
     accessMode: 'frontend',
+    /**
+     * 语言
+     */
+    lang: 'zh-CN', // en-US
   },
   layout: {
     /**

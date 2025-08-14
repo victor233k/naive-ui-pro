@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useProRequest } from '@/composables/use-pro-request'
+import { translateOptions } from '@/utils/common'
 import { Api } from '../index.api'
 import { genderOptions, statusOptions } from '../utils/constants'
 
@@ -29,7 +30,7 @@ const { data: roleOptions } = useProRequest(async () => {
     path="gender"
     required
     :field-props="{
-      options: genderOptions,
+      options: translateOptions(genderOptions),
     }"
   />
   <pro-password
@@ -50,11 +51,11 @@ const { data: roleOptions } = useProRequest(async () => {
     }"
   />
   <pro-radio-group
-    :title="$t('pages.system.user.status')"
+    :title="$t('common.often.status')"
     path="status"
     required
     :field-props="{
-      options: statusOptions,
+      options: translateOptions(statusOptions),
     }"
   />
   <pro-input
@@ -66,7 +67,7 @@ const { data: roleOptions } = useProRequest(async () => {
     path="phone"
   />
   <pro-textarea
-    :title="$t('pages.system.user.remark')"
+    :title="$t('common.often.remark')"
     path="remark"
     :field-props="{
       autosize: {

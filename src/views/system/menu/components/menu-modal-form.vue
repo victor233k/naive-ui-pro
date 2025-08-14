@@ -3,6 +3,7 @@ import type { CascaderOption as _CascaderOption } from 'naive-ui'
 import { orderBy } from 'lodash-es'
 import { ref, shallowReactive } from 'vue'
 import { useProRequest } from '@/composables/use-pro-request'
+import { translateOptions } from '@/utils/common'
 import { Api } from '../index.api'
 import { buildTree } from '../utils'
 import { linkModeOptions, statusOptions, typeOptions } from '../utils/constants'
@@ -66,7 +67,7 @@ function isDisabled(item: Api.Model | undefined): boolean {
     path="type"
     :field-props="{
       type: 'button',
-      options: typeOptions,
+      options: translateOptions(typeOptions),
     }"
   />
   <pro-cascader
@@ -123,7 +124,7 @@ function isDisabled(item: Api.Model | undefined): boolean {
         path="linkMode"
         required
         :field-props="{
-          options: linkModeOptions,
+          options: translateOptions(linkModeOptions),
         }"
       />
     </template>
@@ -138,7 +139,7 @@ function isDisabled(item: Api.Model | undefined): boolean {
     path="status"
     required
     :field-props="{
-      options: statusOptions,
+      options: translateOptions(statusOptions),
     }"
   />
   <pro-textarea
