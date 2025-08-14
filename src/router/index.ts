@@ -68,9 +68,9 @@ export async function setupRouter(app: App) {
        * 路由标题插件
        */
       documentTitlePlugin({
-        titleTemplate: (title, to) => {
+        resolveTitle: (route) => {
           const appStore = useAppStore()
-          const { titleI18nKey } = to.meta ?? {}
+          const { title, titleI18nKey } = route.meta ?? {}
           return titleI18nKey
             ? $t(titleI18nKey)
             : title ?? appStore.title
