@@ -1,6 +1,7 @@
-import type { NavigationFailure, RouteLocationNormalized } from 'vue-router'
+import type { RouteLocationNormalizedGeneric } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { useTitle } from '@vueuse/core'
+import { ref } from 'vue'
 import { normalizeRouteName } from '../utils/normalize-route-name'
 
 declare module 'vue-router' {
@@ -10,28 +11,18 @@ declare module 'vue-router' {
 }
 
 interface DocumentTitlePluginOptions {
-  titleTemplate?: ((
-    title: string,
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    failure?: NavigationFailure | void
-  ) => string)
+  resolveTitle?: (route: RouteLocationNormalizedGeneric) => string
 }
 
-export function documentTitlePlugin({ titleTemplate }: DocumentTitlePluginOptions = {}): ProRouterPlugin {
+export function documentTitlePlugin({
+  resolveTitle = r => r.meta.title ?? normalizeRouteName(r.name),
+}: DocumentTitlePluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
-    router.afterEach((to, from, failure) => {
-      if (failure) {
-        return
-      }
-      const title = to.meta?.title ?? normalizeRouteName(to.name)
-      useTitle(title, {
-        titleTemplate: () => {
-          return titleTemplate
-            ? titleTemplate(title, to, from, failure)
-            : title
-        },
-      })
+    const shouldShowTitle = ref(false)
+    router.isReady().then(() => {
+      shouldShowTitle.value = true
     })
+
+    useTitle(() => shouldShowTitle.value ? resolveTitle(router.currentRoute.value) : null)
   }
 }
