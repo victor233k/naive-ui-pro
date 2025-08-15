@@ -1,10 +1,7 @@
 import type { DropdownOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
-import { storeToRefs } from 'pinia'
 import { h, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useTabsStore } from '@/store/use-tabs-store'
-import { useTabs } from './use-tabs'
 
 export function useTabContextMenu() {
   const router = useRouter()
@@ -13,16 +10,15 @@ export function useTabContextMenu() {
   const dropdownPosition = ref({ x: 0, y: 0 })
 
   const {
-    tabs,
-  } = storeToRefs(useTabsStore())
-  const {
-    handleRemoveTab,
-    handleToggleAffix,
-    handleCloseAllTabs,
-    handleCloseLeftTabs,
-    handleCloseRightTabs,
-    handleCloseOtherTabs,
-  } = useTabs()
+    routes,
+    move,
+    removeAndEnsureActiveKey,
+    removeAllAndEnsureActiveKey,
+    removeAfterAndEnsureActiveKey,
+    toggleVisitedRouteLockedState,
+    removeOtherAndEnsureActiveKey,
+    removeBeforeAndEnsureActiveKey,
+  } = router.visitedRoutes
 
   function createIcon(iconName: string) {
     return () =>
@@ -33,17 +29,17 @@ export function useTabContextMenu() {
   }
 
   function createDropdownOptions(): DropdownOption[] {
-    const currentTab = tabs.value[contextMenuIndex.value]
-    if (!currentTab) {
+    const currentSelectVisitRoute = routes.value[contextMenuIndex.value]
+    if (!currentSelectVisitRoute) {
       return []
     }
 
-    const wasAffix = currentTab.affix
+    const wasLocked = currentSelectVisitRoute.meta?.locked
     const options = [
       {
-        label: wasAffix ? '取消固定' : '固定',
-        key: 'toggleAffix',
-        icon: createIcon(wasAffix ? 'mdi:pin-off-outline' : 'mdi:pin-outline'),
+        label: wasLocked ? '取消固定' : '固定',
+        key: 'toggleLocked',
+        icon: createIcon(wasLocked ? 'mdi:pin-off-outline' : 'mdi:pin-outline'),
       },
       {
         label: '关闭左侧',
@@ -71,7 +67,7 @@ export function useTabContextMenu() {
         icon: createIcon('tabler:arrow-autofit-width'),
       },
     ]
-    if (!wasAffix) {
+    if (!wasLocked) {
       options.unshift({
         label: '关闭',
         key: 'close',
@@ -89,35 +85,43 @@ export function useTabContextMenu() {
 
   function handleDropdownSelect(key: string) {
     const index = contextMenuIndex.value
-    const currentTab = tabs.value[index]
+    const currentSelectVisitRoute = routes.value[index]
 
     switch (key) {
-      case 'toggleAffix': {
-        handleToggleAffix(index)
+      case 'toggleLocked': {
+        toggleVisitedRouteLockedState(index)
+        // locked 路由始终排在前面
+        const lockedCount = routes.value.filter(route => route.meta?.locked).length
+        if (currentSelectVisitRoute.meta?.locked) {
+          move(index, lockedCount - 1)
+        }
+        else {
+          move(index, lockedCount)
+        }
         break
       }
       case 'close': {
-        handleRemoveTab(index)
+        removeAndEnsureActiveKey(index)
         break
       }
       case 'closeLeft': {
-        handleCloseLeftTabs(index)
+        removeBeforeAndEnsureActiveKey(index)
         break
       }
       case 'closeRight': {
-        handleCloseRightTabs(index)
+        removeAfterAndEnsureActiveKey(index)
         break
       }
       case 'closeOther': {
-        handleCloseOtherTabs(index)
+        removeOtherAndEnsureActiveKey(index)
         break
       }
       case 'closeAll': {
-        handleCloseAllTabs()
+        removeAllAndEnsureActiveKey()
         break
       }
       case 'openInNewTab': {
-        const href = router.options.history.createHref(currentTab.fullPath)
+        const href = router.options.history.createHref(currentSelectVisitRoute.fullPath)
         window.open(href, '_blank')
         break
       }

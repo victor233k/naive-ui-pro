@@ -43,7 +43,7 @@ function remove(router: Router, name: string): void {
   router.keepAliveList.value = router.keepAliveList.value.filter(item => item !== name)
 }
 
-export function keepAlivePlugin({ defaultKeepAlive = false }: KeepAlivePluginOptions = {}): ProRouterPlugin {
+export function keepAlivePlugin({ defaultKeepAlive = true }: KeepAlivePluginOptions = {}): ProRouterPlugin {
   return ({ router, onUnmount }) => {
     router.keepAliveList = ref([])
 

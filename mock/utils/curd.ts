@@ -1,8 +1,8 @@
 import type { FakeRoute } from 'vite-plugin-fake-server'
 import { faker } from '@faker-js/faker'
+import { orderBy } from 'lodash-es'
 import { filterByParams, joinURLs } from './index'
 import { RF } from './response'
-import { orderBy } from 'lodash-es'
 
 export interface BaseModel {
   id: string

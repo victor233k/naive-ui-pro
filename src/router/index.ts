@@ -18,6 +18,7 @@ import {
   rbacAccessPlugin,
   refreshPlugin,
   transitionPlugin,
+  visitedRoutesPlugin,
 } from '@pro/router'
 
 import {
@@ -91,6 +92,10 @@ export async function setupRouter(app: App) {
           }
         },
       }),
+      /**
+       * 访问过的路由插件
+       */
+      visitedRoutesPlugin(),
       /**
        * 外链插件，用于处理外链跳转
        */
