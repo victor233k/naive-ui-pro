@@ -4,7 +4,7 @@ import type { Router, RouteRecordRaw } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { createEventHook } from '@vueuse/core'
 import { cloneDeep, noop } from 'lodash-es'
-import { eachTree, mapTree } from 'pro-composables'
+import { mapTree } from 'pro-composables'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -12,10 +12,14 @@ declare module 'vue-router' {
      * 当前路由可以被哪些角色访问，如果为空，则表示所有角色都可以访问，只在前端权限控制模式下有效
      */
     roles?: string[]
+    /**
+     * 是否需要权限控制，如果为 false，则表示不需要权限控制，访问这些路由时不需要登录
+     * @default true
+     */
+    requiresAuth?: boolean
   }
 }
 
-type RouteName = string | symbol
 type MaybePromise<T> = T | Promise<T>
 
 export type RouteRecordRawWithStringComponent = Merge<RouteRecordRaw, {
@@ -27,27 +31,23 @@ type ResolveComponent = (component: string) => NonNullable<RouteRecordRaw['compo
 
 export interface BaseServiceReturned {
   /**
-   * 首页路径，如果登录，会跳转到此路径
+   * 首页路径，登录后会跳转到此路径
    * @default '/home'
    */
   homePath?: string
   /**
-   * 登录路径，如果未登录，会跳转到此路径
+   * 登录路径，未登录会跳转到此路径
    * @default '/login'
    */
   loginPath?: string
   /**
-   * 添加路由时的父级路由名称，设置后使用 router.addRoute(parentNameForAddRoute,routes)，默认使用 router.addRoute(routes)
-   */
-  parentNameForAddRoute?: string
-  /**
-   * 这些路由名称不需要进行权限控制，访问这些路由时不需要登录，如果不设置，则使用传递给 createRouter 的 routes 中的路由名称
-   */
-  ignoreAccessRouteNames?: RouteName[]
-  /**
    * 是否已登录
    */
   logined: boolean
+  /**
+   * 添加路由时的父级路由名称，设置后使用 router.addRoute(parentNameForAddRoute,routes)，默认使用 router.addRoute(routes)
+   */
+  parentNameForAddRoute?: string
   /**
    * 路由构建完成后回调
    * @param routes 构建后最终的 vue-router 路由
@@ -90,38 +90,81 @@ export interface RbacAccessPluginOptions {
   service: () => MaybePromise<BackendServiceReturned | FrontendServiceReturned>
 }
 
-let cachedRouteNames: RouteName[] | null = null
-let resolvedOptions: Required<BackendServiceReturned | FrontendServiceReturned> = null
+export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlugin {
+  return ({ router, onUnmount }) => {
+    const { on: onCleanup, trigger: cleanup } = createEventHook()
+
+    router.beforeEach(async (to) => {
+      const resolvedOptions = await resolveOptions(options)
+      const replaceAgain = await resolveRoutes(resolvedOptions, {
+        router,
+        onCleanup,
+      })
+
+      if (replaceAgain) {
+        // 新注册的路由需再次访问
+        return {
+          path: to.path,
+          replace: true,
+          query: to.query,
+        }
+      }
+
+      const {
+        logined,
+        homePath,
+        loginPath,
+      } = resolvedOptions
+
+      // 已登录跳转 login 页面，重定向到 redirect 参数或者 homePath
+      if (logined && to.path === loginPath) {
+        const path = to.query.redirect ?? homePath
+        return path as string
+      }
+
+      // 如果是不需要鉴权的路由则放行
+      if (to.meta?.requiresAuth === false) {
+        return
+      }
+
+      // 未登录重定向到登录页
+      if (!logined) {
+        return {
+          path: loginPath,
+          query: {
+            redirect: to.fullPath,
+          },
+        }
+      }
+    })
+
+    onUnmount(() => {
+      cleanup()
+    })
+
+    return {
+      onCleanup: cleanup,
+    }
+  }
+}
+
 async function resolveOptions(
   options: RbacAccessPluginOptions,
-  { router, onCleanup }: {
-    router: Router
-    onCleanup: EventHookOn
-  },
 ): Promise<Required<BackendServiceReturned | FrontendServiceReturned>> {
-  if (!resolvedOptions) {
-    onCleanup(() => {
-      resolvedOptions = null
-      cachedRouteNames = null
-    })
-  }
   const {
     homePath,
     loginPath,
     onRoutesBuilt,
     parentNameForAddRoute,
-    ignoreAccessRouteNames,
     ...rest
   } = await options.service()
-  resolvedOptions = {
+  return {
     ...rest,
     homePath: homePath ?? '/home',
     loginPath: loginPath ?? '/login',
     onRoutesBuilt: onRoutesBuilt ?? noop,
     parentNameForAddRoute: parentNameForAddRoute ?? null,
-    ignoreAccessRouteNames: ignoreAccessRouteNames ?? (cachedRouteNames ||= getRoutesNames((router.options.routes ?? []) as RouteRecordRaw[])),
   }
-  return resolvedOptions
 }
 
 let registeredRoutes = false
@@ -170,80 +213,6 @@ async function resolveRoutes(
   })
 
   return registeredRoutes
-}
-
-export function rbacAccessPlugin(options: RbacAccessPluginOptions): ProRouterPlugin {
-  return ({ router, onUnmount }) => {
-    const { on: onCleanup, trigger: cleanup } = createEventHook()
-
-    router.beforeEach(async (to) => {
-      const resolvedOptions = await resolveOptions(options, {
-        router,
-        onCleanup,
-      })
-
-      const shouldRedirect = await resolveRoutes(resolvedOptions, {
-        router,
-        onCleanup,
-      })
-
-      if (shouldRedirect) {
-        return {
-          path: to.path,
-          replace: true,
-          query: to.query,
-        }
-      }
-
-      const {
-        logined,
-        homePath,
-        loginPath,
-        ignoreAccessRouteNames,
-      } = resolvedOptions
-
-      // 已登录跳转 login 页面，重定向到 redirect 参数或者 homePath
-      if (logined && to.path === loginPath) {
-        const path = to.query.redirect ?? homePath
-        return path as string
-      }
-
-      // 如果是不需要鉴权的路由则放行
-      if (ignoreAccessRouteNames.includes(to.name)) {
-        return
-      }
-
-      // 未登录重定向到登录页
-      if (!logined) {
-        return {
-          path: loginPath,
-          query: {
-            redirect: to.fullPath,
-          },
-        }
-      }
-    })
-
-    onUnmount(() => {
-      cleanup()
-    })
-
-    return {
-      onCleanup: cleanup,
-    }
-  }
-}
-
-function getRoutesNames(routes: RouteRecordRaw[]) {
-  const routeNames: RouteName[] = []
-  eachTree(routes, (route) => {
-    if (route.name) {
-      if (!routeNames.includes(route.name)) {
-        routeNames.push(route.name)
-      }
-    }
-  }, 'children')
-  return routeNames
 }
 
 function buildRoutes(options: {

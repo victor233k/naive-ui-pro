@@ -4,6 +4,7 @@ import type {
 } from '@pro/router'
 
 import type { App } from 'vue'
+import type { RouteMeta } from 'vue-router'
 
 import {
   autoRedirectPlugin,
@@ -20,29 +21,14 @@ import {
   transitionPlugin,
 } from '@pro/router'
 
-import {
-  createWebHistory,
-} from 'vue-router'
-
+import { createWebHistory } from 'vue-router'
 import { $t } from '@/locales/locales'
-
-import {
-  useAppStore,
-} from '@/store/use-app-store'
-
-import {
-  useUserStore,
-} from '@/store/use-user-store'
-
+import { useAppStore } from '@/store/use-app-store'
+import { useUserStore } from '@/store/use-user-store'
 import http from '@/utils/axios'
+import { layoutFalsyPlugin } from './plugins/layout-falsy-plugin'
+import { stateCleanupPlugin } from './plugins/state-cleanup-plugin'
 
-import {
-  layoutFalsyPlugin,
-} from './plugins/layout-falsy-plugin'
-
-import {
-  stateCleanupPlugin,
-} from './plugins/state-cleanup-plugin'
 import {
   accessRoutes,
   HOME_ROUTE_PATH,
@@ -50,12 +36,23 @@ import {
   LOGIN_ROUTE_PATH,
   notFoundRoute,
   pageMap,
+  ROOT_ROUTE_NAME,
+  rootRoute,
 } from './routes'
+
+function resolveI18nTitle(route: { meta?: RouteMeta }) {
+  const appStore = useAppStore()
+  const { title, titleI18nKey } = route.meta ?? {}
+  return titleI18nKey
+    ? $t(titleI18nKey)
+    : title ?? appStore.title
+}
 
 export async function setupRouter(app: App) {
   const router = createRouter({
     history: createWebHistory(),
     routes: [
+      rootRoute,
       ...ignoreAccessRoutes,
       notFoundRoute,
     ],
@@ -69,25 +66,18 @@ export async function setupRouter(app: App) {
        */
       documentTitlePlugin({
         resolveTitle: (route) => {
-          const appStore = useAppStore()
-          const { title, titleI18nKey } = route.meta ?? {}
-          return titleI18nKey
-            ? $t(titleI18nKey)
-            : title ?? appStore.title
+          return resolveI18nTitle(route)
         },
       }),
       /**
        * 面包屑插件
        */
       breadcrumbPlugin({
-        resolveBreadcrumb: (item, to) => {
-          const appStore = useAppStore()
-          const { titleI18nKey } = to.meta ?? {}
+        resolveBreadcrumb: (item, route) => {
+          const finalTitle = resolveI18nTitle(route)
           return {
             ...item,
-            title: titleI18nKey
-              ? $t(titleI18nKey)
-              : item.title ?? appStore.title,
+            title: finalTitle,
           }
         },
       }),
@@ -114,22 +104,7 @@ export async function setupRouter(app: App) {
       /**
        * 自动重定向到目标路由插件
        */
-      autoRedirectPlugin({
-        redirectTo: (to) => {
-          const { children } = to.matched[to.matched.length - 1]
-          if (children && children.length > 0) {
-            const availableRoutes = children.filter(item => !item.meta?.hideInMenu)
-            if (availableRoutes.length > 0) {
-              const firstAvailableRoute = availableRoutes[0]
-              // 重定向到第一个可用（不隐藏的）的子路由
-              return {
-                replace: true,
-                ...router.resolve(firstAvailableRoute),
-              }
-            }
-          }
-        },
-      }),
+      autoRedirectPlugin(),
       /**
        * 权限插件
        */
@@ -145,8 +120,7 @@ export async function setupRouter(app: App) {
             logined: !!userStore.user.token,
             homePath: HOME_ROUTE_PATH,
             loginPath: LOGIN_ROUTE_PATH,
-            parentNameForAddRoute: 'Root',
-            ignoreAccessRouteNames: ignoreAccessRoutes.map(t => t.name as string),
+            parentNameForAddRoute: ROOT_ROUTE_NAME,
             onRoutesBuilt: (routes) => {
               userStore.routes = routes
             },
@@ -200,8 +174,7 @@ export async function setupRouter(app: App) {
         },
       }),
       /**
-       * 嵌套路由视图渲染插件，需要在嵌套路由渲染有问题的 `<RouterView>` 上
-       * 设置 `:route="router.resolveNestedRoute()"`
+       * 嵌套路由视图渲染插件
        */
       nestedRouteRenderPlugin(),
       /**

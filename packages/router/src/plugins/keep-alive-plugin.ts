@@ -1,9 +1,14 @@
 import type { Ref } from 'vue'
-import type { Router } from 'vue-router'
+import type { RouteLocationNormalizedGeneric } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { isBoolean } from 'lodash-es'
 import { ref } from 'vue'
-import { normalizeRouteName } from '../utils/normalize-route-name'
+import { getRouteComponentName } from '../utils/route'
+
+type MetaKeepAlive = boolean | {
+  exclude?: string[]
+  include?: string[]
+}
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -11,64 +16,73 @@ declare module 'vue-router' {
      * 路由缓存配置
      * - true: 缓存当前路由
      * - false: 不缓存当前路由
-     * - object: 配置特定情况下的缓存行为
+     * - object.include: 当导航到这些路由时，缓存当前页面，填写 route.name，无需和组件名称一致
+     * - object.exclude: 当导航到这些路由时，不缓存当前页面，填写 route.name，无需和组件名称一致
      */
-    keepAlive?: boolean | {
-      /**
-       * 当导航到这些路由时，不缓存当前页面
-       */
-      exclude: (string | symbol)[]
-    }
+    keepAlive?: MetaKeepAlive
   }
 
   interface Router {
-    keepAliveList: Ref<(string | RegExp)[]>
+    /**
+     * 缓存的组件名称列表，给 keep-alive 组件使用
+     */
+    cachedComponentNames: Ref<string[]>
   }
 }
 
 interface KeepAlivePluginOptions {
   /**
+   * 默认是否缓存
    * @default false
    */
   defaultKeepAlive?: boolean
 }
 
-function add(router: Router, name: string) {
-  if (!router.keepAliveList.value.includes(name)) {
-    router.keepAliveList.value.push(name)
-  }
-}
-
-function remove(router: Router, name: string): void {
-  router.keepAliveList.value = router.keepAliveList.value.filter(item => item !== name)
-}
-
-export function keepAlivePlugin({ defaultKeepAlive = false }: KeepAlivePluginOptions = {}): ProRouterPlugin {
+export function keepAlivePlugin({
+  defaultKeepAlive = false,
+}: KeepAlivePluginOptions = {}): ProRouterPlugin {
   return ({ router, onUnmount }) => {
-    router.keepAliveList = ref([])
+    const cachedComponentNames = router.cachedComponentNames = ref<string[]>([])
 
     router.beforeEach((to, from) => {
-      if (!from.name) {
+      const fromName = getRouteComponentName(from)
+      if (!fromName) {
         return
       }
-      const { keepAlive = defaultKeepAlive } = from.meta ?? {}
-      const normalizedName = normalizeRouteName(from.name)
-      if (isBoolean(keepAlive)) {
-        keepAlive
-          ? add(router, normalizedName)
-          : remove(router, normalizedName)
-        return
+      if (matched(to, from, defaultKeepAlive)) {
+        if (!cachedComponentNames.value.includes(fromName)) {
+          cachedComponentNames.value.push(fromName)
+        }
       }
-      const isExcluded = keepAlive.exclude
-        .map(normalizeRouteName)
-        .includes(normalizeRouteName(to.name))
-      isExcluded
-        ? remove(router, normalizedName)
-        : add(router, normalizedName)
+      else {
+        if (cachedComponentNames.value.includes(fromName)) {
+          cachedComponentNames.value = cachedComponentNames.value.filter(name => name !== fromName)
+        }
+      }
     })
 
     onUnmount(() => {
-      delete router.keepAliveList
+      delete router.cachedComponentNames
     })
   }
+}
+
+function matched(
+  to: RouteLocationNormalizedGeneric,
+  from: RouteLocationNormalizedGeneric,
+  defaultKeepAlive: boolean,
+) {
+  const keepAlive = from.meta?.keepAlive ?? defaultKeepAlive
+  if (isBoolean(keepAlive)) {
+    return keepAlive
+  }
+  const exclude = keepAlive.exclude ?? []
+  if (to.name && exclude.includes(to.name as any)) {
+    return false
+  }
+  const include = keepAlive.include ?? []
+  if (to.name && include.includes(to.name as any)) {
+    return true
+  }
+  return false
 }

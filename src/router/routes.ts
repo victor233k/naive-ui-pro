@@ -11,9 +11,13 @@ const HOME_ROUTE_PATH = '/home'
  */
 const LOGIN_ROUTE_PATH = '/login'
 
+/**
+ * 根路由，所有的动态路由都会添加到这个路由下
+ */
+const ROOT_ROUTE_NAME = 'Root'
+
 const notFoundRoute: RouteRecordRaw = {
   path: '/:path(.*)*',
-  name: 'FallbackNotFound',
   component: () => import('@/views/demos/fallback/404.vue'),
   meta: {
     title: '404',
@@ -21,30 +25,30 @@ const notFoundRoute: RouteRecordRaw = {
 }
 
 /**
- * TODO: 后面把 route.name 都删掉
+ * 根路由，所有的动态路由都会添加到这个路由下
  */
+const rootRoute = {
+  path: '/',
+  name: ROOT_ROUTE_NAME,
+  redirect: HOME_ROUTE_PATH,
+  component: () => import('@/components/layout/index.vue'),
+  children: [],
+  meta: {
+    hideInBreadcrumb: true,
+  },
+}
 
 /**
  * 忽略权限的路由
  */
 const ignoreAccessRoutes: RouteRecordRaw[] = [
   {
-    path: '/',
-    name: 'Root',
-    redirect: HOME_ROUTE_PATH,
-    component: () => import('@/components/layout/index.vue'),
-    children: [],
-    meta: {
-      hideInBreadcrumb: true,
-    },
-  },
-  {
     path: LOGIN_ROUTE_PATH,
-    name: 'Login',
     component: () => import('@/views/login/index.vue'),
     meta: {
       title: '登录',
       titleI18nKey: 'routes.login',
+      requiresAuth: false,
     },
   },
 ]
@@ -55,7 +59,6 @@ const ignoreAccessRoutes: RouteRecordRaw[] = [
 const accessRoutes: RouteRecordRaw[] = [
   {
     path: HOME_ROUTE_PATH,
-    name: 'Home',
     component: () => import('@/views/home/index.vue'),
     meta: {
       title: '首页',
@@ -65,15 +68,12 @@ const accessRoutes: RouteRecordRaw[] = [
   },
   {
     path: '/demos',
-    name: 'Demos',
     children: [
       {
         path: 'access',
-        name: 'Access',
         children: [
           {
             path: 'toggle',
-            name: 'Toggle',
             component: () => import('@/views/demos/access/toggle/index.vue'),
             meta: {
               title: '权限切换',
@@ -90,11 +90,9 @@ const accessRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'fallback',
-        name: 'Falback',
         children: [
           {
             path: '403',
-            name: '403',
             component: () => import('@/views/demos/fallback/403.vue'),
             meta: {
               title: '403',
@@ -103,7 +101,6 @@ const accessRoutes: RouteRecordRaw[] = [
           },
           {
             path: '404',
-            name: '404',
             component: () => import('@/views/demos/fallback/404.vue'),
             meta: {
               title: '404',
@@ -112,7 +109,6 @@ const accessRoutes: RouteRecordRaw[] = [
           },
           {
             path: '500',
-            name: '500',
             component: () => import('@/views/demos/fallback/500.vue'),
             meta: {
               title: '500',
@@ -128,7 +124,6 @@ const accessRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'editor',
-        name: 'EditorDemo',
         component: () => import('@/views/demos/access/editor/index.vue'),
         meta: {
           title: '富文本编辑器',
@@ -137,7 +132,6 @@ const accessRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        name: 'External',
         path: '/external',
         meta: {
           title: '外部页面',
@@ -146,12 +140,10 @@ const accessRoutes: RouteRecordRaw[] = [
         },
         children: [
           {
-            name: 'iframe',
             path: 'iframe',
             children: [
               {
                 path: 'form',
-                name: 'form',
                 component: {},
                 meta: {
                   title: '复杂表单',
@@ -163,13 +155,33 @@ const accessRoutes: RouteRecordRaw[] = [
               },
               {
                 path: 'edit-data-table',
-                name: 'EditDataTable',
                 component: {},
                 meta: {
                   title: '编辑表格',
                   titleI18nKey: 'routes.editTable',
                   icon: 'material-symbols:table-outline',
                   link: 'https://naive-ui.pro-components.cn/zh-CN/os-theme/components/edit-data-table#async.vue',
+                  linkMode: 'iframe',
+                },
+              },
+              {
+                path: 'baidu-iframe',
+                component: {},
+                meta: {
+                  title: '百度',
+                  titleI18nKey: 'routes.baiduIframe',
+                  icon: 'ri:baidu-fill',
+                  link: 'https://www.baidu.com',
+                  linkMode: 'iframe',
+                },
+              },
+              {
+                path: 'menu',
+                component: () => import('@/views/system/menu/index.vue'),
+                meta: {
+                  title: '菜单管理',
+                  titleI18nKey: 'routes.menuManagementIframe',
+                  link: true,
                   linkMode: 'iframe',
                 },
               },
@@ -181,99 +193,43 @@ const accessRoutes: RouteRecordRaw[] = [
             },
           },
           {
-            name: 'Link',
             path: 'link',
             children: [
               {
-                name: 'Vite',
                 path: 'vite',
                 component: {},
                 meta: {
                   icon: 'logos:vitejs',
+                  title: 'Vite',
                   link: 'https://vite.dev',
                 },
               },
               {
-                name: 'Vue',
                 path: 'vue',
                 component: {},
                 meta: {
                   icon: 'logos:vue',
+                  title: 'Vue',
                   link: 'https://vuejs.org/',
                 },
               },
               {
-                name: 'OpenNewWindow',
-                path: 'menu',
-                component: () => import('@/views/system/menu/index.vue'),
-                meta: {
-                  title: '外部打开路由',
-                  titleI18nKey: 'routes.externalOpenRoute',
-                  icon: 'ant-design:menu-outlined',
-                  openInNewWindow: true,
-                },
-              },
-              {
-                name: 'LayoutFalsy',
                 path: 'menu-layout-falsy',
                 component: () => import('@/views/system/menu/index.vue'),
                 meta: {
                   title: '无布局',
                   titleI18nKey: 'routes.noLayout',
-                  icon: 'ant-design:menu-outlined',
                   layout: false,
-                  openInNewWindow: true,
+                  link: true,
                 },
               },
               {
-                name: 'component',
                 path: 'menu',
                 component: () => import('@/views/system/menu/index.vue'),
                 meta: {
-                  title: '菜单管理(外部打开)',
+                  title: '菜单管理',
                   titleI18nKey: 'routes.menuManagementExternal',
-                  icon: 'ant-design:menu-outlined',
-                  keepAlive: false,
                   link: true,
-                },
-              },
-              {
-                name: 'Baidu:iframe',
-                path: 'baidu-iframe',
-                component: {},
-                meta: {
-                  title: '百度(iframe 打开)',
-                  titleI18nKey: 'routes.baiduIframe',
-                  icon: 'ri:baidu-fill',
-                  keepAlive: false,
-                  link: 'https://www.baidu.com',
-                  linkMode: 'iframe',
-                },
-              },
-              {
-                name: 'component:iframe',
-                path: 'menu-iframe',
-                component: () => import('@/views/system/menu/index.vue'),
-                meta: {
-                  title: '菜单管理(iframe 打开)',
-                  titleI18nKey: 'routes.menuManagementIframe',
-                  icon: 'ant-design:menu-outlined',
-                  keepAlive: false,
-                  link: true,
-                  linkMode: 'iframe',
-                },
-              },
-              {
-                name: 'error:iframe',
-                path: 'error-iframe',
-                component: {},
-                meta: {
-                  title: 'iframe 加载失败',
-                  titleI18nKey: 'routes.iframeLoadFailed',
-                  icon: 'ant-design:menu-outlined',
-                  keepAlive: false,
-                  link: 'https://example.com/non-existent-page',
-                  linkMode: 'iframe',
                 },
               },
             ],
@@ -287,7 +243,6 @@ const accessRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'icon',
-        name: 'Icon',
         component: () => import('@/views/demos/icon/index.vue'),
         meta: {
           title: '图标选择器',
@@ -303,11 +258,9 @@ const accessRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    name: 'System',
     path: '/system',
     children: [
       {
-        name: 'User',
         path: 'user',
         component: () => import('@/views/system/user/index.vue'),
         meta: {
@@ -315,10 +268,10 @@ const accessRoutes: RouteRecordRaw[] = [
           titleI18nKey: 'routes.userManagement',
           icon: 'ant-design:user-outlined',
           roles: ['super', 'admin'],
+          keepAlive: true,
         },
       },
       {
-        name: 'Role',
         path: 'role',
         component: () => import('@/views/system/role/index.vue'),
         meta: {
@@ -329,13 +282,11 @@ const accessRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        name: 'Menu',
         path: 'menu',
         component: () => import('@/views/system/menu/index.vue'),
         meta: {
           title: '菜单管理',
           titleI18nKey: 'routes.menuManagement',
-          icon: 'ant-design:menu-outlined',
           roles: ['super'],
         },
       },
@@ -366,4 +317,6 @@ export {
   LOGIN_ROUTE_PATH,
   notFoundRoute,
   pageMap,
+  ROOT_ROUTE_NAME,
+  rootRoute,
 }

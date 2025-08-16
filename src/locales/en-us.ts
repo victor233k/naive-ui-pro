@@ -5,7 +5,7 @@ export default {
     login: {
       title: 'Login',
       accountLogin: 'Account Login',
-      subtitle: 'Please use your account and password to log in to the system',
+      subTitle: 'Please use your account and password to log in to the system',
       usernamePlaceholder: 'Please enter username',
       passwordPlaceholder: 'Please enter password',
       rememberMe: 'Remember me',

@@ -1,12 +1,9 @@
 import type { MenuOption } from 'naive-ui'
 import type { Merge } from 'type-fest'
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteLocationNormalizedGeneric, Router, RouteRecordRaw } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { Icon } from '@iconify/vue'
-import { isNil } from 'lodash-es'
-import { mapTree } from 'pro-composables'
 import { computed, h } from 'vue'
-import { normalizeRouteName } from '../utils/normalize-route-name'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -56,65 +53,47 @@ interface NMenuPluginOptions {
 
 export function nMenuPlugin({ service }: NMenuPluginOptions): ProRouterPlugin {
   return ({ router, onUnmount }) => {
-    router.beforeResolve(() => {
+    router.afterEach((to) => {
       if (!router.buildMenus) {
         const finalMenus = computed(() => {
           const { routes, resolveMenuItem } = service()
-          const routeNameToPathMap = router
-            .getRoutes()
-            .reduce<Map<string, string>>((p, { name, path }) => {
-              p.set(normalizeRouteName(name), path)
-              return p
-            }, new Map())
-
-          return mapTree(sortRoutesByMetaOrder([...routes]), (item) => {
-            const {
-              name,
-              meta,
-              children = [],
-            } = item
-
-            const {
-              icon,
-              title,
-              hideInMenu = false,
-            } = meta ?? {}
-
-            const normalizedName = normalizeRouteName(name)
-            const menuKey = routeNameToPathMap.get(normalizedName)
-            const showMenu = !hideInMenu && !isNil(menuKey)
-            const menu: MenuOption = {
-              key: menuKey,
-              show: showMenu,
-              label: title ?? normalizedName,
-            }
-            if (icon) {
-              menu.icon = () => {
-                return builtinResolveIcon(icon)
-              }
-            }
-            if (children.filter(item => !item.meta?.hideInMenu).length > 0) {
-              menu.children = sortRoutesByMetaOrder(children) as any
-            }
-            return resolveMenuItem
-              ? resolveMenuItem(menu, item)
-              : menu
-          }, 'children')
+          return covertRoutesToMenus(routes, {
+            to,
+            router,
+            resolveMenuItem,
+          })
         })
 
         router.buildMenus = () => {
           return finalMenus.value
         }
-
-        onUnmount(() => {
-          delete router.buildMenus
-        })
       }
+    })
+
+    onUnmount(() => {
+      delete router.buildMenus
     })
   }
 }
 
 function builtinResolveIcon(icon: string) {
+  if (!icon) {
+    return h(Icon, {
+      icon: 'ant-design:menu-outlined',
+      width: 18,
+      height: 18,
+    })
+  }
+  if (isExternalIcon(icon)) {
+    return h('img', {
+      src: icon,
+      style: {
+        'width': '18px',
+        'height': '18px',
+        'object-fit': 'contain',
+      },
+    })
+  }
   return h(Icon, {
     icon,
     width: 18,
@@ -126,4 +105,67 @@ function sortRoutesByMetaOrder(routes: ServiceRoute[]) {
   return routes.sort((a, b) => {
     return (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER)
   })
+}
+
+function isRelativePath(path: string) {
+  return !path.startsWith('/')
+}
+
+function isExternalIcon(icon: string) {
+  return icon.startsWith('http://') || icon.startsWith('https://')
+}
+
+function buildRouteFullPath(route: ServiceRoute, parents: ServiceRoute[]) {
+  const matches = [...parents, route]
+  const fullPathList: string[] = []
+  while (matches.length > 0) {
+    const record = matches.pop()
+    fullPathList.unshift(record.path)
+    if (!isRelativePath(record.path)) {
+      fullPathList[0] = fullPathList[0].slice(1)
+      break
+    }
+  }
+  return [''].concat(fullPathList).join('/')
+}
+
+function covertRoutesToMenus(
+  routes: ServiceRoute[],
+  {
+    router,
+    to,
+    resolveMenuItem,
+  }: {
+    router: Router
+    to: RouteLocationNormalizedGeneric
+    resolveMenuItem: (item: MenuOption, rawItem: ServiceRoute) => MenuOption
+  },
+) {
+  routes = sortRoutesByMetaOrder(routes)
+  const traverse = (routes: ServiceRoute[], parents: ServiceRoute[] = []) => {
+    return routes.map((route) => {
+      const {
+        icon,
+        title,
+        hideInMenu = false,
+      } = route.meta ?? {}
+      const routeFullPath = buildRouteFullPath(route, parents)
+      const resolvedRoute = router.resolve(routeFullPath, to)
+      const menu: MenuOption = {
+        label: title,
+        show: !hideInMenu,
+        key: resolvedRoute.fullPath,
+      }
+      menu.icon = () => {
+        return builtinResolveIcon(icon)
+      }
+      if (route.children && route.children.filter(item => !item.meta?.hideInMenu).length > 0) {
+        menu.children = traverse(sortRoutesByMetaOrder([...route.children]), [...parents, route])
+      }
+      return resolveMenuItem
+        ? resolveMenuItem(menu, route)
+        : menu
+    })
+  }
+  return traverse(routes, [])
 }

@@ -27,3 +27,15 @@ export const ALREADY_INSTALLED = Symbol(
     ? 'already installed'
     : ``,
 )
+
+export const ROUTE_NAME = Symbol(
+  __DEV__
+    ? 'route name'
+    : ``,
+)
+
+export const ROUTE_COMPONENT_NAME = Symbol(
+  __DEV__
+    ? 'route component name'
+    : ``,
+)

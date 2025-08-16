@@ -1,7 +1,6 @@
-import type { RouteLocationNormalizedGeneric } from 'vue-router'
+import type { RouteLocationMatched } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { computed } from 'vue'
-import { normalizeRouteName } from '../utils/normalize-route-name'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -35,40 +34,40 @@ interface BreadcrumbItem {
 }
 
 interface BreadcrumbPluginOptions {
-  resolveBreadcrumb?: (item: BreadcrumbItem, to: RouteLocationNormalizedGeneric) => BreadcrumbItem
+  resolveBreadcrumb?: (item: BreadcrumbItem, matchedRoute: RouteLocationMatched) => BreadcrumbItem
 }
 
 export function breadcrumbPlugin({
   resolveBreadcrumb,
 }: BreadcrumbPluginOptions = {}): ProRouterPlugin {
   return ({ router, onUnmount }) => {
-    router.afterEach((to) => {
-      if (!router.buildBreadcrumbs) {
-        const breadcrumbs = computed(() => {
-          const breadcrumbs: BreadcrumbItem[] = []
-          router.currentRoute.value.matched.forEach(({ meta, path, name }) => {
-            const {
-              title,
-              icon,
-              hideInBreadcrumb,
-            } = meta ?? {}
-            if (title && !hideInBreadcrumb) {
-              const item: BreadcrumbItem = {
-                path,
-                icon,
-                title: title ?? normalizeRouteName(name),
-              }
-              breadcrumbs.push(resolveBreadcrumb ? resolveBreadcrumb(item, to) : item)
-            }
-          })
-          return breadcrumbs
-        })
-
-        router.buildBreadcrumbs = () => {
-          return breadcrumbs.value
+    const breadcrumbs = computed(() => {
+      const breadcrumbs: BreadcrumbItem[] = []
+      router.currentRoute.value.matched.forEach((matchedRoute) => {
+        const {
+          icon,
+          title,
+          hideInBreadcrumb,
+        } = matchedRoute.meta ?? {}
+        if (title && !hideInBreadcrumb) {
+          const item: BreadcrumbItem = {
+            icon,
+            title,
+            path: matchedRoute.path,
+          }
+          breadcrumbs.push(
+            resolveBreadcrumb
+              ? resolveBreadcrumb(item, matchedRoute)
+              : item,
+          )
         }
-      }
+      })
+      return breadcrumbs
     })
+
+    router.buildBreadcrumbs = () => {
+      return breadcrumbs.value
+    }
 
     onUnmount(() => {
       delete router.buildBreadcrumbs
