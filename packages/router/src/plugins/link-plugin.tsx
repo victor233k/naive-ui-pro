@@ -84,7 +84,7 @@ export function linkPlugin({
   openInNewWindow = url => window.open(url, '_blank'),
 }: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
-    router.beforeEach((to) => {
+    router.beforeEach((to, from) => {
       if (to.meta[IFRAME_CLEANUP]) {
         to.meta[IFRAME_CLEANUP]()
       }
@@ -107,7 +107,7 @@ export function linkPlugin({
       switch (linkMode) {
         case 'newWindow': {
           openInNewWindow(finalLink)
-          return false
+          return { ...from, replace: true }
         }
         case 'iframe': {
           const namespace = 'default'
