@@ -250,6 +250,15 @@ const accessRoutes: RouteRecordRaw[] = [
           icon: 'mdi:image-outline',
         },
       },
+      {
+        name: 'Tabs',
+        path: 'tabs',
+        component: () => import('@/views/demos/tabs/index.vue'),
+        meta: {
+          title: '多标签',
+          icon: 'mdi:tab',
+        },
+      },
     ],
     meta: {
       title: '演示',

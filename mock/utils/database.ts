@@ -45,7 +45,7 @@ export const database = {
         username: faker.internet.username(),
         password: faker.internet.password(),
         roleIds: faker.helpers.arrayElements(
-          database.role.map((item) => item.id),
+          database.role.map(item => item.id),
         ),
         email: faker.internet.email(),
         phone: faker.phone.number(),
