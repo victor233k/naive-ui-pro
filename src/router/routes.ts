@@ -123,15 +123,6 @@ const accessRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'editor',
-        component: () => import('@/views/demos/access/editor/index.vue'),
-        meta: {
-          title: '富文本编辑器',
-          titleI18nKey: 'routes.richTextEditor',
-          icon: 'material-symbols:edit-document-outline',
-        },
-      },
-      {
         path: 'external',
         meta: {
           title: '外部页面',
@@ -242,21 +233,30 @@ const accessRoutes: RouteRecordRaw[] = [
         ],
       },
       {
-        path: 'icon',
-        component: () => import('@/views/demos/icon/index.vue'),
-        meta: {
-          title: '图标选择器',
-          titleI18nKey: 'routes.iconSelector',
-          icon: 'mdi:image-outline',
-        },
-      },
-      {
         name: 'Tabs',
         path: 'tabs',
         component: () => import('@/views/demos/tabs/index.vue'),
         meta: {
           title: '多标签',
           icon: 'mdi:tab',
+        },
+      },
+      {
+        path: 'editor',
+        component: () => import('@/views/demos/access/editor/index.vue'),
+        meta: {
+          title: '富文本',
+          titleI18nKey: 'routes.richText',
+          icon: 'material-symbols:edit-document-outline',
+        },
+      },
+      {
+        path: 'icon',
+        component: () => import('@/views/demos/icon/index.vue'),
+        meta: {
+          title: '图标选择器',
+          titleI18nKey: 'routes.iconSelector',
+          icon: 'mdi:image-outline',
         },
       },
     ],
@@ -277,7 +277,6 @@ const accessRoutes: RouteRecordRaw[] = [
           titleI18nKey: 'routes.userManagement',
           icon: 'ant-design:user-outlined',
           roles: ['super', 'admin'],
-          keepAlive: true,
         },
       },
       {

@@ -368,7 +368,7 @@ export default {
     access: '权限',
     accessToggle: '权限切换',
     exception: '异常页',
-    richTextEditor: '富文本编辑器',
+    richText: '富文本',
     externalPage: '外部页面',
     complexForm: '复杂表单',
     editTable: '编辑表格',

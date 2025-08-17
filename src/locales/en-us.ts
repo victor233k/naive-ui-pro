@@ -415,7 +415,7 @@ export default {
     access: 'Access',
     accessToggle: 'Access Toggle',
     exception: 'Exception Page',
-    richTextEditor: 'Rich Text Editor',
+    richText: 'Rich Text',
     externalPage: 'External Page',
     complexForm: 'Complex Form',
     editTable: 'Edit Table',
