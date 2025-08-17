@@ -1,6 +1,6 @@
 <script setup lang='tsx'>
 import type { ProConfigProviderProps } from 'pro-naive-ui'
-import { dateEnUS } from 'naive-ui'
+import { dateEnUS, dateZhCN } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { enUS, zhCN } from 'pro-naive-ui'
 import { computed } from 'vue'
@@ -42,7 +42,7 @@ const configProviderProps = computed<ProConfigProviderProps>(() => {
       },
     },
     locale: isZhCN.value ? zhCN : enUS,
-    dateLocale: isZhCN.value ? null : dateEnUS,
+    dateLocale: isZhCN.value ? dateZhCN : dateEnUS,
   }
 })
 </script>
