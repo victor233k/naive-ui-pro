@@ -220,7 +220,6 @@ const tableColumns = computed<ProDataTableColumns<User>>(() => {
     <pro-data-table
       :title="$t('pages.system.user.title')"
       row-key="id"
-      flex-height
       :scroll-x="1440"
       :columns="tableColumns"
       v-bind="tableProps"

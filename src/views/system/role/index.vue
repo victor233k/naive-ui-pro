@@ -190,7 +190,6 @@ const tableColumns = computed<ProDataTableColumns<Role>>(() => {
     <pro-data-table
       :title="$t('pages.system.role.title')"
       row-key="id"
-      flex-height
       :scroll-x="970"
       :columns="tableColumns"
       v-bind="tableProps"

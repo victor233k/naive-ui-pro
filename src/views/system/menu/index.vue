@@ -177,7 +177,6 @@ const tableColumns = computed<ProDataTableColumns<Menu>>(() => {
     <pro-data-table
       :title="$t('pages.system.menu.title')"
       row-key="id"
-      flex-height
       :scroll-x="730"
       :columns="tableColumns"
       v-bind="tableProps"

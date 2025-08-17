@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { enUS, zhCN } from 'pro-naive-ui'
 import { computed } from 'vue'
 import { useAppStore } from '@/store/use-app-store'
+import { useLayoutStore } from '@/store/use-layout-store'
 import { useThemeStore } from '@/store/use-theme-store'
 
 const {
@@ -14,6 +15,10 @@ const {
 const {
   isZhCN,
 } = storeToRefs(useAppStore())
+
+const {
+  mobile,
+} = storeToRefs(useLayoutStore())
 
 const configProviderProps = computed<ProConfigProviderProps>(() => {
   return {
@@ -25,6 +30,10 @@ const configProviderProps = computed<ProConfigProviderProps>(() => {
       },
       ProDataTable: {
         size: 'small',
+        flexHeight: !mobile.value,
+        pagination: {
+          pageSlot: mobile.value ? 6 : undefined,
+        },
       },
       ProModalForm: {
         preset: 'card',
