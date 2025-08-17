@@ -5,20 +5,41 @@ import http from '@/utils/axios'
 
 type StatusEnum = keyof typeof statusMapping
 
+export interface Role {
+  id: string
+  name: string
+  code: string
+  status: StatusEnum
+  remark?: string
+  createTime: string
+  updateTime: string
+}
+
+export interface ListSearchParams {
+  name?: string
+  code?: string
+  status?: string
+}
+
 export class Api {
-  static page(params: Api.page.RequestData) {
-    return http.get<Api.page.ResponseData>('/system/role/page', { params })
+  /**
+   * 分页查询角色
+   */
+  static page(params: ApiUtil.WithPaginationParams<ListSearchParams>) {
+    return http.get<ApiUtil.PaginationResponse<Role>>('/system/role/page', { params })
   }
 
-  static list(params: Api.list.RequestData = {}) {
-    return http.get<Api.list.ResponseData>('/system/role/list', { params })
-  }
-
+  /**
+   * 获取角色详情
+   */
   static get(id: string) {
-    return http.get<Api.Model>(`/system/role/${id}`)
+    return http.get<Role>(`/system/role/${id}`)
   }
 
-  static insertOrUpdate(data: Api.insertOrUpdate.RequestData) {
+  /**
+   * 新增或修改角色
+   */
+  static insertOrUpdate(data: SetOptional<Role, 'id'>) {
     return http({
       method: isNil(data.id) ? 'post' : 'put',
       url: '/system/role',
@@ -26,43 +47,10 @@ export class Api {
     })
   }
 
-  static del(id: string | string[]) {
+  /**
+   * 删除角色
+   */
+  static del(id: string) {
     return http.delete(`/system/role/${id}`)
-  }
-}
-
-export declare namespace Api {
-  export interface Model {
-    id: string
-    name: string
-    code: string
-    status: StatusEnum
-    remark?: string
-    createTime: string
-    updateTime: string
-  }
-
-  export namespace page {
-    export type RequestData = ApiUtil.WithPaginationParams<{
-      name?: string
-      code?: string
-      status?: string
-    }>
-
-    export type ResponseData = ApiUtil.ResponseFormat.Page<Model>
-  }
-
-  export namespace list {
-    export type RequestData = ApiUtil.WithoutPaginationParams<page.RequestData>
-
-    export type ResponseData = ApiUtil.ResponseFormat.Base<Model[]>
-  }
-
-  export namespace get {
-    export type ResponseData = ApiUtil.ResponseFormat.Base<Model>
-  }
-
-  export namespace insertOrUpdate {
-    export type RequestData = SetOptional<Model, ApiUtil.CommonModelAttrs>
   }
 }

@@ -132,7 +132,7 @@ const accessRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        path: '/external',
+        path: 'external',
         meta: {
           title: '外部页面',
           titleI18nKey: 'routes.externalPage',

@@ -1,6 +1,3 @@
-import type { Api as MenuApi } from '@/views/system/menu/index.api'
-import type { Api as RoleApi } from '@/views/system/role/index.api'
-import type { Api as UserApi } from '@/views/system/user/index.api'
 import { defineFakeRoute } from 'vite-plugin-fake-server/client'
 import { buildCURDRoutes } from './utils/curd'
 import { database } from './utils/database'
@@ -249,9 +246,9 @@ function isInvalidToken(token: string) {
   return !token || !users.some(user => user.token === token)
 }
 
-const systemRoleRoutes = buildCURDRoutes<RoleApi.Model>('/system/role', database.role)
-const systemUserRoutes = buildCURDRoutes<UserApi.Model>('/system/user', database.user)
-const systemMenuRoutes = buildCURDRoutes<MenuApi.Model>('/system/menu', database.menu)
+const systemRoleRoutes = buildCURDRoutes('/system/role', database.role)
+const systemUserRoutes = buildCURDRoutes('/system/user', database.user)
+const systemMenuRoutes = buildCURDRoutes('/system/menu', database.menu)
 
 export default defineFakeRoute([
   ...systemRoleRoutes,

@@ -114,7 +114,7 @@ async function pushTo(path: string) {
     </template>
     <template #nav-left>
       <nav-left />
-      <mobile-sidebar-drawer :drawer-collapsed-width="finalSidebarCollapsedWidth">
+      <mobile-sidebar-drawer :collapsed-width="finalSidebarCollapsedWidth">
         <n-scrollbar class="flex-[1_0_0]">
           <pro-menu
             v-bind="layout.verticalMenuProps"

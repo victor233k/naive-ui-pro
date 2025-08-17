@@ -8,14 +8,19 @@ import { useLayoutStore } from '@/store/use-layout-store'
 
 interface LogoProps {
   /**
-   * 是否在移动端菜单栏使用
+   * 是否在移动端使用侧边栏抽屉
    */
-  isMobileSidebarDrawerBeUsed?: boolean
+  usingMobileSidebarDrawer?: boolean
 }
 
-const { isMobileSidebarDrawerBeUsed = false } = defineProps<LogoProps>()
+const {
+  usingMobileSidebarDrawer = false,
+} = defineProps<LogoProps>()
 
-const { title } = storeToRefs(useAppStore())
+const {
+  title,
+} = storeToRefs(useAppStore())
+
 const {
   mode,
   mobile,
@@ -24,7 +29,7 @@ const {
 
 const enablePaddingLeft = computed(() => {
   const layoutMode = mode.value as ProLayoutMode
-  if (isMobileSidebarDrawerBeUsed) {
+  if (usingMobileSidebarDrawer) {
     return !collapsed.value
   }
   if (mobile.value) {
@@ -38,7 +43,7 @@ const enablePaddingLeft = computed(() => {
 
 const showAppTitle = computed(() => {
   const layoutMode = mode.value as ProLayoutMode
-  if (isMobileSidebarDrawerBeUsed) {
+  if (usingMobileSidebarDrawer) {
     return !collapsed.value
   }
   if (mobile.value) {

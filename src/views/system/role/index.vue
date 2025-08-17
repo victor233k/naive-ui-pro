@@ -1,12 +1,9 @@
 <script setup lang="tsx">
 import type { ProDataTableColumns, ProSearchFormColumns } from 'pro-naive-ui'
+import type { SetOptional } from 'type-fest'
+import type { ListSearchParams, Role } from './index.api'
 import { Icon } from '@iconify/vue'
-import {
-  createProModalForm,
-  createProSearchForm,
-  renderProDateText,
-  renderProTags,
-} from 'pro-naive-ui'
+import { createProModalForm, createProSearchForm, renderProDateText, renderProTags } from 'pro-naive-ui'
 import { computed } from 'vue'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
@@ -22,11 +19,13 @@ import {
 
 const searchForm = createProSearchForm()
 
-const { loading: insertOrUpdateLoading, runAsync: runAsyncInsertOrUpdate }
-  = useProRequest(Api.insertOrUpdate, {
-    manual: true,
-    successTip: true,
-  })
+const {
+  loading: insertOrUpdateLoading,
+  runAsync: runAsyncInsertOrUpdate,
+} = useProRequest(Api.insertOrUpdate, {
+  manual: true,
+  successTip: true,
+})
 
 const {
   search: { proSearchFormProps },
@@ -41,10 +40,8 @@ const {
   },
 )
 
-const modalForm = createProModalForm<Api.insertOrUpdate.RequestData>({
-  onSubmit: (
-    values: Omit<Api.insertOrUpdate.RequestData, ApiUtil.CommonModelAttrs>,
-  ) => {
+const modalForm = createProModalForm<SetOptional<Role, 'id'>>({
+  onSubmit: (values) => {
     runAsyncInsertOrUpdate({
       ...values,
       id: modalForm.values.value.id,
@@ -71,7 +68,7 @@ const { run: handleEditRole } = useProRequest(Api.get, {
   },
 })
 
-const searchColumns = computed<ProSearchFormColumns<Api.page.RequestData>>(() => {
+const searchColumns = computed<ProSearchFormColumns<ListSearchParams>>(() => {
   return [
     {
       title: $t('pages.system.role.roleName'),
@@ -94,7 +91,7 @@ const searchColumns = computed<ProSearchFormColumns<Api.page.RequestData>>(() =>
   ]
 })
 
-const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
+const tableColumns = computed<ProDataTableColumns<Role>>(() => {
   return [
     {
       title: $t('common.often.index'),

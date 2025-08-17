@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { HOME_ROUTE_PATH, LOGIN_ROUTE_PATH } from '@/router/routes'
-import { apiLogin, apiQueryUserInfo } from './api/user.api'
+import http from '@/utils/axios'
 
 export interface UserInfo {
   name: string
@@ -33,7 +33,7 @@ export const useUserStore = defineStore('user', () => {
 
   async function fetchUpdateUserInfo() {
     try {
-      const { data } = await apiQueryUserInfo()
+      const { data } = await Api.queryUserInfo()
       user.value = {
         ...user.value,
         ...data,
@@ -50,7 +50,7 @@ export const useUserStore = defineStore('user', () => {
   async function login(payload: UserLoginPayload) {
     try {
       loading.value = true
-      const res = await apiLogin(payload)
+      const res = await Api.login(payload)
       const token = user.value.token = res.data.token
       localStorage.setItem('token', token)
       const info = await fetchUpdateUserInfo()
@@ -93,3 +93,20 @@ export const useUserStore = defineStore('user', () => {
     user: computed(() => user.value),
   }
 })
+
+class Api {
+  static login(payload: UserLoginPayload) {
+    return http<{ token: string }>({
+      url: '/user/login',
+      method: 'post',
+      data: payload,
+    })
+  }
+
+  static queryUserInfo() {
+    return http<Omit<UserInfo, 'token'>>({
+      url: '/user/info',
+      method: 'get',
+    })
+  }
+}

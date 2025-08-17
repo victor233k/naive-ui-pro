@@ -83,8 +83,8 @@ const layoutStore = useLayoutStore()
   </div>
 </template>
 
-<style>
-.preference-item {
+<style scoped>
+:deep(.preference-item) {
   display: flex;
   align-items: center;
   justify-content: space-between;

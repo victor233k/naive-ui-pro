@@ -10,7 +10,7 @@ const {
   mode,
   mobile,
   showSidebar,
-  showMobileMenuDrawer,
+  showMobileSidebarDrawer,
 } = storeToRefs(useLayoutStore())
 
 const showSidebarHiddenButton = computed(() => {
@@ -33,7 +33,7 @@ const showBreadcrumbs = computed(() => {
 
 function toggleSidebar() {
   if (mobile.value) {
-    showMobileMenuDrawer.value = !showMobileMenuDrawer.value
+    showMobileSidebarDrawer.value = !showMobileSidebarDrawer.value
     return
   }
   showSidebar.value = !showSidebar.value

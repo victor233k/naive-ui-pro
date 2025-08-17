@@ -8,24 +8,29 @@ interface MobileSidebarDrawerProps {
   /**
    * 移动端菜单抽屉折叠后的宽度
    */
-  drawerCollapsedWidth: number
+  collapsedWidth: number
 }
+
 defineProps<MobileSidebarDrawerProps>()
 
-const { showMobileMenuDrawer, sidebarWidth, collapsed } = storeToRefs(useLayoutStore())
+const {
+  collapsed,
+  sidebarWidth,
+  showMobileSidebarDrawer,
+} = storeToRefs(useLayoutStore())
 </script>
 
 <template>
   <n-drawer
-    v-model:show="showMobileMenuDrawer"
+    v-model:show="showMobileSidebarDrawer"
     :auto-focus="false"
-    :width="collapsed ? drawerCollapsedWidth : sidebarWidth"
+    :width="collapsed ? collapsedWidth : sidebarWidth"
     placement="left"
-    class="mobile-sidebar-drawer"
+    class="mobile-sidebar-drawer transition-[width] duration-300 ease-[var(--n-bezier)]"
   >
     <n-drawer-content :native-scrollbar="false">
       <template #header>
-        <logo is-mobile-sidebar-drawer-be-used />
+        <logo using-mobile-sidebar-drawer />
       </template>
       <div class="flex flex-col h-full">
         <slot />
@@ -37,18 +42,17 @@ const { showMobileMenuDrawer, sidebarWidth, collapsed } = storeToRefs(useLayoutS
   </n-drawer>
 </template>
 
-<style>
+<style scoped>
 .mobile-sidebar-drawer {
-  transition: width 0.3s var(--n-bezier);
   .n-drawer-content {
-    .n-scrollbar-content {
+    :deep(.n-scrollbar-content) {
       height: 100%;
     }
-    .n-drawer-header {
+    :deep(.n-drawer-header) {
       padding-left: 0;
       padding-right: 0;
     }
-    .n-drawer-body-content-wrapper {
+    :deep(.n-drawer-body-content-wrapper) {
       padding: 0;
     }
   }
