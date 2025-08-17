@@ -35,7 +35,7 @@ function setupComponents(app: App) {
 function setupAppLoading() {
   const cachedPreference = localStorage.getItem('preference')
   const finalPreference: typeof preferenceConfig = cachedPreference
-    ? merge(preferenceConfig, JSON.parse(cachedPreference))
+    ? merge(JSON.parse(cachedPreference), preferenceConfig)
     : preferenceConfig
   const { title } = finalPreference.app
   const { mode, primaryColor } = finalPreference.theme
