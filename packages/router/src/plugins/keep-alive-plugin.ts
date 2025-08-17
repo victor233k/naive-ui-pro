@@ -64,6 +64,12 @@ export function keepAlivePlugin({
     onUnmount(() => {
       delete router.cachedComponentNames
     })
+
+    return {
+      onCleanup: () => {
+        cachedComponentNames.value = []
+      },
+    }
   }
 }
 
