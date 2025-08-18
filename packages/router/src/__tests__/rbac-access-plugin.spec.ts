@@ -16,33 +16,44 @@ const BasicList = { template: `<div>BasicList</div>` }
 
 type RbacAccessPluginServiceReturned = RbacAccessPluginBackendServiceReturned | RbacAccessPluginFrontendServiceReturned
 
+const rootRoute = {
+  name: 'Root',
+  path: '/',
+  redirect: '/list',
+  component: Layout,
+  children: [],
+}
+
+const notFoundRoute = {
+  name: 'FallbackNotFound',
+  path: '/:path(.*)*',
+  component: () => NotFound,
+}
+
 const ignoreAccessRoutes: RouteRecordRaw[] = [
-  {
-    name: 'Root',
-    path: '/',
-    redirect: '/list',
-    component: Layout,
-    children: [],
-  },
   {
     name: 'admin',
     path: '/admin',
     component: Admin,
+    meta: {
+      requiresAuth: false,
+    },
   },
   {
     name: 'Login',
     path: '/login',
     component: Login,
+    meta: {
+      requiresAuth: false,
+    },
   },
   {
     name: 'Register',
     path: '/register',
     component: Register,
-  },
-  {
-    name: 'FallbackNotFound',
-    path: '/:path(.*)*',
-    component: () => NotFound,
+    meta: {
+      requiresAuth: false,
+    },
   },
 ]
 
@@ -77,7 +88,7 @@ const accessRoutes: RouteRecordRaw[] = [
   },
 ]
 
-function setupRouter(options: Partial<RbacAccessPluginServiceReturned> = {}) {
+function setupRouter(options: Partial<RbacAccessPluginServiceReturned> = {}, notFoundRouteRequiresAuth = false) {
   let finalOptions = {
     mode: 'frontend',
     routes: accessRoutes,
@@ -90,7 +101,16 @@ function setupRouter(options: Partial<RbacAccessPluginServiceReturned> = {}) {
   const app = createApp({})
   const router = createRouter({
     history: createWebHashHistory(),
-    routes: ignoreAccessRoutes,
+    routes: [
+      rootRoute,
+      ...ignoreAccessRoutes,
+      {
+        ...notFoundRoute,
+        meta: {
+          requiresAuth: notFoundRouteRequiresAuth,
+        },
+      },
+    ],
     plugins: [
       rbacAccessPlugin({
         service: async () => {
@@ -125,7 +145,7 @@ describe('rbac-access-plugin', () => {
     })
 
     it('redirect to Login when navigation to not exsit path', async () => {
-      const router = setupRouter({ ignoreAccessRouteNames: ignoreAccessRoutes.map(route => route.name).slice(0, -1) })
+      const router = setupRouter({ }, true)
       await router.push('/list?a=1')
       expect(router.currentRoute.value.name).toBe('Login')
       expect(router.currentRoute.value.fullPath).toBe('/login?redirect=/list?a=1')

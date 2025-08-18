@@ -17,7 +17,7 @@ const layoutStore = useLayoutStore()
     <n-drawer
       v-model:show="appStore.showPreferenceDrawer"
       :auto-focus="false"
-      :width="320"
+      :width="layoutStore.mobile ? '100%' : 320"
       :style="{
         '--preference-item-height': itemHeight,
       }"
@@ -83,8 +83,8 @@ const layoutStore = useLayoutStore()
   </div>
 </template>
 
-<style>
-.preference-item {
+<style scoped>
+:deep(.preference-item) {
   display: flex;
   align-items: center;
   justify-content: space-between;

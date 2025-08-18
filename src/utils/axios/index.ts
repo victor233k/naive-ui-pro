@@ -2,6 +2,12 @@ import axios from 'axios'
 import { setupTokenInterceptor } from './request-interceptors'
 import { setupResponseInterceptors } from './response-interceptors'
 
+/**
+ * 我们提供了 2 种全局错误处理方式
+ * 方式一：可以在 axios 的 handleError 中返回 Promise.reject(error)，调用侧将会进入 catch 回调，并获取错误对象
+ * 方式二：如果你决定使用 useProRequest 来作为请求工具，那么可以在 message-tip-after-request-finally-plugin 插件中实现
+ */
+
 const http = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 })
@@ -43,8 +49,6 @@ setupResponseInterceptors(http, {
    * @param error axios 响应错误
    */
   handleError(error) {
-    // TODO: 需要全局进行错误处理时可以在这里定义
-
     // 调用侧将会进入 then 回调并获取数据
     // return Promise.resolve({})
 

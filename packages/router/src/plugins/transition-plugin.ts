@@ -75,37 +75,35 @@ export function transitionPlugin({
   transitionName = 'fade-slide',
 }: TransitionPluginOptions = {}): ProRouterPlugin {
   return ({ router, onUnmount }) => {
-    if (!router.currentRouteTransitionProps) {
-      router.currentRouteTransitionProps = computed(() => {
-        let preElement: Element = null
-        const mergedTransitionName = resolveTransitionName(router, transitionName)
-        const transitionProps = builtinTransitionNameToTransitionPropsRecord[mergedTransitionName]
-        return {
-          ...transitionProps,
-          appear: true,
-          mode: 'out-in',
-          onEnter(el) {
-            lockScroll(el.parentElement)
-          },
-          onAfterEnter(el) {
-            unlockScroll(el.parentElement)
-          },
-          onEnterCancelled(el) {
-            unlockScroll(el.parentElement)
-          },
-          onLeave(el) {
-            preElement = el.parentElement
-            lockScroll(preElement)
-          },
-          onAfterLeave() {
-            unlockScroll(preElement)
-          },
-          onLeaveCancelled() {
-            unlockScroll(preElement)
-          },
-        }
-      })
-    }
+    router.currentRouteTransitionProps = computed(() => {
+      let preElement: Element = null
+      const resolvedTransitionName = resolveTransitionName(router, transitionName)
+      const transitionProps = builtinTransitionNameToTransitionPropsRecord[resolvedTransitionName]
+      return {
+        ...transitionProps,
+        appear: true,
+        mode: 'out-in',
+        onEnter(el) {
+          lockScroll(el.parentElement)
+        },
+        onAfterEnter(el) {
+          unlockScroll(el.parentElement)
+        },
+        onEnterCancelled(el) {
+          unlockScroll(el.parentElement)
+        },
+        onLeave(el) {
+          preElement = el.parentElement
+          lockScroll(preElement)
+        },
+        onAfterLeave() {
+          unlockScroll(preElement)
+        },
+        onLeaveCancelled() {
+          unlockScroll(preElement)
+        },
+      }
+    })
 
     onUnmount(() => {
       delete router.currentRouteTransitionProps

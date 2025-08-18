@@ -1,6 +1,6 @@
 <script setup lang='tsx'>
 import { Icon } from '@iconify/vue'
-import { useFullscreen } from '@vueuse/core'
+import { useFullscreen, useTimeoutFn } from '@vueuse/core'
 import { ref, watch } from 'vue'
 import { useAppStore } from '@/store/use-app-store'
 import { useThemeStore } from '@/store/use-theme-store'
@@ -17,11 +17,15 @@ const {
   isFullscreen,
 } = useFullscreen()
 
+const { start } = useTimeoutFn(
+  () => rotating.value = false,
+  rotateDuration,
+  { immediate: false },
+)
+
 watch(() => themeStore.isDark, () => {
   rotating.value = true
-  setTimeout(() => {
-    rotating.value = false
-  }, rotateDuration)
+  start()
 })
 </script>
 

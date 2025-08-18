@@ -7,7 +7,7 @@
     :route="$router.resolveNestedRoute()"
   >
     <transition v-bind="$router.currentRouteTransitionProps.value">
-      <keep-alive :include="$router.keepAliveList.value">
+      <keep-alive :include="$router.cachedComponentNames.value">
         <component
           :is="Component"
           :key="$router.getRouteKey()"

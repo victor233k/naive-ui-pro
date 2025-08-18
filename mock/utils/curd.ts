@@ -75,7 +75,8 @@ export function buildCURDRoutes<T extends BaseModel>(
           createTime: new Date().toISOString(),
           updateTime: new Date().toISOString(),
         } as T)
-        return RF.success(null)
+        return RF.error('演示环境，不支持删除！')
+        // return RF.success(null)
       },
     },
     // #endregion
@@ -89,11 +90,12 @@ export function buildCURDRoutes<T extends BaseModel>(
         if (!item) {
           return RF.error('数据不存在')
         }
-        Object.assign(item, body, {
-          createTime: item.createTime,
-          updateTime: new Date().toISOString(),
-        })
-        return RF.success(null)
+        return RF.error('演示环境，不支持修改！')
+        // Object.assign(item, body, {
+        //   createTime: item.createTime,
+        //   updateTime: new Date().toISOString(),
+        // })
+        // return RF.success(null)
       },
     },
     // #endregion
@@ -106,13 +108,13 @@ export function buildCURDRoutes<T extends BaseModel>(
         if (!params.id) {
           return RF.error('缺失 id 参数')
         }
+        return RF.error('演示环境，不支持删除！')
+        // const idArray = params.id.toString().split(',')
+        // const newData = collection.filter(item => !idArray.includes(item.id))
+        // collection.length = 0
+        // collection.push(...newData)
 
-        const idArray = params.id.toString().split(',')
-        const newData = collection.filter(item => !idArray.includes(item.id))
-        collection.length = 0
-        collection.push(...newData)
-
-        return RF.success(null)
+        // return RF.success(null)
       },
     },
     // #endregion

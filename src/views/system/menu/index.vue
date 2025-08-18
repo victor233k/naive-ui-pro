@@ -1,117 +1,60 @@
 <script setup lang="tsx">
-import type { FormRules } from 'naive-ui'
-import type { ProDataTableColumns, ProSearchFormColumns } from 'pro-naive-ui'
+import type { ProDataTableColumns } from 'pro-naive-ui'
+import type { Merge, SetOptional } from 'type-fest'
+import type { Menu } from './index.api'
 import { Icon } from '@iconify/vue'
-import { orderBy } from 'lodash-es'
-import {
-  createProModalForm,
-  createProSearchForm,
-  renderProDateText,
-  renderProTags,
-} from 'pro-naive-ui'
+import { storeToRefs } from 'pinia'
+import { createProDrawerForm, renderProTags } from 'pro-naive-ui'
 import { computed } from 'vue'
 import { useProNDataTable } from '@/composables/use-pro-n-data-table'
 import { useProRequest } from '@/composables/use-pro-request'
 import { $t } from '@/locales/locales'
+import { useLayoutStore } from '@/store/use-layout-store'
 import { translateOptions } from '@/utils/common'
-import MenuModalForm from './components/menu-modal-form.vue'
+import DirectoryDrawerForm from './components/driectory-drawer-form.vue'
+import MenuDrawerForm from './components/menu-drawer-form.vue'
 import { Api } from './index.api'
-import { buildTree } from './utils'
 import {
-  statusMapping,
-  statusOptions,
-  statusToColorMapping,
+  menuTypeEnum,
   typeMapping,
   typeOptions,
   typeToColorMapping,
 } from './utils/constants'
 
-const searchForm = createProSearchForm()
-
-const { loading: insertOrUpdateLoading, runAsync: runAsyncInsertOrUpdate }
-  = useProRequest(Api.insertOrUpdate, {
-    manual: true,
-    successTip: true,
-  })
+const {
+  mobile,
+} = storeToRefs(useLayoutStore())
 
 const {
-  search: { proSearchFormProps },
+  loading: insertOrUpdateLoading,
+  runAsync: runAsyncInsertOrUpdate,
+} = useProRequest(Api.insertOrUpdate, {
+  manual: true,
+  successTip: true,
+})
+
+const {
   table: { tableProps, onChange },
 } = useProNDataTable(
-  async (_, values) => {
-    const { data } = await Api.list(values)
-    return { list: buildTree(orderBy(data, ['sort'], ['asc'])), total: data.length }
-  },
-  {
-    form: searchForm,
+  async () => {
+    const { data } = await Api.list()
+    return { list: data, total: data.length }
   },
 )
 
-tableProps.value.pagination = false
-
-const modalForm = createProModalForm<Api.insertOrUpdate.RequestData>({
-  initialValues: {
-    type: '0',
-    title: '',
-    code: '',
-    status: '1',
-    linkMode: '0',
-    sort: 1,
-    keepAlive: true,
-  },
-  onSubmit: (
-    values: Omit<Api.insertOrUpdate.RequestData, ApiUtil.CommonModelAttrs>,
-  ) => {
+const drawerForm = createProDrawerForm<Merge<SetOptional<Menu, 'id'>, { parentId: null | string }>>({
+  onSubmit: (values) => {
     const data = {
       ...values,
-      id: modalForm.values.value.id,
+      id: drawerForm.values.value.id,
+      parentId: drawerForm.values.value.parentId,
     }
-
-    switch (data.type) {
-      case '0': {
-        data.link = ''
-        data.linkMode = '0'
-        data.routeFile = ''
-        data.keepAlive = true
-        break
-      }
-
-      case '2': {
-        data.link = ''
-        data.linkMode = '0'
-        break
-      }
-
-      case '3': {
-        data.icon = ''
-        data.link = ''
-        data.linkMode = '0'
-        data.routeFile = ''
-        data.routePath = ''
-        data.keepAlive = true
-        break
-      }
-    }
-
     runAsyncInsertOrUpdate(data).then(() => {
-      modalForm.show.value = false
+      drawerForm.show.value = false
       onChange({ page: 1 })
     })
   },
 })
-
-const rules: FormRules = {
-  routeFile: [
-    {
-      validator: () => {
-        const value = modalForm.values.value
-        return value.routeFile || (value.type === '1' && value.link)
-          ? true
-          : new Error($t('pages.system.menu.requiredWhenNoLink'))
-      },
-    },
-  ],
-}
 
 const { run: runDeleteMenus } = useProRequest(Api.del, {
   manual: true,
@@ -121,52 +64,10 @@ const { run: runDeleteMenus } = useProRequest(Api.del, {
   },
 })
 
-const { run: handleEditMenu } = useProRequest(Api.get, {
-  manual: true,
-  onSuccess: ({ data: menu }) => {
-    modalForm.show.value = true
-    modalForm.values.value = menu
-  },
-})
-
-const searchColumns = computed<ProSearchFormColumns<Api.list.RequestData>>(() => {
+const tableColumns = computed<ProDataTableColumns<Menu>>(() => {
   return [
     {
       title: $t('pages.system.menu.menuTitle'),
-      path: 'title',
-    },
-    {
-      title: $t('pages.system.menu.menuType'),
-      path: 'type',
-      field: 'select',
-      fieldProps: () => {
-        return {
-          options: translateOptions(typeOptions),
-        }
-      },
-    },
-    {
-      title: $t('pages.system.menu.routeName'),
-      path: 'code',
-    },
-    {
-      title: $t('common.often.status'),
-      path: 'status',
-      field: 'select',
-      fieldProps: () => {
-        return {
-          options: translateOptions(statusOptions),
-        }
-      },
-    },
-  ]
-})
-
-const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
-  return [
-    {
-      title: $t('pages.system.menu.menuTitle'),
-      path: 'title',
       width: 180,
       render: (row) => {
         return (
@@ -174,14 +75,14 @@ const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
             inline
             align="center"
           >
-            {row.icon && <Icon icon={row.icon}></Icon>}
-            <span>{row.title}</span>
+            {row.meta?.icon && <Icon icon={row.meta.icon}></Icon>}
+            <span>{row.meta?.title}</span>
           </n-flex>
         )
       },
     },
     {
-      title: $t('pages.system.menu.menuType'),
+      title: $t('pages.system.menu.type'),
       path: 'type',
       width: 100,
       render: (row) => {
@@ -192,46 +93,14 @@ const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
       },
     },
     {
-      title: $t('pages.system.menu.menuCode'),
-      path: 'code',
+      title: $t('pages.system.menu.path'),
+      path: 'path',
       width: 150,
     },
     {
-      title: $t('pages.system.menu.routePath'),
-      path: 'routePath',
+      title: $t('pages.system.menu.component'),
+      path: 'component',
       width: 150,
-    },
-    {
-      title: $t('pages.system.menu.routeFile'),
-      path: 'routeFile',
-      width: 150,
-    },
-    {
-      title: $t('pages.system.menu.sort'),
-      path: 'sort',
-      width: 120,
-    },
-    {
-      title: $t('common.often.status'),
-      width: 100,
-      render: (row) => {
-        return renderProTags({
-          content: $t(statusMapping[row.status]),
-          type: statusToColorMapping[row.status],
-        })
-      },
-    },
-    {
-      title: $t('common.often.remark'),
-      path: 'remark',
-      ellipsis: {
-        tooltip: true,
-      },
-    },
-    {
-      title: $t('common.often.updateTime'),
-      width: 220,
-      render: row => renderProDateText(row.updateTime),
     },
     {
       title: $t('common.often.operation'),
@@ -244,8 +113,9 @@ const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
               size="small"
               text={true}
               onClick={() => {
-                modalForm.values.value.parentId = row.id
-                modalForm.show.value = true
+                drawerForm.show.value = true
+                drawerForm.values.value.parentId = row.id
+                drawerForm.values.value.type = menuTypeEnum.MENU
               }}
             >
               {$t('common.often.add')}
@@ -254,7 +124,17 @@ const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
               type="primary"
               size="small"
               text={true}
-              onClick={() => handleEditMenu(row.id)}
+              onClick={() => {
+                drawerForm.show.value = true
+                drawerForm.values.value = {
+                  ...row,
+                  parentId: null,
+                  meta: {
+                    layout: true,
+                    ...(row.meta ?? {} as any),
+                  },
+                }
+              }}
             >
               {$t('common.often.edit')}
             </n-button>
@@ -263,7 +143,7 @@ const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
                 default: () => (
                   <span>
                     {$t('common.often.deleteConfirm')}
-                    <span class="c-red-500 font-bold">{row.title}</span>
+                    <span class="c-red-500 font-bold">{row.meta?.title}</span>
                     {$t('common.often.deleteQuestion')}
                   </span>
                 ),
@@ -294,27 +174,20 @@ const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
     vertical
     size="large"
   >
-    <pro-card content-class="pb-0!">
-      <pro-search-form
-        :form="searchForm"
-        :columns="searchColumns"
-        v-bind="proSearchFormProps"
-      />
-    </pro-card>
     <pro-data-table
       :title="$t('pages.system.menu.title')"
       row-key="id"
-      flex-height
-      :scroll-x="970"
+      :scroll-x="730"
       :columns="tableColumns"
       v-bind="tableProps"
+      :pagination="false"
     >
       <template #toolbar>
         <n-flex>
           <n-button
             type="primary"
             ghost
-            @click="modalForm.show.value = true"
+            @click="drawerForm.show.value = true;drawerForm.values.value.type = menuTypeEnum.MENU"
           >
             <template #icon>
               <n-icon>
@@ -326,13 +199,28 @@ const tableColumns = computed<ProDataTableColumns<Api.Model>>(() => {
         </n-flex>
       </template>
     </pro-data-table>
-    <pro-modal-form
-      :form="modalForm"
+    <pro-drawer-form
+      :form="drawerForm"
       :loading="insertOrUpdateLoading"
-      :title="`${modalForm.values.value.id ? $t('pages.system.menu.editMenu') : $t('pages.system.menu.addMenu')}`"
-      :rules
+      :width="mobile ? '100%' : undefined"
     >
-      <menu-modal-form :values="modalForm.values.value" />
-    </pro-modal-form>
+      <pro-drawer-content
+        :title="`${drawerForm.values.value.id ? $t('pages.system.menu.editMenu') : $t('pages.system.menu.addMenu')}`"
+        :native-scrollbar="false"
+      >
+        <pro-radio-group
+          :title="$t('pages.system.menu.menuType')"
+          path="type"
+          :field-props="{
+            type: 'button',
+            options: translateOptions(typeOptions),
+          }"
+        />
+        <div class="grid grid-cols-1 gap-x-0 md:grid-cols-2 md:gap-x-4">
+          <menu-drawer-form v-if="drawerForm.values.value.type === menuTypeEnum.MENU" />
+          <directory-drawer-form v-else-if="drawerForm.values.value.type === menuTypeEnum.DIRECTORY" />
+        </div>
+      </pro-drawer-content>
+    </pro-drawer-form>
   </n-flex>
 </template>

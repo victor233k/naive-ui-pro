@@ -18,6 +18,7 @@ export function autoRedirectPlugin({
       const currentRoute = to.matched[to.matched.length - 1]
       if (
         !currentRoute.redirect
+        && !currentRoute.components
         && currentRoute.children
         && currentRoute.children.length > 0
       ) {
