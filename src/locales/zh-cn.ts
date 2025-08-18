@@ -158,6 +158,14 @@ export default {
         remoteSearchTooltip1: '回显时远程搜索 options',
         remoteSearchTooltip2: '回显时合并 options',
       },
+      nested: {
+        title: '嵌套路由演示',
+        description: '演示嵌套路由功能，包含列表页和详情页',
+        goToDetail: '点击跳转详情页',
+        detailTitle: '详情页',
+        detailDescription: '详情页，它不在菜单中，也可以高亮菜单',
+        backToList: '返回列表页',
+      },
     },
     home: {
       welcomeBack: '欢迎回来',
@@ -381,5 +389,7 @@ export default {
     iframeLoadFailed: 'iframe 加载失败',
     externalLink: '外链',
     iconSelector: '图标选择器',
+    nestedDetail: '嵌套详情页',
+    detail: '详情页',
   },
 } as const

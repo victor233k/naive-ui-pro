@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import type { ProLayoutMode } from 'pro-naive-ui'
+import { isNil } from 'lodash-es'
 import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { useLayoutMenu } from 'pro-naive-ui'
@@ -41,6 +42,7 @@ const {
 
 const {
   layout,
+  fullKeys,
   activeKey,
 } = useLayoutMenu({
   mode,
@@ -76,9 +78,27 @@ const showSidebarExtraCollapseButton = computed(() => {
     || layoutMode === 'mixed-two-column'
 })
 
-watch(() => route.path, (value) => {
-  activeKey.value = value
+watch(() => route.path, (path) => {
+  if (activeKey.value === path) {
+    return
+  }
+  const key = findAvailableMenuKey()
+  if (isNil(key) && __DEV__) {
+    console.warn('This looks like a bug, please open an issue to report this problem')
+    return
+  }
+  activeKey.value = key!
 }, { immediate: true })
+
+function findAvailableMenuKey() {
+  const keys = fullKeys.value
+  for (let i = route.matched.length - 1; i >= 0; i--) {
+    const item = route.matched[i]
+    if (keys.includes(item.path)) {
+      return item.path
+    }
+  }
+}
 
 async function pushTo(path: string) {
   const failure = await router.push(path)

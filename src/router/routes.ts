@@ -233,7 +233,26 @@ const accessRoutes: RouteRecordRaw[] = [
         ],
       },
       {
-        name: 'Tabs',
+        path: 'nested-detail',
+        component: () => import('@/views/demos/nested/index.vue'),
+        children: [
+          {
+            path: 'detail',
+            component: () => import('@/views/demos/nested/detail.vue'),
+            meta: {
+              title: '详情页',
+              titleI18nKey: 'routes.detail',
+              hideInMenu: true,
+            },
+          },
+        ],
+        meta: {
+          title: '嵌套详情页',
+          titleI18nKey: 'routes.nestedDetail',
+          icon: 'bx:detail',
+        },
+      },
+      {
         path: 'tabs',
         component: () => import('@/views/demos/tabs/index.vue'),
         meta: {

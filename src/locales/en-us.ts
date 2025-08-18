@@ -176,6 +176,14 @@ export default {
         remoteSearchTooltip1: 'Remote search options when echoing',
         remoteSearchTooltip2: 'Merge options when echoing',
       },
+      nested: {
+        title: 'Nested Route Demo',
+        description: 'Demonstrates nested routing functionality, including list and detail pages',
+        goToDetail: 'Click to go to detail page',
+        detailTitle: 'Detail Page',
+        detailDescription: 'Detail page that is not in the menu but can highlight the menu',
+        backToList: 'Back to list',
+      },
     },
 
     // Home page
@@ -428,5 +436,7 @@ export default {
     iframeLoadFailed: 'iframe Load Failed',
     externalLink: 'External Link',
     iconSelector: 'Icon Selector',
+    nestedDetail: 'Nested Detail',
+    detail: 'Detail',
   },
 } as const
