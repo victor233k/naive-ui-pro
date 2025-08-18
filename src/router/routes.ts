@@ -286,6 +286,15 @@ const accessRoutes: RouteRecordRaw[] = [
         ],
       },
       {
+        path: 'download',
+        name: 'Download',
+        component: () => import('@/views/demos/download/index.vue'),
+        meta: {
+          title: '文件下载',
+          icon: 'material-symbols:download',
+        },
+      },
+      {
         path: 'icon',
         name: 'Icon',
         component: () => import('@/views/demos/icon/index.vue'),
