@@ -1,6 +1,7 @@
 import type { ProRouterPlugin } from '../plugin'
 import NProgress from 'nprogress'
 import { nextTick, ref } from 'vue'
+import { ROUTE_NAME } from '../symbols'
 import { getRouteComponentName } from '../utils/route'
 import 'nprogress/nprogress.css'
 
@@ -42,7 +43,8 @@ export function refreshPlugin(): ProRouterPlugin {
     const routeKeyMap = ref<Map<string, RouteKey>>(new Map())
 
     router.getRouteKey = () => {
-      const name = getRouteComponentName(router.currentRoute.value)
+      const to = router.currentRoute.value
+      const name = getRouteComponentName(to) ?? to.meta[ROUTE_NAME].toString()
       const { key, timestamp } = routeKeyMap.value.get(name)!
       return timestamp ? `${key}${timestamp}` : key
     }
@@ -74,7 +76,7 @@ export function refreshPlugin(): ProRouterPlugin {
       if (failure) {
         return
       }
-      const toName = getRouteComponentName(to)
+      const toName = getRouteComponentName(to) ?? to.meta[ROUTE_NAME].toString()
       if (!toName || routeKeyMap.value.has(toName)) {
         return
       }
@@ -88,5 +90,11 @@ export function refreshPlugin(): ProRouterPlugin {
       delete router.refresh
       delete router.getRouteKey
     })
+
+    return {
+      onCleanup: () => {
+        routeKeyMap.value.clear()
+      },
+    }
   }
 }
