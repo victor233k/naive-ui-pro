@@ -1,3 +1,4 @@
+import { $t } from '@/locales/locales'
 import http from '@/utils/axios'
 
 /**
@@ -94,7 +95,7 @@ export async function downloadFileFromUrl(url: string, filename?: string): Promi
     }
   }
   catch (error) {
-    console.error('下载文件失败:', error)
+    console.error($t('pages.demos.download.downloadFileFailed'), error)
     throw error
   }
 }
@@ -111,7 +112,7 @@ export async function downloadImage(imageUrl: string, filename?: string): Promis
     downloadBase64(base64, finalFilename, 'image/png')
   }
   catch (error) {
-    console.error('下载图片失败:', error)
+    console.error($t('pages.demos.download.downloadImageFailed'), error)
     throw error
   }
 }
@@ -132,7 +133,7 @@ export function downloadText(
     downloadBlob(blob, filename)
   }
   catch (error) {
-    console.error('下载文本失败:', error)
+    console.error($t('pages.demos.download.downloadTextFailed'), error)
     throw error
   }
 }
@@ -163,7 +164,7 @@ export function downloadBase64(
     downloadBlob(blob, filename)
   }
   catch (error) {
-    console.error('下载base64数据失败:', error)
+    console.error($t('pages.demos.download.downloadBase64Failed'), error)
     throw error
   }
 }
@@ -182,7 +183,7 @@ export async function getBlob(url: string, options?: any): Promise<Blob> {
     return response.data
   }
   catch (error) {
-    console.error('获取Blob失败:', error)
+    console.error($t('pages.demos.download.getBlobFailed'), error)
     throw error
   }
 }
@@ -194,10 +195,13 @@ export async function getBlob(url: string, options?: any): Promise<Blob> {
  */
 export async function getResponse(url: string, options?: any): Promise<any> {
   try {
-    return await http.get(url, options)
+    return await http.get(url, {
+      responseType: 'blob',
+      ...options,
+    })
   }
   catch (error) {
-    console.error('获取Response失败:', error)
+    console.error($t('pages.demos.download.getResponseFailed'), error)
     throw error
   }
 }

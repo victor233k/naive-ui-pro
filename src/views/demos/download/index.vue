@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useMessage } from 'naive-ui'
 import { shallowRef } from 'vue'
+import { $t } from '@/locales/locales'
 import {
   downloadBase64,
   downloadFileFromUrl,
@@ -15,78 +16,27 @@ const message = useMessage()
 // 示例数据
 const fileUrl = shallowRef('https://github.com/Zheng-Changfu/naive-ui-pro/archive/refs/heads/main.zip')
 const imageUrl = shallowRef('https://unpkg.com/@lircoding/static-source@1.0.2/source/naive.svg')
-const sampleText = shallowRef('这是一个示例文本文件，包含一些中文内容。\nThis is a sample text file with some Chinese content.')
+const sampleText = shallowRef('这是一个示例文本文件，包含一些中文内容。')
 const base64Data = shallowRef('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 
-// 下载文件
-async function handleDownloadFile() {
-  try {
-    await downloadFileFromUrl(fileUrl.value, 'sample.pdf')
-    message.success('文件下载成功')
-  }
-  catch (error) {
-    message.error('文件下载失败')
-    console.error(error)
-  }
-}
-
-// 下载图片
-async function handleDownloadImage() {
-  try {
-    await downloadImage(imageUrl.value, 'sample-image.png')
-    message.success('图片下载成功')
-  }
-  catch (error) {
-    message.error('图片下载失败')
-    console.error(error)
-  }
-}
-
-// 下载文本
-function handleDownloadText() {
-  try {
-    downloadText(sampleText.value, 'sample-text.txt')
-    message.success('文本下载成功')
-  }
-  catch (error) {
-    message.error('文本下载失败')
-    console.error(error)
-  }
-}
-
-// 下载base64数据
-function handleDownloadBase64() {
-  try {
-    downloadBase64(base64Data.value, 'sample-image.png', 'image/png')
-    message.success('base64数据下载成功')
-  }
-  catch (error) {
-    message.error('base64数据下载失败')
-    console.error(error)
-  }
-}
-
-// 获取Blob
 async function handleGetBlob() {
   try {
     const blob = await getBlob(imageUrl.value)
-    message.success(`获取Blob成功，大小: ${(blob.size / 1024).toFixed(2)} KB`)
-    console.log('Blob对象:', blob)
+    message.success(`${$t('pages.demos.download.getBlobSuccess')}，${$t('pages.demos.download.blobSize')}: ${(blob.size / 1024).toFixed(2)} KB`)
   }
   catch (error) {
-    message.error('获取Blob失败')
+    message.error($t('pages.demos.download.getBlobFailed'))
     console.error(error)
   }
 }
 
-// 获取Response
 async function handleGetResponse() {
   try {
     const response = await getResponse(imageUrl.value)
-    message.success(`获取Response成功，状态: ${response.status}`)
+    message.success(`${$t('pages.demos.download.getResponseSuccess')}，${$t('pages.demos.download.responseStatus')}: ${response.status}`)
   }
   catch (error) {
-    message.error('获取Response失败')
+    message.error($t('pages.demos.download.getResponseFailed'))
     console.error(error)
   }
 }
@@ -97,88 +47,88 @@ async function handleGetResponse() {
     vertical
     class="gap-16px"
   >
-    <n-card title="根据文件地址下载文件">
+    <n-card :title="$t('pages.demos.download.fileDownload')">
       <n-space vertical>
         <n-input
           v-model:value="fileUrl"
-          placeholder="请输入文件URL"
+          :placeholder="$t('pages.demos.download.fileUrlPlaceholder')"
         />
         <n-button
           type="primary"
-          @click="handleDownloadFile"
+          @click="downloadFileFromUrl(fileUrl, 'sample.pdf')"
         >
-          下载文件
+          {{ $t('pages.demos.download.downloadFile') }}
         </n-button>
       </n-space>
     </n-card>
 
-    <n-card title="根据地址下载图片">
+    <n-card :title="$t('pages.demos.download.imageDownload')">
       <n-space vertical>
         <n-input
           v-model:value="imageUrl"
-          placeholder="请输入图片URL"
+          :placeholder="$t('pages.demos.download.imageUrlPlaceholder')"
         />
         <n-button
           type="primary"
-          @click="handleDownloadImage"
+          @click="downloadImage(imageUrl, 'sample-image.png')"
         >
-          下载图片
+          {{ $t('pages.demos.download.downloadImage') }}
         </n-button>
       </n-space>
     </n-card>
 
-    <n-card title="文本下载">
+    <n-card :title="$t('pages.demos.download.textDownload')">
       <n-space vertical>
         <n-input
           v-model:value="sampleText"
           type="textarea"
-          placeholder="请输入要下载的文本内容"
+          :placeholder="$t('pages.demos.download.textContentPlaceholder')"
           :rows="4"
         />
         <n-button
           type="primary"
-          @click="handleDownloadText"
+          @click="downloadText(sampleText, 'sample-text.txt')"
         >
-          下载文本
+          {{ $t('pages.demos.download.downloadText') }}
         </n-button>
       </n-space>
     </n-card>
 
-    <n-card title="base64流下载">
+    <n-card :title="$t('pages.demos.download.base64Download')">
       <n-space vertical>
         <n-input
           v-model:value="base64Data"
           type="textarea"
-          placeholder="请输入base64数据"
+          :placeholder="$t('pages.demos.download.base64DataPlaceholder')"
           :rows="3"
         />
         <n-button
           type="primary"
-          @click="handleDownloadBase64"
+          @click="downloadBase64(base64Data, 'sample-image.png', 'image/png')"
         >
-          下载base64数据
+          {{ $t('pages.demos.download.downloadBase64') }}
         </n-button>
       </n-space>
     </n-card>
 
-    <n-card title="请求下载">
+    <n-card :title="$t('pages.demos.download.requestDownload')">
       <n-space vertical>
         <n-input
           v-model:value="imageUrl"
-          placeholder="请输入请求URL"
+          :placeholder="$t('pages.demos.download.requestUrlPlaceholder')"
         />
         <n-space>
           <n-button
             type="info"
             @click="handleGetBlob"
           >
-            获取Blob
+            {{ $t('pages.demos.download.getBlob') }}
           </n-button>
           <n-button
             type="info"
             @click="handleGetResponse"
           >
-            获取Response
+            {{ $t('pages.demos.download.getResponse') }}
           </n-button>
         </n-space>
       </n-space>
