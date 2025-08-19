@@ -233,6 +233,16 @@ const accessRoutes: RouteRecordRaw[] = [
         ],
       },
       {
+        path: 'download',
+        name: 'Download',
+        component: () => import('@/views/demos/download/index.vue'),
+        meta: {
+          title: '文件下载',
+          titleI18nKey: 'routes.fileDownload',
+          icon: 'material-symbols:download',
+        },
+      },
+      {
         path: 'nested-detail',
         component: () => import('@/views/demos/nested/index.vue'),
         children: [
