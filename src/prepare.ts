@@ -3,6 +3,7 @@ import { preferenceConfig } from '@root/preference'
 import { merge } from 'lodash-es'
 import { create, ProInput, ProSelect } from 'pro-naive-ui'
 import { ProIconifyIcons, ProIconifyIcons2 } from './components/iconify-icons'
+import { WangEditor } from './components/wang-editor'
 import { setupI18n } from './locales/locales'
 import { setupRouter } from './router'
 import { setupPinia } from './store'
@@ -30,6 +31,8 @@ function setupComponents(app: App) {
   }))
   app.component(ProIconifyIcons.name!, ProIconifyIcons)
   app.component(ProIconifyIcons2.name!, ProIconifyIcons2)
+  // 这里纯粹是为了方便使用，跟 pro-search-form 无关
+  app.component(WangEditor.name!, WangEditor)
 }
 
 function setupAppLoading() {

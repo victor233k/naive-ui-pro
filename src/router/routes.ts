@@ -262,7 +262,7 @@ const accessRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'editor',
-        component: () => import('@/views/demos/access/editor/index.vue'),
+        component: () => import('@/views/demos/wang-editor/index.vue'),
         meta: {
           title: '富文本',
           titleI18nKey: 'routes.richText',

@@ -1,6 +1,7 @@
-import { defineAsyncComponent } from 'vue'
+import WangEditor from './index.vue'
+import ProWangEditor from './pro-wang-editor.vue'
 
-export * from './interface'
-
-// 异步加载组件，有利于代码分割
-export const ProWangEditor = defineAsyncComponent(() => import('./index.vue'))
+export { proWangEditorProps, wangEditorProps } from './props'
+export type { ProWangEditorProps, WangEditorProps } from './props'
+export type { ProWangEditorSlots } from './slots'
+export { ProWangEditor, WangEditor }

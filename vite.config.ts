@@ -44,6 +44,7 @@ export default defineConfig(({ mode }) => {
             type: 'component',
             resolve: (name: string) => {
               const components = [
+                { name: 'ProWangEditor', from: '@/components/wang-editor' },
                 { name: 'ProIconifyIcons', from: '@/components/iconify-icons' },
                 { name: 'ProIconifyIcons2', from: '@/components/iconify-icons' },
               ]
