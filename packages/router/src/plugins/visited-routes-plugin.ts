@@ -1,429 +1,300 @@
-import type { Ref } from 'vue'
+import type { DeepReadonly, WritableComputedRef } from 'vue'
 import type { RouteLocationNormalized } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
-import { createEventHook, tryOnScopeDispose } from '@vueuse/core'
-import { move as _move } from 'pro-naive-ui'
-import { ref } from 'vue'
+import { tryOnScopeDispose } from '@vueuse/core'
+import { move as _move } from 'pro-composables'
+import { computed, readonly, ref } from 'vue'
+import { warn } from '../utils/warn'
 
 declare module 'vue-router' {
-  interface RouteMeta {
-    /**
-     * 从访问路由记录中排除
-     * 如果为 true，则不会添加到访问路由记录中
-     * @default false
-     */
-    visitedRoutesIgnore?: boolean
-    /**
-     * 是否固定在访问路由记录中
-     * 如果为 true，则不会从访问路由记录中删除
-     * @default false
-     */
-    locked?: boolean
-  }
-
   interface Router {
-    /**
-     * 访问路由记录
-     */
-    visitedRoutes: VisitedRoutesManager
-  }
-}
-
-export type InterceptorOffFunction = () => void
-
-export type AddInterceptorResult = RouteLocationNormalized | false | Promise<RouteLocationNormalized | false>
-
-export type AddInterceptor = (visitedRoute: RouteLocationNormalized) => AddInterceptorResult
-
-export interface InterceptorOptions {
-  once?: boolean
-}
-
-export interface InterceptorResult {
-  off: InterceptorOffFunction
-}
-
-interface InterceptorRecord<T = any> {
-  interceptor: T
-  offFn: InterceptorOffFunction
-  options: InterceptorOptions
-}
-
-/**
- * 拦截器管理器
- */
-class InterceptorManager<T = any> {
-  private interceptors: InterceptorRecord<T>[] = []
-
-  add(interceptor: T, options: InterceptorOptions = {}): InterceptorResult {
-    const record: InterceptorRecord<T> = {
-      interceptor,
-      offFn: () => {
-        const index = this.interceptors.indexOf(record)
-        if (index > -1) {
-          this.interceptors.splice(index, 1)
-        }
-      },
-      options,
+    visitedRoutesPlugin: {
+      /**
+       * 访问过的路由记录
+       */
+      routes: DeepReadonly<RouteLocationNormalized[]>
+      /**
+       * 当前激活的路由索引
+       */
+      activeIndex: WritableComputedRef<number>
+      /**
+       * 添加路由
+       * @param route 要添加的路由
+       * @returns 添加成功返回 true，否则返回 false
+       */
+      add: (route: RouteLocationNormalized) => Promise<boolean>
+      /**
+       * 移除指定索引的路由
+       * @param index 要移除的路由索引
+       * @returns 移除成功返回 true，否则返回 false
+       */
+      remove: (index: number) => Promise<boolean>
+      /**
+       * 移除指定索引范围的路由，包含起始索引，不包含结束索引
+       * @param from 起始索引
+       * @param to 结束索引
+       */
+      removes: (from: number, to: number) => Promise<void>
+      /**
+       * 移动指定索引的路由到另一个位置
+       * @param from 原始索引
+       * @param to 目标索引
+       * @returns 移动成功返回 true，否则返回 false
+       */
+      move: (from: number, to: number) => Promise<boolean>
+      /**
+       * 操作拦截守卫
+       */
+      guards: Required<Interceptor>
     }
-    this.interceptors.push(record)
+  }
+}
 
-    // 自动在作用域销毁时清理
-    tryOnScopeDispose(record.offFn)
+type MaybePromise<T> = T | Promise<T>
 
-    return { off: record.offFn }
+interface Interceptor {
+  /**
+   * 在添加路由之前执行
+   */
+  beforeAdd?: (callback: (route: RouteLocationNormalized) => MaybePromise<RouteLocationNormalized | false>) => () => void
+  /**
+   * 在添加路由之后执行
+   */
+  afterAdd?: (callback: (route: RouteLocationNormalized) => MaybePromise<void>) => () => void
+  /**
+   * 在移除路由之前执行
+   */
+  beforeRemove?: (callback: (index: number) => MaybePromise<number | false>) => () => void
+  /**
+   * 在移除路由之后执行
+   */
+  afterRemove?: (callback: (index: number) => MaybePromise<void>) => () => void
+  /**
+   * 在移动路由之前执行
+   */
+  beforeMove?: (callback: ([from, to]: [number, number]) => MaybePromise<[number, number] | false>) => () => void
+  /**
+   * 在移动路由之后执行
+   */
+  afterMove?: (callback: ([from, to]: [number, number]) => MaybePromise<void>) => () => void
+}
+
+class InterceptorStore {
+  private interceptorsRecord: Record<
+    keyof Interceptor,
+    Set<Parameters<Interceptor[keyof Interceptor]>[0]>
+  >
+
+  constructor() {
+    this.interceptorsRecord = {
+      beforeAdd: new Set(),
+      afterAdd: new Set(),
+      beforeRemove: new Set(),
+      afterRemove: new Set(),
+      beforeMove: new Set(),
+      afterMove: new Set(),
+    }
   }
 
-  async execute(...args: any[]): Promise<AddInterceptorResult> {
-    let currentResult = args[0]
-
-    for (const record of this.interceptors) {
-      try {
-        const result = await (record.interceptor as any)(currentResult, ...args.slice(1))
-        if (record.options.once) {
-          this.interceptors = this.interceptors.filter(item => item.interceptor !== record.interceptor)
-        }
-
-        if (result === false) {
-          return false
-        }
-
-        // 如果拦截器返回了修改后的值，使用它作为下一次执行的输入
-        if (result !== undefined && result !== true) {
-          currentResult = result
-        }
+  on = <T extends keyof Interceptor>(interceptorName: T, callback: Parameters<Interceptor[T]>[0]) => {
+    if (this.interceptorsRecord[interceptorName]) {
+      this.interceptorsRecord[interceptorName].add(callback)
+    }
+    const off = () => {
+      if (this.interceptorsRecord[interceptorName]) {
+        this.interceptorsRecord[interceptorName].delete(callback)
       }
-      catch (error) {
-        console.error('Interceptor execution failed:', error)
+    }
+    tryOnScopeDispose(off)
+    return off
+  }
+
+  run = async <T extends keyof Interceptor>(interceptorName: T, params: Parameters<Parameters<Interceptor[T]>[0]>[0]) => {
+    if (!this.interceptorsRecord[interceptorName]) {
+      return
+    }
+    const interceptors = Array.from(this.interceptorsRecord[interceptorName])
+    let currentResult = params
+    for (let i = 0; i < interceptors.length; i++) {
+      const result = await interceptors[i](currentResult as any)
+      if (result === false) {
         return false
       }
+      currentResult = result as any
     }
     return currentResult
   }
 
-  clear() {
-    this.interceptors.forEach(record => record.offFn())
-    this.interceptors = []
+  clear = () => {
+    for (const interceptorName in this.interceptorsRecord) {
+      this.interceptorsRecord[interceptorName].clear()
+    }
   }
-
-  get size() {
-    return this.interceptors.length
-  }
-}
-
-/**
- * 访问路由记录管理器
- * 提供访问路由的添加、删除、移动、锁定等操作，并自动维护当前激活的访问路由 key
- */
-export interface VisitedRoutesManager {
-  /**
-   * 当前激活的访问路由唯一 key（当前是 fullPath）
-   */
-  activeKey: Ref<string | null>
-
-  /**
-   * 访问路由列表
-   */
-  routes: Ref<RouteLocationNormalized[]>
-
-  /**
-   * 当访问路由成功添加时触发的事件钩子
-   */
-  onRouteAdded: ReturnType<typeof createEventHook<RouteLocationNormalized>>
-
-  /**
-   * 添加访问路由之前的拦截器
-   * @param interceptor 拦截器函数
-   * @param options 拦截器选项（如 once 表示只执行一次）
-   * @returns 用于移除该拦截器的控制对象
-   */
-  addBeforeAddInterceptor: (interceptor: AddInterceptor, options?: InterceptorOptions) => InterceptorResult
-
-  /**
-   * 移除指定索引的访问路由
-   * @param index 要移除的索引
-   */
-  remove: (index: number) => void
-
-  /**
-   * 设置当前激活的访问路由 key
-   * @param key 要激活的路由 key（通常是 fullPath）
-   */
-  setActiveKey: (key: string) => void
-
-  /**
-   * 移除所有访问路由，仅保留锁定的路由，并确保激活项正确
-   */
-  removeAllAndEnsureActiveKey: () => void
-
-  /**
-   * 在访问路由列表中移动指定索引的路由到另一个位置
-   * @param from 原始索引
-   * @param to 目标索引
-   */
-  move: (from: number, to: number) => void
-
-  /**
-   * 切换指定索引访问路由的锁定状态
-   * @param index 访问路由索引
-   */
-  toggleVisitedRouteLockedState: (index: number) => void
-
-  /**
-   * 根据 fullPath 查找访问路由的索引
-   * @param fullPath 完整路径
-   * @returns 找到则返回索引，否则返回 -1
-   */
-  findVisitedRouteIndexByFullPath: (fullPath: string) => number
-
-  /**
-   * 移除指定索引的访问路由，并在必要时更新激活项
-   * @param index 要移除的索引
-   */
-  removeAndEnsureActiveKey: (index: number) => void
-
-  /**
-   * 添加访问路由
-   * @param visitedRoute 要添加的访问路由对象
-   * @returns 添加成功返回 true，否则返回 false
-   */
-  add: (visitedRoute: RouteLocationNormalized) => Promise<boolean>
-
-  /**
-   * 移除除指定索引及锁定路由以外的所有访问路由，并确保激活项正确
-   * @param index 要保留的索引
-   */
-  removeOtherAndEnsureActiveKey: (index: number) => void
-
-  /**
-   * 移除指定索引之后的所有访问路由，并确保激活项正确
-   * @param index 起始索引
-   */
-  removeAfterAndEnsureActiveKey: (index: number) => void
-
-  /**
-   * 移除指定索引之前的所有访问路由，并确保激活项正确
-   * @param index 起始索引
-   */
-  removeBeforeAndEnsureActiveKey: (index: number) => void
-
-  /**
-   * 添加访问路由并确保其成为当前激活项
-   * @param visitedRoute 要添加的访问路由对象
-   * @returns 添加成功返回 true，否则返回 false
-   */
-  addAndEnsureActiveKey: (visitedRoute: RouteLocationNormalized) => Promise<boolean>
-
-  /**
-   * 初始化访问路由列表，并确保当前激活项正确
-   * @param routes 可选的初始访问路由数组
-   */
-  initAndEnsureActiveKey: (routes?: RouteLocationNormalized[]) => Promise<void>
 }
 
 export function visitedRoutesPlugin(): ProRouterPlugin {
   return ({ router, onUnmount }) => {
-    const routes = ref<RouteLocationNormalized[]>([])
-    const activeKey = ref<string | null>(null)
+    const activeIndex = ref(-1)
+    const interceptorStore = new InterceptorStore()
+    const visitedRoutes = ref<RouteLocationNormalized[]>([])
 
-    const beforeAddManager = new InterceptorManager<AddInterceptor>()
-    const onRouteAdded = createEventHook<RouteLocationNormalized>()
-
-    const addBeforeAddInterceptor = (interceptor: AddInterceptor, options: InterceptorOptions = {}): InterceptorResult => {
-      return beforeAddManager.add(interceptor, options)
+    async function add(route: RouteLocationNormalized) {
+      const result = await interceptorStore.run('beforeAdd', route)
+      const successed = result !== false
+      if (successed) {
+        const i = visitedRoutes.value.findIndex(item => isEqualRoute(item as RouteLocationNormalized, result))
+        if (~i) {
+          return false
+        }
+        visitedRoutes.value.push(result)
+        await interceptorStore.run('afterAdd', result)
+      }
+      return successed
     }
 
-    async function add(visitedRoute: RouteLocationNormalized): Promise<boolean> {
-      const result = await beforeAddManager.execute(visitedRoute)
-      if (result === false) {
+    async function move(from: number, to: number) {
+      if (from < 0 || to < 0 || to >= visitedRoutes.value.length || from >= visitedRoutes.value.length) {
+        if (__DEV__) {
+          warn(`from or to is out of range, from: ${from}, to: ${to}, length: ${visitedRoutes.value.length}`)
+        }
         return false
       }
-      routes.value.push(result)
-      onRouteAdded.trigger(result)
-      return true
-    }
-
-    function move(from: number, to: number): void {
-      if (from < 0 || from >= routes.value.length || to < 0 || to >= routes.value.length) {
-        return
+      if (from === to) {
+        return false
       }
-      _move(routes.value, from, to)
-    }
-
-    function remove(index: number): void {
-      if (index < 0 || index >= routes.value.length) {
-        return
+      const result = await interceptorStore.run('beforeMove', [from, to])
+      const successed = result !== false
+      if (successed) {
+        _move(visitedRoutes.value, result[0], result[1])
+        await interceptorStore.run('afterMove', result)
       }
-      routes.value.splice(index, 1)
+      return successed
     }
 
-    function findVisitedRouteIndexByFullPath(fullPath: string) {
-      return routes.value.findIndex(visitedRoute => visitedRoute.fullPath === fullPath)
-    }
-
-    function setActiveKey(key: string): void {
-      if (activeKey.value === key) {
-        return
-      }
-      activeKey.value = key
-    }
-
-    async function initAndEnsureActiveKey(routeList?: RouteLocationNormalized[]): Promise<void> {
-      if (routeList && routeList.length > 0) {
-        routes.value = [...routeList]
-        // 等待路由初始化完成，确保 router.currentRoute.value 正确
-        await router.isReady()
-        const currentRoute = router.currentRoute.value
-        if (currentRoute) {
-          await addAndEnsureActiveKey(currentRoute)
+    async function remove(index: number) {
+      if (index < 0 || index > visitedRoutes.value.length - 1) {
+        if (__DEV__) {
+          warn(`index is out of range, index: ${index}, length: ${visitedRoutes.value.length}`)
         }
+        return false
       }
-      else {
-        routes.value = []
-        activeKey.value = null
+      const result = await interceptorStore.run('beforeRemove', index)
+      const successed = result !== false
+      if (successed) {
+        visitedRoutes.value.splice(result, 1)
+        await interceptorStore.run('afterRemove', result)
       }
+      return successed
     }
 
-    async function addAndEnsureActiveKey(visitedRoute: RouteLocationNormalized): Promise<boolean> {
-      const existingIndex = findVisitedRouteIndexByFullPath(visitedRoute.fullPath)
-      let addResult = true
-      if (existingIndex === -1) {
-        addResult = await add(visitedRoute)
-      }
-      // 只有添加成功且已存在时才设置当前key
-      if (addResult || existingIndex !== -1) {
-        setActiveKey(visitedRoute.fullPath)
-        return true
-      }
-      return false
-    }
-
-    function removeAndEnsureActiveKey(index: number): void {
-      const currentVisitedRouteItem = routes.value[index]
-      if (!currentVisitedRouteItem || currentVisitedRouteItem.meta?.locked) {
-        return
-      }
-      // todo: 删除最后一个标签页
-      if (routes.value.length <= 1) {
-        return
-      }
-      remove(index)
-      if (activeKey.value === currentVisitedRouteItem.fullPath) {
-        const fallbackIndex = index > 0 ? index - 1 : 0
-        const fallbackRoute = routes.value[fallbackIndex]
-        if (fallbackRoute) {
-          setActiveKey(fallbackRoute.fullPath)
+    async function removes(from: number, to: number) {
+      if (from < 0 || to < 0 || from > to || to > visitedRoutes.value.length - 1 || from > visitedRoutes.value.length - 1) {
+        if (__DEV__) {
+          warn(`from or to is out of range, from: ${from}, to: ${to}, length: ${visitedRoutes.value.length}`)
         }
-      }
-    }
-
-    function removeBeforeAndEnsureActiveKey(index: number) {
-      const currentVisitedRouteItem = routes.value[index]
-      if (!currentVisitedRouteItem || index <= 0) {
         return
       }
-      routes.value = routes.value.filter((visitedRoute, i) => i >= index || visitedRoute.meta?.locked)
-      ensureActiveKeyFallback(currentVisitedRouteItem.fullPath)
+      let i = to - 1
+      let deleteCount = to - from
+      while (deleteCount > 0) {
+        await remove(i)
+        i--
+        deleteCount--
+      }
     }
 
-    function removeAfterAndEnsureActiveKey(index: number) {
-      const currentVisitedRouteItem = routes.value[index]
-      if (!currentVisitedRouteItem || index >= routes.value.length - 1) {
+    function setActiveIndex(index: number) {
+      if (index < 0 || index > visitedRoutes.value.length - 1) {
+        if (__DEV__) {
+          warn(`index is out of range, index: ${index}, length: ${visitedRoutes.value.length}`)
+        }
         return
       }
-      routes.value = routes.value.filter((visitedRoute, i) => i <= index || visitedRoute.meta?.locked)
-      ensureActiveKeyFallback(currentVisitedRouteItem.fullPath)
+      activeIndex.value = index
     }
 
-    function removeOtherAndEnsureActiveKey(index: number) {
-      const currentVisitedRouteItem = routes.value[index]
-      if (!currentVisitedRouteItem) {
-        return
+    interceptorStore.on('beforeAdd', (route) => {
+      const i = visitedRoutes.value.findIndex(item => isEqualRoute(item as RouteLocationNormalized, route))
+      if (~i) {
+        activeIndex.value = i
       }
-      routes.value = routes.value.filter((visitedRoute, i) => i === index || visitedRoute.meta?.locked)
-      ensureActiveKeyFallback(currentVisitedRouteItem.fullPath)
-    }
-
-    function removeAllAndEnsureActiveKey() {
-      if (!routes.value.length) {
-        return
-      }
-      const lockedRoutes = routes.value.filter(visitedRoute => visitedRoute.meta?.locked)
-      // 回退路由优先锁定路由的最后一个，否则访问路由的第一个
-      const fallbackVisitedRoute = lockedRoutes.length > 0
-        ? lockedRoutes[lockedRoutes.length - 1]
-        : routes.value[0]
-      routes.value = lockedRoutes.length > 0
-        ? [...lockedRoutes]
-        : routes.value.slice(0, 1)
-      ensureActiveKeyFallback(fallbackVisitedRoute.fullPath)
-    }
-
-    function toggleVisitedRouteLockedState(index: number): void {
-      const currentVisitedRouteItem = routes.value[index]
-      if (!currentVisitedRouteItem) {
-        return
-      }
-      const newLocked = !currentVisitedRouteItem.meta?.locked
-      currentVisitedRouteItem.meta = {
-        ...currentVisitedRouteItem.meta,
-        locked: newLocked,
-      }
-    }
-
-    function ensureActiveKeyFallback(currentFullPath: string) {
-      if (activeKey.value === currentFullPath) {
-        return
-      }
-      const newIndex = findVisitedRouteIndexByFullPath(currentFullPath)
-      if (newIndex !== -1) {
-        setActiveKey(currentFullPath)
-      }
-    }
-
-    const visitedRoutesManager: VisitedRoutesManager = {
-      activeKey,
-      routes: routes as Ref<RouteLocationNormalized[]>,
-
-      add,
-      remove,
-      move,
-      onRouteAdded,
-      addBeforeAddInterceptor,
-      setActiveKey,
-      toggleVisitedRouteLockedState,
-      findVisitedRouteIndexByFullPath,
-      addAndEnsureActiveKey,
-      initAndEnsureActiveKey,
-      removeAndEnsureActiveKey,
-      removeAllAndEnsureActiveKey,
-      removeAfterAndEnsureActiveKey,
-      removeOtherAndEnsureActiveKey,
-      removeBeforeAndEnsureActiveKey,
-    }
-
-    router.visitedRoutes = visitedRoutesManager
-
-    router.afterEach(async (to) => {
-      // 如果路由被标记为忽略，则不添加到访问记录中
-      if (to.meta?.visitedRoutesIgnore) {
-        return
-      }
-
-      await addAndEnsureActiveKey(to as RouteLocationNormalized)
+      return route
     })
 
-    onUnmount(() => {
-      beforeAddManager.clear()
+    interceptorStore.on('afterAdd', () => {
+      activeIndex.value = visitedRoutes.value.length - 1
+    })
 
-      delete router.visitedRoutes
+    interceptorStore.on('afterRemove', (removedIndex) => {
+      const i = activeIndex.value
+      if (removedIndex < i || (removedIndex === i && i === visitedRoutes.value.length)) {
+        activeIndex.value--
+      }
+    })
+
+    router.afterEach((to) => {
+      add(to)
+    })
+
+    router.visitedRoutesPlugin = {
+      routes: readonly(visitedRoutes.value) as DeepReadonly<RouteLocationNormalized[]>,
+      activeIndex: computed({
+        get() {
+          return activeIndex.value
+        },
+        set(index) {
+          if (index < 0 || index > visitedRoutes.value.length - 1) {
+            if (__DEV__) {
+              warn(`index is out of range, index: ${index}, length: ${visitedRoutes.value.length}`)
+            }
+            return
+          }
+          setActiveIndex(index)
+        },
+      }),
+      add,
+      move,
+      remove,
+      removes,
+      guards: {
+        beforeAdd: (callback) => {
+          return interceptorStore.on('beforeAdd', callback)
+        },
+        afterAdd: (callback) => {
+          return interceptorStore.on('afterAdd', callback)
+        },
+        beforeRemove: (callback) => {
+          return interceptorStore.on('beforeRemove', callback)
+        },
+        afterRemove: (callback) => {
+          return interceptorStore.on('afterRemove', callback)
+        },
+        beforeMove: (callback) => {
+          return interceptorStore.on('beforeMove', callback)
+        },
+        afterMove: (callback) => {
+          return interceptorStore.on('afterMove', callback)
+        },
+      },
+    }
+
+    function cleanup() {
+      activeIndex.value = -1
+      visitedRoutes.value = []
+      interceptorStore.clear()
+    }
+
+    onUnmount(() => {
+      cleanup()
+      delete router.visitedRoutesPlugin
     })
 
     return {
-      onCleanup: () => {
-        routes.value = []
-        activeKey.value = null
-      },
+      onCleanup: cleanup,
     }
   }
+}
+
+function isEqualRoute(a: RouteLocationNormalized, b: RouteLocationNormalized) {
+  return a.path === b.path
 }
