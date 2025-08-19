@@ -90,6 +90,7 @@ export default defineConfig(({ mode }) => {
             'vue': ['vue'],
             'pinia': ['pinia'],
             'iconify': ['@iconify/vue'],
+            'wangeditor': ['@wangeditor/editor'],
           },
         },
       },
