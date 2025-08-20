@@ -1,13 +1,7 @@
 {
-  "files.autoSave": "onWindowChange",
   "files.eol": "\n",
-
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-  "editor.formatOnSave": false,
-
-  // 将 eslint 作为格式化工具
   "eslint.format.enable": true,
-
   // Auto fix
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
@@ -54,5 +48,7 @@
   ],
   "i18n-ally.localesPaths": [
     "src/locales"
-  ]
+  ],
+  "i18n-ally.enabledParsers": ["ts"],
+  "i18n-ally.displayLanguage": "zh-cn"
 }
