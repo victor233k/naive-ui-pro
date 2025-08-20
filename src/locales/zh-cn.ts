@@ -126,8 +126,7 @@ export default {
         downloadImage: '下载图片',
         downloadText: '下载文本',
         downloadBase64: '下载base64数据',
-        getBlob: '获取Blob',
-        getResponse: '获取Response',
+        fetchBlobResponse: '获取Response',
         downloadSuccess: '下载成功',
         downloadFailed: '下载失败',
         getBlobSuccess: '获取Blob成功',
@@ -385,5 +384,6 @@ export default {
     nestedDetail: '嵌套详情页',
     detail: '详情页',
     fileDownload: '文件下载',
+    pageComponent: '页面级组件',
   },
 } as const

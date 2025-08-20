@@ -7,9 +7,8 @@ import {
   downloadFileFromUrl,
   downloadImage,
   downloadText,
-  getBlob,
-  getResponse,
-} from './utils/file-download'
+  fetchBlobResponse,
+} from '@/utils/file'
 
 const message = useMessage()
 
@@ -21,8 +20,8 @@ const base64Data = shallowRef('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAD
 
 async function handleGetBlob() {
   try {
-    const blob = await getBlob(imageUrl.value)
-    message.success(`${$t('pages.demos.download.getBlobSuccess')}，${$t('pages.demos.download.blobSize')}: ${(blob.size / 1024).toFixed(2)} KB`)
+    const response = await fetchBlobResponse<Blob>(imageUrl.value)
+    message.success(`${$t('pages.demos.download.getBlobSuccess')}，${$t('pages.demos.download.blobSize')}: ${(response.data.size / 1024).toFixed(2)} KB`)
   }
   catch (error) {
     message.error($t('pages.demos.download.getBlobFailed'))
@@ -32,7 +31,7 @@ async function handleGetBlob() {
 
 async function handleGetResponse() {
   try {
-    const response = await getResponse(imageUrl.value)
+    const response = await fetchBlobResponse(imageUrl.value)
     message.success(`${$t('pages.demos.download.getResponseSuccess')}，${$t('pages.demos.download.responseStatus')}: ${response.status}`)
   }
   catch (error) {
@@ -128,7 +127,7 @@ async function handleGetResponse() {
             type="info"
             @click="handleGetResponse"
           >
-            {{ $t('pages.demos.download.getResponse') }}
+            {{ $t('pages.demos.download.fetchBlobResponse') }}
           </n-button>
         </n-space>
       </n-space>

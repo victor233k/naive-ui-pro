@@ -143,8 +143,7 @@ export default {
         downloadImage: 'Download Image',
         downloadText: 'Download Text',
         downloadBase64: 'Download Base64 Data',
-        getBlob: 'Get Blob',
-        getResponse: 'Get Response',
+        fetchBlobResponse: 'Get Response',
         downloadSuccess: 'Download successful',
         downloadFailed: 'Download failed',
         getBlobSuccess: 'Get Blob successful',
@@ -431,5 +430,6 @@ export default {
     nestedDetail: 'Nested Detail',
     detail: 'Detail',
     fileDownload: 'File Download',
+    pageComponent: 'Page Component',
   },
 } as const
