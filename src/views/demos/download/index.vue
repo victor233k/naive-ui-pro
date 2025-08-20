@@ -9,7 +9,7 @@ import {
   downloadText,
   getBlob,
   getResponse,
-} from './utils/download'
+} from './utils/file-download'
 
 const message = useMessage()
 
