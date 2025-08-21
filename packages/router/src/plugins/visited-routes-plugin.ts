@@ -1,9 +1,9 @@
-import type { DeepReadonly, WritableComputedRef } from 'vue'
+import type { WritableComputedRef } from 'vue'
 import type { RouteLocationNormalized } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { tryOnScopeDispose } from '@vueuse/core'
 import { move as _move } from 'pro-composables'
-import { computed, readonly, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { warn } from '../utils/warn'
 
 declare module 'vue-router' {
@@ -12,7 +12,7 @@ declare module 'vue-router' {
       /**
        * 访问过的路由记录
        */
-      routes: DeepReadonly<RouteLocationNormalized[]>
+      routes: RouteLocationNormalized[]
       /**
        * 当前激活的路由索引
        */
@@ -188,7 +188,7 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
     }
 
     async function removes(from: number, to: number) {
-      if (from < 0 || to < 0 || from > to || to > visitedRoutes.value.length - 1 || from > visitedRoutes.value.length - 1) {
+      if (from < 0 || to < 0 || from > to || to > visitedRoutes.value.length || from > visitedRoutes.value.length) {
         if (__DEV__) {
           warn(`from or to is out of range, from: ${from}, to: ${to}, length: ${visitedRoutes.value.length}`)
         }
@@ -196,11 +196,13 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
       }
       let i = to - 1
       let deleteCount = to - from
+      const promises: Promise<boolean>[] = []
       while (deleteCount > 0) {
-        await remove(i)
+        promises.push(remove(i))
         i--
         deleteCount--
       }
+      return Promise.all(promises).then(() => undefined)
     }
 
     function setActiveIndex(index: number) {
@@ -233,11 +235,14 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
     })
 
     router.afterEach((to) => {
-      add(to)
+      const invalidRoute = to.matched.length === 0
+      if (!invalidRoute) {
+        add(to)
+      }
     })
 
     router.visitedRoutesPlugin = {
-      routes: readonly(visitedRoutes.value) as DeepReadonly<RouteLocationNormalized[]>,
+      routes: visitedRoutes.value as RouteLocationNormalized[],
       activeIndex: computed({
         get() {
           return activeIndex.value
@@ -280,7 +285,9 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
 
     function cleanup() {
       activeIndex.value = -1
-      visitedRoutes.value = []
+      while (visitedRoutes.value.length > 0) {
+        visitedRoutes.value.pop()
+      }
       interceptorStore.clear()
     }
 
