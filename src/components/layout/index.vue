@@ -14,6 +14,7 @@ import Logo from './logo.vue'
 import MobileSidebarDrawer from './mobile-sidebar-drawer.vue'
 import NavLeft from './nav-left.vue'
 import NavRight from './nav-right.vue'
+import Tabbar from './tabbar.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -161,7 +162,7 @@ async function pushTo(path: string) {
       <nav-right />
     </template>
     <template #tabbar>
-      <!-- <tabbar /> -->
+      <tabbar />
     </template>
     <template #sidebar>
       <div class="flex flex-col h-full">

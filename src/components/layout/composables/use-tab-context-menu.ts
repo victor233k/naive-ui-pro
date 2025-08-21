@@ -12,13 +12,9 @@ export function useTabContextMenu() {
   const {
     routes,
     move,
-    removeAndEnsureActiveKey,
-    removeAllAndEnsureActiveKey,
-    removeAfterAndEnsureActiveKey,
-    toggleVisitedRouteLockedState,
-    removeOtherAndEnsureActiveKey,
-    removeBeforeAndEnsureActiveKey,
-  } = router.visitedRoutes
+    remove,
+    removes,
+  } = router.visitedRoutesPlugin
 
   function createIcon(iconName: string) {
     return () =>
@@ -29,17 +25,17 @@ export function useTabContextMenu() {
   }
 
   function createDropdownOptions(): DropdownOption[] {
-    const currentSelectVisitRoute = routes.value[contextMenuIndex.value]
+    const currentSelectVisitRoute = routes[contextMenuIndex.value]
     if (!currentSelectVisitRoute) {
       return []
     }
 
-    const wasLocked = currentSelectVisitRoute.meta?.locked
+    const wasAffixed = currentSelectVisitRoute.meta?.affixed
     const options = [
       {
-        label: wasLocked ? '取消固定' : '固定',
-        key: 'toggleLocked',
-        icon: createIcon(wasLocked ? 'mdi:pin-off-outline' : 'mdi:pin-outline'),
+        label: wasAffixed ? '取消固定' : '固定',
+        key: 'toggleAffixed',
+        icon: createIcon(wasAffixed ? 'mdi:pin-off-outline' : 'mdi:pin-outline'),
       },
       {
         label: '关闭左侧',
@@ -67,7 +63,7 @@ export function useTabContextMenu() {
         icon: createIcon('tabler:arrow-autofit-width'),
       },
     ]
-    if (!wasLocked) {
+    if (!wasAffixed) {
       options.unshift({
         label: '关闭',
         key: 'close',
@@ -83,41 +79,42 @@ export function useTabContextMenu() {
     showDropdown.value = true
   }
 
-  function handleDropdownSelect(key: string) {
+  async function handleDropdownSelect(key: string) {
     const index = contextMenuIndex.value
-    const currentSelectVisitRoute = routes.value[index]
+    const currentSelectVisitRoute = routes[index]
 
     switch (key) {
-      case 'toggleLocked': {
-        toggleVisitedRouteLockedState(index)
-        // locked 路由始终排在前面
-        const lockedCount = routes.value.filter(route => route.meta?.locked).length
-        if (currentSelectVisitRoute.meta?.locked) {
-          move(index, lockedCount - 1)
+      case 'toggleAffixed': {
+        currentSelectVisitRoute.meta.affixed = !currentSelectVisitRoute.meta?.affixed
+        // affixed 路由始终排在前面
+        const affixedCount = routes.filter(route => route.meta?.affixed).length
+        if (currentSelectVisitRoute.meta?.affixed) {
+          await move(index, affixedCount - 1)
         }
         else {
-          move(index, lockedCount)
+          await move(index, affixedCount)
         }
         break
       }
       case 'close': {
-        removeAndEnsureActiveKey(index)
+        await remove(index)
         break
       }
       case 'closeLeft': {
-        removeBeforeAndEnsureActiveKey(index)
+        await removes(0, index)
         break
       }
       case 'closeRight': {
-        removeAfterAndEnsureActiveKey(index)
+        await removes(index + 1, routes.length)
         break
       }
       case 'closeOther': {
-        removeOtherAndEnsureActiveKey(index)
+        await removes(0, index)
+        await removes(index + 1, routes.length)
         break
       }
       case 'closeAll': {
-        removeAllAndEnsureActiveKey()
+        await removes(0, routes.length)
         break
       }
       case 'openInNewTab': {
@@ -133,8 +130,8 @@ export function useTabContextMenu() {
     showDropdown,
     contextMenuIndex,
     dropdownPosition,
-    createDropdownOptions,
     handleContextMenu,
     handleDropdownSelect,
+    createDropdownOptions,
   }
 }

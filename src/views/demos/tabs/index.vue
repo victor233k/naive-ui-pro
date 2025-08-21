@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
-const route = useRoute()
 const router = useRouter()
 
 const demoFullPath = '/demos/fallback/403'
 
 const {
+  routes,
   remove,
-  addBeforeAddInterceptor,
-  removeAndEnsureActiveKey,
-  removeAllAndEnsureActiveKey,
-  removeAfterAndEnsureActiveKey,
-  removeOtherAndEnsureActiveKey,
-  removeBeforeAndEnsureActiveKey,
-  findVisitedRouteIndexByFullPath,
-} = router.visitedRoutes
+  activeIndex,
+  removes,
+  guards,
+} = router.visitedRoutesPlugin
 
 function openDynamicTitleTab() {
   const timestamp = Date.now()
 
-  addBeforeAddInterceptor((route) => {
+  // TODO: 拦截器返回卸载函数类型定义需修改
+  let off: () => void = () => {}
+  off = guards.beforeAdd((route) => {
+    off()
     return {
       ...route,
+      path: route.fullPath,
       meta: {
         ...route.meta,
         title: `动态页面 #${timestamp}`,
       },
     }
-  }, { once: true })
+  })
 
   router.push({
     path: demoFullPath,
@@ -41,32 +41,31 @@ function openTestPage() {
 }
 
 function closeTestPage() {
-  const index = findVisitedRouteIndexByFullPath(demoFullPath)
-  remove(index)
+  const index = routes.findIndex(r => r.fullPath === demoFullPath)
+  if (index !== -1) {
+    remove(index)
+  }
 }
 
 function closeAllTabs() {
-  removeAllAndEnsureActiveKey()
+  removes(0, routes.length)
 }
 
 function closeBeforeTabs() {
-  const index = findVisitedRouteIndexByFullPath(route.fullPath)
-  removeBeforeAndEnsureActiveKey(index)
+  removes(0, activeIndex.value)
 }
 
 function closeAfterTabs() {
-  const index = findVisitedRouteIndexByFullPath(route.fullPath)
-  removeAfterAndEnsureActiveKey(index)
+  removes(activeIndex.value + 1, routes.length)
 }
 
 function closeCurrentTab() {
-  const index = findVisitedRouteIndexByFullPath(route.fullPath)
-  removeAndEnsureActiveKey(index)
+  remove(activeIndex.value)
 }
 
-function closeOtherTabs() {
-  const index = findVisitedRouteIndexByFullPath(route.fullPath)
-  removeOtherAndEnsureActiveKey(index)
+async function closeOtherTabs() {
+  await removes(0, activeIndex.value)
+  await removes(activeIndex.value + 1, routes.length)
 }
 </script>
 
