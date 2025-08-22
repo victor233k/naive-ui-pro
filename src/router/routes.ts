@@ -267,6 +267,7 @@ const accessRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/demos/tabs/index.vue'),
         meta: {
           title: '多标签',
+          titleI18nKey: 'routes.tabs',
           icon: 'mdi:tab',
         },
       },

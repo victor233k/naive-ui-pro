@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { $t } from '@/locales/locales'
 
 const router = useRouter()
 
@@ -23,7 +24,7 @@ function openDynamicTitleTab() {
       path: route.fullPath,
       meta: {
         ...route.meta,
-        title: `动态页面 #${timestamp}`,
+        title: `${$t('common.layout.tabs.dynamicTitle')} #${timestamp}`,
       },
     }
   })
@@ -78,10 +79,10 @@ async function closeOtherTabs() {
           prefix="bar"
           style="margin: 0;"
         >
-          标签页管理
+          {{ $t('common.layout.tabs.tabManagement') }}
         </n-h2>
         <n-text depth="3">
-          支持动态创建、批量操作和智能拦截
+          {{ $t('common.layout.tabs.tabManagementDesc') }}
         </n-text>
       </n-space>
     </n-card>
@@ -91,7 +92,7 @@ async function closeOtherTabs() {
       size="medium"
     >
       <n-card
-        title="动态标签页"
+        :title="$t('common.layout.tabs.dynamicTabs')"
         size="small"
       >
         <template #header-extra>
@@ -99,23 +100,23 @@ async function closeOtherTabs() {
             type="info"
             size="small"
           >
-            拦截器
+            {{ $t('common.layout.tabs.interceptor') }}
           </n-tag>
         </template>
         <n-space vertical>
           <n-text depth="3">
-            创建带时间戳的动态标题，演示一次性拦截器功能
+            {{ $t('common.layout.tabs.dynamicTitleDesc') }}
           </n-text>
           <n-space>
             <n-button @click="openDynamicTitleTab">
-              创建动态标题页面
+              {{ $t('common.layout.tabs.createDynamicTitlePage') }}
             </n-button>
           </n-space>
         </n-space>
       </n-card>
 
       <n-card
-        title="打开/关闭标签页"
+        :title="$t('common.layout.tabs.openCloseTabs')"
         size="small"
       >
         <template #header-extra>
@@ -123,26 +124,26 @@ async function closeOtherTabs() {
             type="success"
             size="small"
           >
-            基础
+            {{ $t('common.layout.tabs.basic') }}
           </n-tag>
         </template>
         <n-space vertical>
           <n-text depth="3">
-            如果存在则激活已有标签页，否则则打开新标签页
+            {{ $t('common.layout.tabs.openCloseTabsDesc') }}
           </n-text>
           <n-space>
             <n-button @click="openTestPage">
-              打开"403"页面
+              {{ $t('common.layout.tabs.openPage') }}
             </n-button>
             <n-button @click="closeTestPage">
-              关闭"403"页面
+              {{ $t('common.layout.tabs.closePage') }}
             </n-button>
           </n-space>
         </n-space>
       </n-card>
 
       <n-card
-        title="标签页操作"
+        :title="$t('common.layout.tabs.tabOperations')"
         size="small"
       >
         <template #header-extra>
@@ -150,28 +151,28 @@ async function closeOtherTabs() {
             type="warning"
             size="small"
           >
-            批量
+            {{ $t('common.layout.tabs.batch') }}
           </n-tag>
         </template>
         <n-space vertical>
           <n-text depth="3">
-            用于动态配置标签页
+            {{ $t('common.layout.tabs.tabOperationsDesc') }}
           </n-text>
           <n-space>
             <n-button @click="closeCurrentTab">
-              关闭当前标签页
+              {{ $t('common.layout.tabs.closeCurrentTab') }}
             </n-button>
             <n-button @click="closeBeforeTabs">
-              关闭左侧标签页
+              {{ $t('common.layout.tabs.closeLeftTabs') }}
             </n-button>
             <n-button @click="closeAfterTabs">
-              关闭右侧标签页
+              {{ $t('common.layout.tabs.closeRightTabs') }}
             </n-button>
             <n-button @click="closeOtherTabs">
-              关闭其他标签页
+              {{ $t('common.layout.tabs.closeOtherTabs') }}
             </n-button>
             <n-button @click="closeAllTabs">
-              关闭所有标签页
+              {{ $t('common.layout.tabs.closeAllTabs') }}
             </n-button>
           </n-space>
         </n-space>

@@ -5,6 +5,7 @@ import { useEventListener } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { $t } from '@/locales/locales'
 import { useLayoutStore } from '@/store/use-layout-store'
 import { CACHE_KEY } from '@/store/use-tabs-store'
 import { useTabContextMenu } from './composables/use-tab-context-menu'
@@ -13,14 +14,8 @@ import { useTabbarTransition } from './composables/use-tab-transition'
 
 const route = useRoute()
 const router = useRouter()
-const {
-  routes,
-  activeIndex,
-  add,
-  remove,
-  removes,
-  guards,
-} = router.visitedRoutesPlugin
+const { routes, activeIndex, add, remove, removes, guards }
+  = router.visitedRoutesPlugin
 
 const { showNav, tabbarTheme, showSidebar, tabbarCache } = storeToRefs(
   useLayoutStore(),
@@ -28,7 +23,8 @@ const { showNav, tabbarTheme, showSidebar, tabbarCache } = storeToRefs(
 
 const { transitionProps } = useTabbarTransition()
 
-const { tabbarRef, tabListRef, handleWheel, scrollbarRef, updateNavScroll } = useTabScroll()
+const { tabbarRef, tabListRef, handleWheel, scrollbarRef, updateNavScroll }
+  = useTabScroll()
 
 const {
   showDropdown,
@@ -163,7 +159,11 @@ watch(
               :icon="tab.meta.icon"
               class="tabbar__item__icon"
             />
-            <span>{{ tab.meta?.title || tab.name || tab.path }}</span>
+            <span>{{
+              tab.meta?.titleI18nKey
+                ? $t(tab.meta.titleI18nKey)
+                : tab.meta?.title
+            }}</span>
             <icon
               v-if="tab.meta?.affixed"
               class="tabbar__item__extra"
@@ -181,28 +181,42 @@ watch(
       </div>
     </n-scrollbar>
     <div class="tabbar__actions">
-      <pro-button
-        quaternary
-        circle
-        size="small"
-        @click="handleFullscreen"
-      >
-        <template #icon>
-          <icon
-            :icon="isFullscreen ? 'mdi:fullscreen-exit' : 'mdi:fullscreen'"
-          />
+      <n-tooltip>
+        <template #trigger>
+          <pro-button
+            quaternary
+            circle
+            size="small"
+            @click="handleFullscreen"
+          >
+            <template #icon>
+              <icon
+                :icon="isFullscreen ? 'mdi:fullscreen-exit' : 'mdi:fullscreen'"
+              />
+            </template>
+          </pro-button>
         </template>
-      </pro-button>
-      <pro-button
-        quaternary
-        circle
-        size="small"
-        @click="$router.refresh()"
-      >
-        <template #icon>
-          <icon icon="mdi:refresh" />
+        {{
+          isFullscreen
+            ? $t('common.layout.tabs.exitFullscreen')
+            : $t('common.layout.tabs.fullscreen')
+        }}
+      </n-tooltip>
+      <n-tooltip>
+        <template #trigger>
+          <pro-button
+            quaternary
+            circle
+            size="small"
+            @click="$router.refresh()"
+          >
+            <template #icon>
+              <icon icon="mdi:refresh" />
+            </template>
+          </pro-button>
         </template>
-      </pro-button>
+        {{ $t('common.layout.tabs.refresh') }}
+      </n-tooltip>
     </div>
     <n-dropdown
       :show="showDropdown"

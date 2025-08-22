@@ -2,6 +2,7 @@ import type { DropdownOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
 import { h, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { $t } from '@/locales/locales'
 
 export function useTabContextMenu() {
   const router = useRouter()
@@ -33,39 +34,39 @@ export function useTabContextMenu() {
     const wasAffixed = currentSelectVisitRoute.meta?.affixed
     const options = [
       {
-        label: wasAffixed ? '取消固定' : '固定',
+        label: wasAffixed ? $t('common.layout.tabs.unpin') : $t('common.layout.tabs.pin'),
         key: 'toggleAffixed',
         icon: createIcon(wasAffixed ? 'mdi:pin-off-outline' : 'mdi:pin-outline'),
       },
       {
-        label: '关闭左侧',
+        label: $t('common.layout.tabs.closeLeft'),
         key: 'closeLeft',
         icon: createIcon('tabler:arrow-bar-to-left'),
       },
       {
-        label: '关闭右侧',
+        label: $t('common.layout.tabs.closeRight'),
         key: 'closeRight',
         icon: createIcon('tabler:arrow-bar-to-right'),
       },
       {
-        label: '关闭其他',
+        label: $t('common.layout.tabs.closeOthers'),
         key: 'closeOther',
         icon: createIcon('tabler:arrow-bar-both'),
       },
       {
-        label: '关闭全部',
+        label: $t('common.layout.tabs.closeAll'),
         key: 'closeAll',
         icon: createIcon('tabler:arrow-autofit-width'),
       },
       {
-        label: '在新窗口打开',
+        label: $t('common.layout.tabs.openInNewWindow'),
         key: 'openInNewTab',
         icon: createIcon('mdi:open-in-new'),
       },
     ]
     if (!wasAffixed) {
       options.unshift({
-        label: '关闭',
+        label: $t('common.layout.tabs.close'),
         key: 'close',
         icon: createIcon('ant-design:close-outlined'),
       })
