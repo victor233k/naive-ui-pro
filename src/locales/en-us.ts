@@ -143,6 +143,7 @@ export default {
         downloadImage: 'Download Image',
         downloadText: 'Download Text',
         downloadBase64: 'Download Base64 Data',
+        getBlob: 'Get Blob',
         fetchBlobResponse: 'Get Response',
         downloadSuccess: 'Download successful',
         downloadFailed: 'Download failed',
