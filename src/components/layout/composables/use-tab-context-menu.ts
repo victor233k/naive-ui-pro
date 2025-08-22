@@ -60,7 +60,7 @@ export function useTabContextMenu() {
       {
         label: '在新窗口打开',
         key: 'openInNewTab',
-        icon: createIcon('tabler:arrow-autofit-width'),
+        icon: createIcon('mdi:open-in-new'),
       },
     ]
     if (!wasAffixed) {

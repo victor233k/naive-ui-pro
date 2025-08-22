@@ -3,7 +3,7 @@ import type { RouteLocationNormalized } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useEventListener } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLayoutStore } from '@/store/use-layout-store'
 import { CACHE_KEY } from '@/store/use-tabs-store'
@@ -39,6 +39,7 @@ const {
 } = useTabContextMenu()
 
 const isFullscreen = ref(false)
+const isInitializing = ref(true)
 
 async function handleToggleAffix(index: number) {
   const currentSelectVisitRoute = routes[index]
@@ -76,58 +77,36 @@ guards.beforeRemove((index) => {
   if (routes[index]?.meta?.affixed) {
     return false
   }
-  return index
 })
 
 guards.afterRemove(() => {
-  // 如果当前关闭的标签页是最后一个，则跳转到首页
-  if (!routes.length) {
+  // 在还未进入页面初始化状态下不需要执行跳转到首页操作
+  // 且没有路由时才跳转首页
+  if (!isInitializing.value && !routes.length) {
     router.push('/')
   }
 })
 
-watch(
-  () => routes[activeIndex.value]?.fullPath,
-  (newPath) => {
-    if (newPath && newPath !== route.fullPath) {
-      router.push(newPath)
-    }
-  },
-)
-
 async function initTabs() {
   if (tabbarCache.value) {
-    removes(0, routes.length)
+    await removes(0, routes.length)
     const raw = localStorage.getItem(CACHE_KEY)
     const cachedTabs: RouteLocationNormalized[] = raw ? JSON.parse(raw) : []
-
     const currentFullPath = route.fullPath
-
-    // 先添加所有缓存的路由
     for (const tab of cachedTabs) {
       await add(tab)
     }
-
-    // 检查当前路由是否已经在缓存中
-    const currentTabExists = cachedTabs.some(tab => tab.fullPath === currentFullPath)
-
-    if (!currentTabExists) {
-      // 如果当前路由不在缓存中，添加当前路由
+    const existed = cachedTabs.some(tab => tab.fullPath === currentFullPath)
+    if (!existed) {
       await add(route)
     }
-    else {
-      // 如果当前路由在缓存中，找到对应的索引并设置为激活状态
-      const currentIndex = routes.findIndex(r => r.fullPath === currentFullPath)
-      if (currentIndex !== -1) {
-        activeIndex.value = currentIndex
-      }
-    }
   }
+
+  // 初始化完成后，将标志设置为 false
+  isInitializing.value = false
 }
 
-onMounted(() => {
-  initTabs()
-})
+initTabs()
 
 useEventListener('beforeunload', () => {
   if (tabbarCache.value) {
@@ -137,6 +116,15 @@ useEventListener('beforeunload', () => {
     localStorage.removeItem(CACHE_KEY)
   }
 })
+
+watch(
+  () => routes[activeIndex.value]?.fullPath,
+  (newPath) => {
+    if (newPath && route.fullPath && newPath !== route.fullPath) {
+      router.push(newPath)
+    }
+  },
+)
 </script>
 
 <template>

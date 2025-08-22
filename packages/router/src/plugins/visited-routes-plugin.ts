@@ -56,7 +56,7 @@ interface Interceptor {
   /**
    * 在添加路由之前执行
    */
-  beforeAdd?: (callback: (route: RouteLocationNormalized) => MaybePromise<RouteLocationNormalized | false>) => () => void
+  beforeAdd?: (callback: (route: RouteLocationNormalized) => MaybePromise<RouteLocationNormalized | false> | void) => () => void
   /**
    * 在添加路由之后执行
    */
@@ -64,7 +64,7 @@ interface Interceptor {
   /**
    * 在移除路由之前执行
    */
-  beforeRemove?: (callback: (index: number) => MaybePromise<number | false>) => () => void
+  beforeRemove?: (callback: (index: number) => MaybePromise<number | false> | void) => () => void
   /**
    * 在移除路由之后执行
    */
@@ -72,18 +72,21 @@ interface Interceptor {
   /**
    * 在移动路由之前执行
    */
-  beforeMove?: (callback: ([from, to]: [number, number]) => MaybePromise<[number, number] | false>) => () => void
+  beforeMove?: (callback: ([from, to]: [number, number]) => MaybePromise<[number, number] | false> | void) => () => void
   /**
    * 在移动路由之后执行
    */
   afterMove?: (callback: ([from, to]: [number, number]) => MaybePromise<void>) => () => void
 }
 
+type InterceptorParams<T> = T extends (arg: infer P) => any ? P : never
+type InterceptorReturn<T> = T extends (arg: any) => infer R ? R : never
+type ExtractInterceptor<T> = T extends (cb: infer Fn) => any ? Fn : never
+
 class InterceptorStore {
-  private interceptorsRecord: Record<
-    keyof Interceptor,
-    Set<Parameters<Interceptor[keyof Interceptor]>[0]>
-  >
+  private interceptorsRecord: {
+    [K in keyof Interceptor]: Set<ExtractInterceptor<NonNullable<Interceptor[K]>>>
+  }
 
   constructor() {
     this.interceptorsRecord = {
@@ -96,38 +99,39 @@ class InterceptorStore {
     }
   }
 
-  on = <T extends keyof Interceptor>(interceptorName: T, callback: Parameters<Interceptor[T]>[0]) => {
-    if (this.interceptorsRecord[interceptorName]) {
-      this.interceptorsRecord[interceptorName].add(callback)
-    }
+  on = <T extends keyof Interceptor>(
+    interceptorName: T,
+    callback: ExtractInterceptor<NonNullable<Interceptor[T]>>,
+  ) => {
+    this.interceptorsRecord[interceptorName].add(callback)
     const off = () => {
-      if (this.interceptorsRecord[interceptorName]) {
-        this.interceptorsRecord[interceptorName].delete(callback)
-      }
+      this.interceptorsRecord[interceptorName].delete(callback)
     }
     tryOnScopeDispose(off)
     return off
   }
 
-  run = async <T extends keyof Interceptor>(interceptorName: T, params: Parameters<Parameters<Interceptor[T]>[0]>[0]) => {
-    if (!this.interceptorsRecord[interceptorName]) {
-      return
-    }
+  run = async <T extends keyof Interceptor>(
+    interceptorName: T,
+    params: InterceptorParams<ExtractInterceptor<NonNullable<Interceptor[T]>>>,
+  ): Promise<Awaited<InterceptorReturn<ExtractInterceptor<NonNullable<Interceptor[T]>>>>> => {
     const interceptors = Array.from(this.interceptorsRecord[interceptorName])
-    let currentResult = params
+    let currentResult: any = params
     for (let i = 0; i < interceptors.length; i++) {
-      const result = await interceptors[i](currentResult as any)
+      const result = await interceptors[i](currentResult)
       if (result === false) {
-        return false
+        return false as any
       }
-      currentResult = result as any
+      if (result !== undefined) {
+        currentResult = result
+      }
     }
     return currentResult
   }
 
   clear = () => {
-    for (const interceptorName in this.interceptorsRecord) {
-      this.interceptorsRecord[interceptorName].clear()
+    for (const key in this.interceptorsRecord) {
+      this.interceptorsRecord[key as keyof Interceptor].clear()
     }
   }
 }
@@ -142,12 +146,12 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
       const result = await interceptorStore.run('beforeAdd', route)
       const successed = result !== false
       if (successed) {
-        const i = visitedRoutes.value.findIndex(item => isEqualRoute(item as RouteLocationNormalized, result))
+        const i = visitedRoutes.value.findIndex(item => isEqualRoute(item as RouteLocationNormalized, result || route))
         if (~i) {
           return false
         }
-        visitedRoutes.value.push(result)
-        await interceptorStore.run('afterAdd', result)
+        visitedRoutes.value.push(result || route)
+        await interceptorStore.run('afterAdd', result || route)
       }
       return successed
     }
@@ -165,8 +169,8 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
       const result = await interceptorStore.run('beforeMove', [from, to])
       const successed = result !== false
       if (successed) {
-        _move(visitedRoutes.value, result[0], result[1])
-        await interceptorStore.run('afterMove', result)
+        _move(visitedRoutes.value, result[0] ?? from, result[1] ?? to)
+        await interceptorStore.run('afterMove', result || [from, to])
       }
       return successed
     }
@@ -181,8 +185,8 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
       const result = await interceptorStore.run('beforeRemove', index)
       const successed = result !== false
       if (successed) {
-        visitedRoutes.value.splice(result, 1)
-        await interceptorStore.run('afterRemove', result)
+        visitedRoutes.value.splice(result || index, 1)
+        await interceptorStore.run('afterRemove', result || index)
       }
       return successed
     }
@@ -224,7 +228,9 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
     })
 
     interceptorStore.on('afterAdd', () => {
-      activeIndex.value = visitedRoutes.value.length - 1
+      const idx = visitedRoutes.value.findIndex(item => isEqualRoute(item as RouteLocationNormalized, router.currentRoute.value))
+      if (~idx)
+        activeIndex.value = idx
     })
 
     interceptorStore.on('afterRemove', (removedIndex) => {
@@ -232,6 +238,12 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
       if (removedIndex < i || (removedIndex === i && i === visitedRoutes.value.length)) {
         activeIndex.value--
       }
+    })
+
+    interceptorStore.on('afterMove', () => {
+      const idx = visitedRoutes.value.findIndex(item => isEqualRoute(item as RouteLocationNormalized, router.currentRoute.value))
+      if (~idx)
+        activeIndex.value = idx
     })
 
     router.afterEach((to) => {

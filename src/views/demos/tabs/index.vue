@@ -16,9 +16,7 @@ const {
 function openDynamicTitleTab() {
   const timestamp = Date.now()
 
-  // TODO: 拦截器返回卸载函数类型定义需修改
-  let off: () => void = () => {}
-  off = guards.beforeAdd((route) => {
+  const off = guards.beforeAdd((route) => {
     off()
     return {
       ...route,
