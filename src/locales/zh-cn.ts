@@ -126,6 +126,7 @@ export default {
         downloadImage: '下载图片',
         downloadText: '下载文本',
         downloadBase64: '下载base64数据',
+        getBlob: '获取Blob',
         fetchBlobResponse: '获取Response',
         downloadSuccess: '下载成功',
         downloadFailed: '下载失败',
