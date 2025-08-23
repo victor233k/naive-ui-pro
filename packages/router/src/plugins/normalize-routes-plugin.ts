@@ -72,7 +72,7 @@ function normalizeRouteResolvedComponent(
   namespace: string = 'default',
 ) {
   const currentRoute = route.matched[route.matched.length - 1]
-  const currentRouteComponent = currentRoute.components?.[namespace]
+  const currentRouteComponent = currentRoute?.components?.[namespace]
   if (!currentRouteComponent) {
     return
   }
