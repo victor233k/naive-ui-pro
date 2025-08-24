@@ -293,7 +293,6 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
       while (visitedRoutes.value.length > 0) {
         visitedRoutes.value.pop()
       }
-      interceptorStore.clear()
     }
 
     onUnmount(() => {
