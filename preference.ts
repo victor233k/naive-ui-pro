@@ -73,11 +73,7 @@ export const preferenceConfig = {
     /**
      * 标签页主题
      */
-    tabbarTheme: 'chrome',
-    /**
-     * 是否缓存标签页
-     */
-    tabbarCache: true,
+    tabsTheme: 'chrome',
     /**
      * 侧边栏折叠后的宽度
      */

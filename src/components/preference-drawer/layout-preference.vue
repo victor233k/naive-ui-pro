@@ -16,14 +16,18 @@ const {
   showFooter,
   showSidebar,
   footerFixed,
-  tabbarTheme,
-  tabbarCache,
+  tabsTheme,
   footerHeight,
   tabbarHeight,
   sidebarWidth,
   sidebarCollapsedWidth,
   sidebarCollapsedShowMenuTitle,
 } = storeToRefs(useLayoutStore())
+
+const tabsThemeOptions = computed(() => [
+  { label: $t('common.preference.layout.chrome'), value: 'chrome' },
+  { label: $t('common.preference.layout.card'), value: 'card' },
+])
 
 const layoutOptions = computed<Array<{ label: string, value: ProLayoutMode }>>(() => [
   { label: $t('common.preference.layout.vertical'), value: 'vertical' },
@@ -33,11 +37,6 @@ const layoutOptions = computed<Array<{ label: string, value: ProLayoutMode }>>((
   { label: $t('common.preference.layout.mixedSidebar'), value: 'mixed-sidebar' },
   { label: $t('common.preference.layout.fullContent'), value: 'full-content' },
   { label: $t('common.preference.layout.twoColumn'), value: 'two-column' },
-])
-
-const tabbarThemeOptions = computed<Array<{ label: string, value: 'chrome' | 'card' }>>(() => [
-  { label: $t('common.preference.layout.chrome'), value: 'chrome' },
-  { label: $t('common.preference.layout.card'), value: 'card' },
 ])
 </script>
 
@@ -110,10 +109,6 @@ const tabbarThemeOptions = computed<Array<{ label: string, value: 'chrome' | 'ca
         <n-switch v-model:value="showTabbar" />
       </div>
       <div class="preference-item">
-        <span>{{ $t('common.preference.layout.cacheTab') }}</span>
-        <n-switch v-model:value="tabbarCache" />
-      </div>
-      <div class="preference-item">
         <span>{{ $t('common.preference.layout.tabbarHeight') }}</span>
         <n-input-number
           v-model:value="tabbarHeight"
@@ -123,9 +118,9 @@ const tabbarThemeOptions = computed<Array<{ label: string, value: 'chrome' | 'ca
       <div class="preference-item">
         <span>{{ $t('common.preference.layout.tabbarTheme') }}</span>
         <n-select
-          v-model:value="tabbarTheme"
+          v-model:value="tabsTheme"
           class="w-120px"
-          :options="tabbarThemeOptions"
+          :options="tabsThemeOptions"
         />
       </div>
     </n-flex>

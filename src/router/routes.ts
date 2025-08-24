@@ -96,6 +96,7 @@ const accessRoutes: RouteRecordRaw[] = [
             component: () => import('@/views/demos/fallback/403.vue'),
             meta: {
               title: '403',
+              titleI18nKey: 'routes.403',
               icon: 'mdi:forbid',
             },
           },
@@ -104,6 +105,7 @@ const accessRoutes: RouteRecordRaw[] = [
             component: () => import('@/views/demos/fallback/404.vue'),
             meta: {
               title: '404',
+              titleI18nKey: 'routes.404',
               icon: 'ic:baseline-browser-not-supported',
             },
           },
@@ -112,6 +114,7 @@ const accessRoutes: RouteRecordRaw[] = [
             component: () => import('@/views/demos/fallback/500.vue'),
             meta: {
               title: '500',
+              titleI18nKey: 'routes.500',
               icon: 'streamline-flex:monitor-error',
             },
           },
@@ -267,6 +270,7 @@ const accessRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/demos/tabs/index.vue'),
         meta: {
           title: '多标签',
+          titleI18nKey: 'routes.tabs',
           icon: 'mdi:tab',
         },
       },

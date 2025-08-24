@@ -14,10 +14,14 @@ export const useThemeStore = defineStore('theme', () => {
     return theme.mode === 'dark' || (theme.mode === 'auto' && systemThemeIsDark.value)
   })
 
-  const themeProps = computed<ProConfigProviderProps>(() => {
-    const colors = generate(theme.primaryColor, {
+  const primaryColors = computed(() => {
+    return generate(theme.primaryColor, {
       theme: isDark.value ? 'dark' : 'default',
     })
+  })
+
+  const themeProps = computed<ProConfigProviderProps>(() => {
+    const colors = primaryColors.value
     return {
       theme: isDark.value ? darkTheme : undefined,
       themeOverrides: {
@@ -90,6 +94,7 @@ export const useThemeStore = defineStore('theme', () => {
   return {
     isDark,
     themeProps,
+    primaryColors,
     ...toRefs(theme),
     toggleThemeMode,
     toggleThemeModeWithAnimation,
