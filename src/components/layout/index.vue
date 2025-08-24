@@ -44,6 +44,7 @@ const {
   layout,
   fullKeys,
   activeKey,
+  verticalLayout,
 } = useLayoutMenu({
   mode,
   menus: computed(() => router.buildMenus()),
@@ -137,7 +138,7 @@ async function pushTo(path: string) {
       <mobile-sidebar-drawer :collapsed-width="finalSidebarCollapsedWidth">
         <n-scrollbar class="flex-[1_0_0]">
           <pro-menu
-            v-bind="layout.verticalMenuProps"
+            v-bind="verticalLayout.verticalMenuProps"
             :indent="18"
             :collapsed-width="finalSidebarCollapsedWidth"
             :collapsed-show-title="sidebarCollapsedShowMenuTitle"
