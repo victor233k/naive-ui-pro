@@ -2,6 +2,7 @@ import type { WritableComputedRef } from 'vue'
 import type { RouteLocationNormalized } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { tryOnScopeDispose } from '@vueuse/core'
+import { cloneDeep } from 'lodash-es'
 import { move as _move } from 'pro-composables'
 import { computed, ref } from 'vue'
 import { warn } from '../utils/warn'
@@ -139,7 +140,7 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
     const visitedRoutes = ref<RouteLocationNormalized[]>([])
 
     async function add(route: RouteLocationNormalized) {
-      const result = await interceptorStore.run('beforeAdd', route)
+      const result = await interceptorStore.run('beforeAdd', cloneDeep(route))
       const successed = result !== false
       if (successed) {
         const i = visitedRoutes.value.findIndex(item => isEqualRoute(item as RouteLocationNormalized, result))
@@ -234,10 +235,14 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
       }
     })
 
+    interceptorStore.on('afterMove', ([_, targetIndex]) => {
+      activeIndex.value = targetIndex
+    })
+
     router.afterEach((to) => {
       const invalidRoute = to.matched.length === 0
       if (!invalidRoute) {
-        add(to)
+        add({ ...to, path: to.fullPath })
       }
     })
 
