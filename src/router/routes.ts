@@ -266,7 +266,38 @@ const accessRoutes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'keep-alive',
+        children: [
+          {
+            path: 'demo1',
+            component: () => import('@/views/demos/keep-alive/demo1.vue'),
+            meta: {
+              title: '基础缓存',
+              titleI18nKey: 'routes.keepAliveDemo1',
+              keepAlive: true,
+            },
+          },
+          {
+            path: 'demo2',
+            component: () => import('@/views/demos/keep-alive/demo2.vue'),
+            meta: {
+              title: '条件缓存',
+              titleI18nKey: 'routes.keepAliveDemo2',
+              keepAlive: {
+                include: ['Tabs'],
+              },
+            },
+          },
+        ],
+        meta: {
+          title: '缓存路由',
+          titleI18nKey: 'routes.keepAlive',
+          icon: 'octicon:cache-16',
+        },
+      },
+      {
         path: 'tabs',
+        name: 'Tabs',
         component: () => import('@/views/demos/tabs/index.vue'),
         meta: {
           title: '多标签',

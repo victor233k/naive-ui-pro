@@ -101,7 +101,6 @@ export default {
           user: '普通用户',
         },
       },
-
       icon: {
         remoteSearch1: '远程搜索-风格1',
         remoteSearch2: '远程搜索-风格2',
@@ -158,6 +157,18 @@ export default {
         detailTitle: '详情页',
         detailDescription: '详情页，它不在菜单中，也可以高亮菜单',
         backToList: '返回列表页',
+      },
+      keepAlive: {
+        basicCache: {
+          title: '基础缓存',
+          description: '这是一个演示 keep-alive 基础功能的页面',
+          inputPlaceholder: '请输入内容测试缓存...',
+        },
+        conditionalCache: {
+          title: '条件缓存',
+          description: '只有从多标签页面进入时，才会缓存',
+          inputPlaceholder: '请输入内容测试缓存...',
+        },
       },
     },
     home: {
@@ -414,5 +425,8 @@ export default {
     403: '403',
     404: '404',
     500: '500',
+    keepAlive: '缓存路由示例',
+    keepAliveDemo1: '基础缓存',
+    keepAliveDemo2: '条件缓存',
   },
 } as const

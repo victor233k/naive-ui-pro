@@ -115,7 +115,6 @@ export default {
           user: 'Regular User',
         },
       },
-
       // Icon demo
       icon: {
         remoteSearch1: 'Remote Search - Style 1',
@@ -125,7 +124,6 @@ export default {
         remoteSearchTooltip1: 'Remote search options when echoing',
         remoteSearchTooltip2: 'Merge options when echoing',
       },
-
       // Download demo
       download: {
         title: 'File Download',
@@ -175,6 +173,18 @@ export default {
         detailTitle: 'Detail Page',
         detailDescription: 'Detail page that is not in the menu but can highlight the menu',
         backToList: 'Back to list',
+      },
+      keepAlive: {
+        basicCache: {
+          title: 'Basic Cache',
+          description: 'This is a page demonstrating basic keep-alive functionality',
+          inputPlaceholder: 'Please enter content to test cache...',
+        },
+        conditionalCache: {
+          title: 'Conditional Cache',
+          description: 'Only cached when entering from multi-tab page',
+          inputPlaceholder: 'Please enter content to test cache...',
+        },
       },
     },
 
@@ -460,5 +470,8 @@ export default {
     403: '403',
     404: '404',
     500: '500',
+    keepAlive: 'Keep Alive',
+    keepAliveDemo1: 'Basic Cache',
+    keepAliveDemo2: 'Conditional Cache',
   },
 } as const
