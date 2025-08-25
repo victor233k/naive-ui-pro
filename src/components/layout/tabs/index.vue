@@ -31,6 +31,7 @@ const {
 
 const {
   tabsRef,
+  handleWheel,
   scrollbarRef,
   scrollbarContainerCls,
 } = useScroll()
@@ -102,6 +103,7 @@ watch(
       railColor: 'transparent',
     }"
     :content-style="{ height: '100%' }"
+    @wheel.prevent="handleWheel"
   >
     <div
       ref="tabsRef"

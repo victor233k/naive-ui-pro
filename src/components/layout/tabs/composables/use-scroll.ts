@@ -33,6 +33,15 @@ export function useScroll() {
     })
   }
 
+  function handleWheel(event: WheelEvent) {
+    if (scrollbarRef.value) {
+      scrollbarRef.value.scrollBy({
+        left: event.deltaY,
+        behavior: 'smooth',
+      })
+    }
+  }
+
   watch(
     () => router.visitedRoutesPlugin.routes[activeIndex.value]?.path,
     () => {
@@ -58,6 +67,7 @@ export function useScroll() {
 
   return {
     tabsRef,
+    handleWheel,
     scrollbarRef,
     updateTabsScroll,
     scrollbarContainerCls,
