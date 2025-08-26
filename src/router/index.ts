@@ -29,6 +29,7 @@ import { useUserStore } from '@/store/use-user-store'
 import http from '@/utils/axios'
 import { layoutFalsyPlugin } from './plugins/layout-falsy-plugin'
 import { stateCleanupPlugin } from './plugins/state-cleanup-plugin'
+import { tabsPlugin } from './plugins/tabs-plugin'
 
 import {
   accessRoutes,
@@ -190,6 +191,10 @@ export async function setupRouter(app: App) {
        * 状态清理插件
        */
       stateCleanupPlugin(),
+      /**
+       * tabs 插件
+       */
+      tabsPlugin(),
     ],
   })
   app.use(router)

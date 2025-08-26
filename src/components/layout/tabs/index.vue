@@ -4,7 +4,6 @@ import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ROOT_ROUTE_NAME } from '@/router/routes'
 import { useLayoutStore } from '@/store/use-layout-store'
 import { useThemeStore } from '@/store/use-theme-store'
 import { useContextMenu } from './composables/use-context-menu'
@@ -18,7 +17,6 @@ const {
   routes,
   activeIndex,
   remove,
-  guards,
 } = router.visitedRoutesPlugin
 
 const {
@@ -64,22 +62,6 @@ function onBeforeLeave(el: Element) {
     height: `${offsetHeight}px`,
   })
 }
-
-// 如果不是 layout 页面中的路由，则跳过添加
-guards.beforeAdd((route) => {
-  if (route.matched[0].name !== ROOT_ROUTE_NAME) {
-    return false
-  }
-  return route
-})
-
-// 如果当前关闭的标签页是已固定的，则阻止关闭
-guards.beforeRemove((index) => {
-  if (routes[index]?.meta?.fixedInTabs) {
-    return false
-  }
-  return index
-})
 
 watch(
   () => routes[activeIndex.value]?.path,
