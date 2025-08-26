@@ -1,6 +1,15 @@
 import type { ProRouterPlugin } from '@pro/router'
 import { ROOT_ROUTE_NAME } from '../routes'
 
+declare module 'vue-router' {
+  interface RouteMeta {
+    /**
+     * 是否固定在多页签中
+     */
+    fixedInTabs?: boolean
+  }
+}
+
 /**
  * tabs 相关处理插件，这个插件与 admin 强关联，所以不放在 @pro/router 中
  */
