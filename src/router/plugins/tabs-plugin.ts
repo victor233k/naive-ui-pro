@@ -1,4 +1,9 @@
 import type { ProRouterPlugin } from '@pro/router'
+import type { RouteLocationNormalized } from 'vue-router'
+import { isEqualRoute } from '@pro/router'
+import { useEventListener } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
+import { useLayoutStore } from '@/store/use-layout-store'
 import { ROOT_ROUTE_NAME } from '../routes'
 
 declare module 'vue-router' {
@@ -16,8 +21,13 @@ declare module 'vue-router' {
 export function tabsPlugin(): ProRouterPlugin {
   return ({ router }) => {
     const {
+      tabsPersist,
+    } = storeToRefs(useLayoutStore())
+
+    const {
       routes,
       guards,
+      activeIndex,
     } = router.visitedRoutesPlugin
 
     // 如果不是 layout 页面中的路由，则跳过添加
@@ -35,5 +45,45 @@ export function tabsPlugin(): ProRouterPlugin {
       }
       return index
     })
+
+    // 标签页持久化
+    if (tabsPersist.value) {
+      const off = guards.beforeAdd((route) => {
+        const [finalIndex, finalTabs] = resolveActiveIndexAndTabs(route)
+        Object.assign(routes, finalTabs)
+        activeIndex.value = finalIndex
+        off()
+        return false
+      })
+    }
+    useEventListener('beforeunload', () => {
+      tabsPersist.value
+        ? localStorage.setItem('tabs', JSON.stringify(routes))
+        : localStorage.removeItem('tabs')
+    })
   }
+}
+
+function getTabsFromStorage(): RouteLocationNormalized[] {
+  const tabs = localStorage.getItem('tabs')
+  if (tabs) {
+    return JSON.parse(tabs)
+  }
+  return []
+}
+
+function resolveActiveIndexAndTabs(route: RouteLocationNormalized): [number, RouteLocationNormalized[]] {
+  const cachedTabs = getTabsFromStorage()
+  const index = cachedTabs.findIndex(item => isEqualRoute(item, route))
+  if (~index) {
+    return [
+      index,
+      cachedTabs,
+    ]
+  }
+  const finalTabs = [...cachedTabs, route]
+  return [
+    finalTabs.length - 1,
+    finalTabs,
+  ]
 }
