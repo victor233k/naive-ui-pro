@@ -57,8 +57,9 @@ export function tabsPlugin(): ProRouterPlugin {
       })
     }
     useEventListener('beforeunload', () => {
+      // 需要 map 处理一下，matched 存在循环引用，导致 JSON.stringify 报错
       tabsPersist.value
-        ? localStorage.setItem('tabs', JSON.stringify(routes))
+        ? localStorage.setItem('tabs', JSON.stringify(routes.map(item => ({ ...item, matched: [] }))))
         : localStorage.removeItem('tabs')
     })
   }
