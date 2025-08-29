@@ -15,11 +15,12 @@
 
 ## 预览
 
-[`naive-ui-pro`](https://naive-ui-pro.pro-components.cn)
+[admin 预览地址](https://naive-ui-pro.pro-components.cn)
 
 ## 文档
 
-[`pro-naive-ui`](https://naive-ui.pro-components.cn)
+[组件库文档地址](https://naive-ui.pro-components.cn/)
+[admin 文档地址](https://docs-naive-ui-pro.pro-components.cn/)
 
 ## 示例图片
 
