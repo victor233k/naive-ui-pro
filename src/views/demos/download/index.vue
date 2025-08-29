@@ -118,13 +118,13 @@ async function handleGetResponse() {
         />
         <n-space>
           <n-button
-            type="info"
+            type="primary"
             @click="handleGetBlob"
           >
             {{ $t('pages.demos.download.getBlob') }}
           </n-button>
           <n-button
-            type="info"
+            type="primary"
             @click="handleGetResponse"
           >
             {{ $t('pages.demos.download.fetchBlobResponse') }}
