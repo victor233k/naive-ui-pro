@@ -44,20 +44,21 @@ export function keepAlivePlugin({
   return ({ router, onUnmount }) => {
     const cachedComponentNames = router.cachedComponentNames = ref<string[]>([])
 
-    router.beforeEach((to, from) => {
-      const fromName = getRouteComponentName(from)
-      if (!fromName) {
+    router.beforeResolve((to, from) => {
+      // 判断 from 路由组件是否需要被缓存
+      if (matched(to, from, defaultKeepAlive)) {
+        const fromName = getRouteComponentName(from)
+        cachedComponentNames.value = Array.from(new Set([
+          ...cachedComponentNames.value,
+          fromName,
+        ]))
         return
       }
-      if (matched(to, from, defaultKeepAlive)) {
-        if (!cachedComponentNames.value.includes(fromName)) {
-          cachedComponentNames.value.push(fromName)
-        }
-      }
-      else {
-        if (cachedComponentNames.value.includes(fromName)) {
-          cachedComponentNames.value = cachedComponentNames.value.filter(name => name !== fromName)
-        }
+
+      // 判断 to 路由组件是否需要被删除
+      if (!matched(from, to, defaultKeepAlive)) {
+        const toName = getRouteComponentName(to)
+        cachedComponentNames.value = cachedComponentNames.value.filter(name => name !== toName)
       }
     })
 
