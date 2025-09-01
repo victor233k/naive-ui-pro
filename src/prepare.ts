@@ -4,6 +4,7 @@ import { merge } from 'lodash-es'
 import { create, ProInput, ProSelect } from 'pro-naive-ui'
 import { ProIconifyIcons, ProIconifyIcons2 } from './components/iconify-icons'
 import { WangEditor } from './components/wang-editor'
+import { setupDirective } from './directive'
 import { setupI18n } from './locales/locales'
 import { setupRouter } from './router'
 import { setupPinia } from './store'
@@ -19,6 +20,7 @@ export async function prepareMount(app: App) {
   await setupRouter(app)
   setupI18n(app)
   setupComponents(app)
+  setupDirective(app)
 }
 
 function setupComponents(app: App) {

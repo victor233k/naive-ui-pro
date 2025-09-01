@@ -323,6 +323,15 @@ const accessRoutes: RouteRecordRaw[] = [
           icon: 'mdi:image-outline',
         },
       },
+      {
+        path: 'loading',
+        component: () => import('@/views/demos/loading/index.vue'),
+        meta: {
+          title: 'Loading 指令',
+          titleI18nKey: 'routes.loading',
+          icon: 'mdi:loading',
+        },
+      },
     ],
     meta: {
       title: '演示',
