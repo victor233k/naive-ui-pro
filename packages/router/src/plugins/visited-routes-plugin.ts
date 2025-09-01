@@ -234,8 +234,19 @@ export function visitedRoutesPlugin(): ProRouterPlugin {
       }
     })
 
-    interceptorStore.on('afterMove', ([_, targetIndex]) => {
-      activeIndex.value = targetIndex
+    interceptorStore.on('afterMove', ([from, to]) => {
+      const i = activeIndex.value
+      if (from === i) {
+        activeIndex.value = to
+        return
+      }
+      if (from < i && to >= i) {
+        activeIndex.value--
+        return
+      }
+      if (from > i && to <= i) {
+        activeIndex.value++
+      }
     })
 
     router.afterEach((to) => {

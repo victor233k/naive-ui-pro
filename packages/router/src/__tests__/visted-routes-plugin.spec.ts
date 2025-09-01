@@ -262,4 +262,43 @@ describe('visited-routes-plugin', () => {
 
     router.unmount()
   })
+
+  it('mock fixedTabs', async () => {
+    const router = await setupRouter()
+    const activeIndex = router.visitedRoutesPlugin.activeIndex
+
+    await restoreRoutes(router)
+    activeIndex.value = 3
+    await router.visitedRoutesPlugin.move(0, 2)
+    await vi.runAllTimersAsync()
+    expect(activeIndex.value).toBe(3)
+    await router.visitedRoutesPlugin.move(3, 4)
+    await vi.runAllTimersAsync()
+    expect(activeIndex.value).toBe(4)
+
+    await restoreRoutes(router)
+    activeIndex.value = 2
+    await router.visitedRoutesPlugin.move(3, 4)
+    await vi.runAllTimersAsync()
+    expect(activeIndex.value).toBe(2)
+
+    await router.visitedRoutesPlugin.move(1, 4)
+    await vi.runAllTimersAsync()
+    expect(activeIndex.value).toBe(1)
+    activeIndex.value = 2
+    await router.visitedRoutesPlugin.move(4, 1)
+    await vi.runAllTimersAsync()
+    expect(activeIndex.value).toBe(3)
+
+    await router.visitedRoutesPlugin.move(0, 3)
+    await vi.runAllTimersAsync()
+    expect(activeIndex.value).toBe(2)
+
+    activeIndex.value = 2
+    await router.visitedRoutesPlugin.move(4, 2)
+    await vi.runAllTimersAsync()
+    expect(activeIndex.value).toBe(3)
+
+    router.unmount()
+  })
 })
