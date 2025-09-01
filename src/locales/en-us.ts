@@ -259,6 +259,7 @@ export default {
       // User avatar component
       userAvatar: {
         documentation: 'Documentation',
+        documentationForProNaiveUI: 'ProNaiveUI Documentation',
         logout: 'Logout',
         logoutConfirmTitle: 'Confirm',
         logoutConfirmContent: 'Are you sure you want to logout?',

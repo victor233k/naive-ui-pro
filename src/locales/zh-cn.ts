@@ -234,6 +234,7 @@ export default {
     layout: {
       userAvatar: {
         documentation: '文档',
+        documentationForProNaiveUI: '组件库文档',
         logout: '退出登录',
         logoutConfirmTitle: '提示',
         logoutConfirmContent: '确认退出登录吗？',

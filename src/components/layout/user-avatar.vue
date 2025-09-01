@@ -27,6 +27,17 @@ const options = computed<DropdownMixedOption[]>(() => [
     },
   },
   {
+    label: $t('common.layout.userAvatar.documentationForProNaiveUI'),
+    key: 'docProNaiveUI',
+    icon: () => {
+      return (
+        <NIcon>
+          <Icon icon="formkit:filedoc" />
+        </NIcon>
+      )
+    },
+  },
+  {
     label: 'Github',
     key: 'github',
     icon: () => {
@@ -55,10 +66,16 @@ const options = computed<DropdownMixedOption[]>(() => [
 
 function handleSelect(key: string) {
   if (key === 'doc') {
+    window.open('https://docs-naive-ui-pro.pro-components.cn', '_blank')
+    return
+  }
+  if (key === 'docProNaiveUI') {
     window.open('https://naive-ui.pro-components.cn', '_blank')
+    return
   }
   if (key === 'github') {
     window.open('https://github.com/Zheng-Changfu/naive-ui-pro', '_blank')
+    return
   }
   if (key === 'logout') {
     dialog.info({
