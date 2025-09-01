@@ -306,6 +306,8 @@ export default {
         card: '卡片',
         showLogo: '显示logo',
         layoutMode: '布局模式',
+        menuGroup: '菜单分组',
+        menuDivider: '菜单分割线',
         header: '顶栏',
         showHeader: '显示顶栏',
         fixedHeader: '固定顶栏',

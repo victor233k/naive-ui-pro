@@ -1,4 +1,5 @@
-<script setup lang='ts'>
+<script setup lang='tsx'>
+import type { MenuOption } from 'naive-ui'
 import type { ProLayoutMode } from 'pro-naive-ui'
 import { isNil } from 'lodash-es'
 import { useThemeVars } from 'naive-ui'
@@ -35,6 +36,8 @@ const {
   footerHeight,
   sidebarWidth,
   tabbarHeight,
+  sidebarMenuGroup,
+  sidebarMenuDivider,
   sidebarCollapsedWidth,
   sidebarCollapsedShowMenuTitle,
   sidebarCollapsedWidthWhenShowMenuTitle,
@@ -101,6 +104,47 @@ function findAvailableMenuKey() {
   }
 }
 
+function handleMenuGroupAndDivider(menus: MenuOption[] = []) {
+  let finalMenus: MenuOption[] = menus
+  // 处理菜单分组
+  if (sidebarMenuGroup.value) {
+    finalMenus = finalMenus.map((item) => {
+      if ((item.children ?? []).length <= 0) {
+        return item
+      }
+      const { icon, label, ...rest } = item
+      return {
+        ...rest,
+        type: 'group',
+        label: () => {
+          return icon
+            ? (
+                <div class="flex items-center gap-8px">
+                  <span class="pl-3px">{icon()}</span>
+                  {label}
+                </div>
+              )
+            : label
+        },
+      }
+    })
+  }
+  // 处理菜单分割线
+  if (sidebarMenuDivider.value) {
+    const tempMenus: MenuOption[] = []
+    finalMenus.forEach((item) => {
+      tempMenus.push(item)
+      if ((item.children ?? []).length > 0) {
+        tempMenus.push({
+          type: 'divider',
+        })
+      }
+    })
+    finalMenus = tempMenus
+  }
+  return finalMenus
+}
+
 async function pushTo(path: string) {
   const failure = await router.push(path)
   if (failure) {
@@ -142,6 +186,7 @@ async function pushTo(path: string) {
             :indent="18"
             :collapsed-width="finalSidebarCollapsedWidth"
             :collapsed-show-title="sidebarCollapsedShowMenuTitle"
+            :options="handleMenuGroupAndDivider(verticalLayout.verticalMenuProps.options)"
             @update:value="pushTo"
           />
         </n-scrollbar>
@@ -173,6 +218,7 @@ async function pushTo(path: string) {
             :indent="18"
             :collapsed-width="finalSidebarCollapsedWidth"
             :collapsed-show-title="sidebarCollapsedShowMenuTitle"
+            :options="handleMenuGroupAndDivider(layout.verticalMenuProps.options)"
             @update:value="pushTo"
           />
         </n-scrollbar>
@@ -192,6 +238,7 @@ async function pushTo(path: string) {
             :indent="18"
             :collapsed-width="finalSidebarCollapsedWidth"
             :collapsed-show-title="sidebarCollapsedShowMenuTitle"
+            :options="handleMenuGroupAndDivider(layout.verticalExtraMenuProps.options)"
             @update:value="pushTo"
           />
         </n-scrollbar>

@@ -22,7 +22,7 @@ export const useUserStore = defineStore('user', () => {
   const route = useRoute()
   const router = useRouter()
   const loading = ref(false)
-  const routes = ref<RouteRecordRaw[]>([]) // 当前角色拥有的路由
+  const routes = ref<RouteRecordRaw[]>([]) // 当前角色拥有的路由，Admin 中根据此数据生成菜单
 
   const user = ref<UserInfo>({
     name: '',

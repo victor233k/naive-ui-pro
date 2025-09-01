@@ -90,6 +90,14 @@ export const preferenceConfig = {
      * 当展示菜单标题时，侧边栏折叠后的宽度
      */
     sidebarCollapsedWidthWhenShowMenuTitle: 80,
+    /**
+     * 是否开启侧边栏菜单分组
+     */
+    sidebarMenuGroup: false,
+    /**
+     * 是否开启侧边栏菜单分割线
+     */
+    sidebarMenuDivider: false,
   },
   theme: {
     /**

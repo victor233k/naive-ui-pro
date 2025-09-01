@@ -21,6 +21,8 @@ const {
   footerHeight,
   tabbarHeight,
   sidebarWidth,
+  sidebarMenuGroup,
+  sidebarMenuDivider,
   sidebarCollapsedWidth,
   sidebarCollapsedShowMenuTitle,
 } = storeToRefs(useLayoutStore())
@@ -58,6 +60,14 @@ const layoutOptions = computed<Array<{ label: string, value: ProLayoutMode }>>((
         class="w-150px"
         :options="layoutOptions"
       />
+    </div>
+    <div class="preference-item">
+      <span>{{ $t('common.preference.layout.menuGroup') }}</span>
+      <n-switch v-model:value="sidebarMenuGroup" />
+    </div>
+    <div class="preference-item">
+      <span>{{ $t('common.preference.layout.menuDivider') }}</span>
+      <n-switch v-model:value="sidebarMenuDivider" />
     </div>
   </n-flex>
 

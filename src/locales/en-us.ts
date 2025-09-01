@@ -337,6 +337,8 @@ export default {
         card: 'Card',
         showLogo: 'Show Logo',
         layoutMode: 'Layout Mode',
+        menuGroup: 'Menu Group',
+        menuDivider: 'Menu Divider',
         header: 'Header',
         showHeader: 'Show Header',
         fixedHeader: 'Fixed Header',
