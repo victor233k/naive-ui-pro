@@ -22,7 +22,9 @@ import {
   visitedRoutesPlugin,
 } from '@pro/router'
 
+import { h } from 'vue'
 import { createWebHistory } from 'vue-router'
+import IframeContainer from '@/components/iframe/index.vue'
 import { $t } from '@/locales/locales'
 import { useAppStore } from '@/store/use-app-store'
 import { useUserStore } from '@/store/use-user-store'
@@ -90,7 +92,11 @@ export async function setupRouter(app: App) {
       /**
        * 外链插件，用于处理外链跳转
        */
-      linkPlugin(),
+      linkPlugin({
+        renderIframe: (url) => {
+          return h(IframeContainer, { url })
+        },
+      }),
       /**
        * 路由缓存插件
        */

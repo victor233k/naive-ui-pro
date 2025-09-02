@@ -1,3 +1,4 @@
+import type { VNodeChild } from 'vue'
 import type { RouteLocationNormalizedGeneric, Router } from 'vue-router'
 import type { ProRouterPlugin } from '../plugin'
 import { defineComponent } from 'vue'
@@ -32,7 +33,10 @@ declare module 'vue-router' {
      * @internal
      */
 
-    [IFRAME_CONFIG]?: { src: string }
+    [IFRAME_CONFIG]?: {
+      src: string
+      renderIframe: (url: string) => VNodeChild
+    }
     /**
      * @internal
      */
@@ -52,36 +56,54 @@ export interface LinkPluginOptions {
    * ```
    */
   openInNewWindow?: (url: string) => void
+  /**
+   * 自定义 iframe 渲染方式
+   * @default
+   * ```ts
+   * (url) => <iframe
+        class="size-full border-none overflow-hidden"
+        src={url}
+      >
+      </iframe>
+   * ```
+   */
+  renderIframe?: (url: string) => VNodeChild
 }
 
 const BuiltinIframeComponent = /* @__PURE__ */ defineComponent({
   setup() {
     const route = useRoute()
-    const { src } = route.meta?.[IFRAME_CONFIG] ?? {}
+    const { src, renderIframe } = route.meta?.[IFRAME_CONFIG] ?? {}
 
     if (__DEV__) {
       if (!src) {
         warn(`'src' not found in 'route.meta[IFRAME_CONFIG]'!`)
       }
+      if (!renderIframe) {
+        warn(`'renderIframe' not found in 'route.meta[IFRAME_CONFIG]'!`)
+      }
     }
 
     return {
       src,
+      renderIframe,
     }
   },
   render() {
-    return (
-      <iframe
-        class="size-full border-none overflow-hidden"
-        src={this.src}
-      >
-      </iframe>
-    )
+    return this.renderIframe(this.src)
   },
 })
 
 export function linkPlugin({
-  openInNewWindow = url => window.open(url, '_blank'),
+  openInNewWindow = url => (
+    window.open(url, '_blank')
+  ),
+  renderIframe = url => (
+    <iframe
+      class="size-full border-none overflow-hidden"
+      src={url}
+    />
+  ),
 }: LinkPluginOptions = {}): ProRouterPlugin {
   return ({ router }) => {
     router.beforeEach((to, from) => {
@@ -115,7 +137,7 @@ export function linkPlugin({
           const rawComponent = components[namespace]
           components[namespace] = BuiltinIframeComponent
 
-          to.meta[IFRAME_CONFIG] = { src: finalLink }
+          to.meta[IFRAME_CONFIG] = { src: finalLink, renderIframe }
           to.meta[IFRAME_CLEANUP] = () => {
             components[namespace] = rawComponent
             to.meta[IFRAME_CONFIG] = undefined
