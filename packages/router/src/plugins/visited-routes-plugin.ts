@@ -114,15 +114,22 @@ class InterceptorStore {
       return
     }
     const interceptors = Array.from(this.interceptorsRecord[interceptorName])
-    let currentResult = params
-    for (let i = 0; i < interceptors.length; i++) {
-      const result = await interceptors[i](currentResult as any)
-      if (result === false) {
-        return false
+    if (interceptorName.startsWith('before')) {
+      let currentResult = params
+      for (let i = 0; i < interceptors.length; i++) {
+        const result = await interceptors[i](currentResult as any)
+        if (result === false) {
+          return false
+        }
+        currentResult = result as any
       }
-      currentResult = result as any
+      return currentResult
     }
-    return currentResult
+    else {
+      for (let i = 0; i < interceptors.length; i++) {
+        await interceptors[i](params as any)
+      }
+    }
   }
 
   clear = () => {
