@@ -60,7 +60,6 @@ function parseLoadingOptions(el: LoadingEl, binding: DirectiveBinding<LoadingBin
   const options: LoadingOptions = {
     text: getProp('text'),
     svg: getProp('svg'),
-    svgViewBox: getProp('svgViewBox'),
     background: getProp('background'),
     customClass: getProp('customClass'),
     fullscreen,
@@ -111,7 +110,6 @@ function createLoadingMask(options: LoadingOptions = {}): HTMLDivElement {
   const { primaryColor } = storeToRefs(useThemeStore())
 
   const svg = unref(options.svg)
-  const svgViewBox = unref(options.svgViewBox)
   const text = unref(options.text)
   const customClass = unref(options.customClass)
 
@@ -121,7 +119,6 @@ function createLoadingMask(options: LoadingOptions = {}): HTMLDivElement {
       'span',
       {
         class: customClass,
-        viewBox: svgViewBox || '0 0 50 50',
         innerHTML: svg,
       },
     )
@@ -140,11 +137,13 @@ function createLoadingMask(options: LoadingOptions = {}): HTMLDivElement {
 }
 
 function addLoadingMask(el: LoadingEl, options: LoadingOptions): LoadingInstance {
+  const fullscreen = unref(options.fullscreen)
+
   const mask = createLoadingMask(options)
   let originalOverflow = ''
 
   // 处理全屏模式
-  if (options.fullscreen) {
+  if (fullscreen) {
     if (fullscreenInstance) {
       removeLoadingMask(fullscreenInstance)
     }
@@ -170,13 +169,21 @@ function addLoadingMask(el: LoadingEl, options: LoadingOptions): LoadingInstance
   // 非全屏模式
   setPosition(el)
 
-  if (options.lock) {
-    const aimEl = options.target || el
-    originalOverflow = aimEl.style.overflow
-    aimEl.style.overflow = 'hidden'
-  }
   // 处理挂载
-  const target = options.body ? document.body : options.target || el
+  let target: HTMLElement
+  if (isString(options.target)) {
+    target
+      = document.querySelector<HTMLElement>(options.target) ?? document.body
+  }
+  else {
+    target = options.target || el
+  }
+
+  if (options.lock) {
+    originalOverflow = target.style.overflow
+    target.style.overflow = 'hidden'
+  }
+
   target.appendChild(mask)
 
   const instance: LoadingInstance = {
