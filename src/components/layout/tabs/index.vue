@@ -16,6 +16,7 @@ const vars = useThemeVars()
 const {
   routes,
   activeIndex,
+  move,
   remove,
 } = router.visitedRoutesPlugin
 
@@ -42,14 +43,10 @@ const {
   createDropdownOptions,
 } = useContextMenu()
 
-async function handleToggleFixed(index: number) {
-  if (!routes[index].meta) {
-    routes[index].meta = {
-      fixedInTabs: true,
-    }
-    return
-  }
-  routes[index].meta.fixedInTabs = !routes[index].meta.fixedInTabs
+async function handleUnFixed(index: number) {
+  routes[index].meta.fixedInTabs = false
+  const fixedCount = routes.filter(r => r.meta?.fixedInTabs).length
+  await move(index, Math.max(0, fixedCount))
 }
 
 function onBeforeLeave(el: Element) {
@@ -120,7 +117,7 @@ watch(
             v-if="tab.meta?.fixedInTabs"
             class="tabs__item__extra"
             icon="mdi:pin-outline"
-            @click.stop="handleToggleFixed(index)"
+            @click.stop="handleUnFixed(index)"
           />
           <icon
             v-if="!tab.meta?.fixedInTabs && routes.length > 1"

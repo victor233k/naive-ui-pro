@@ -64,6 +64,7 @@ const accessRoutes: RouteRecordRaw[] = [
       title: '首页',
       titleI18nKey: 'routes.home',
       icon: 'material-symbols:dashboard-outline-rounded',
+      fixedInTabs: true,
     },
   },
   {

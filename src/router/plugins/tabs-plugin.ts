@@ -9,6 +9,10 @@ import { ROOT_ROUTE_NAME } from '../routes'
 declare module 'vue-router' {
   interface RouteMeta {
     /**
+     * 是否隐藏在多页签中
+     */
+    hideInTabs?: boolean
+    /**
      * 是否固定在多页签中
      */
     fixedInTabs?: boolean
@@ -28,11 +32,16 @@ export function tabsPlugin(): ProRouterPlugin {
       routes,
       guards,
       activeIndex,
+      move,
     } = router.visitedRoutesPlugin
 
-    // 如果不是 layout 页面中的路由，则跳过添加
     guards.beforeAdd((route) => {
+      // 如果不是 layout 页面中的路由，则跳过添加
       if (route.matched[0].name !== ROOT_ROUTE_NAME) {
+        return false
+      }
+      // 如果路由配置 hideInTabs，则跳过添加
+      if (route.meta?.hideInTabs) {
         return false
       }
       return route
@@ -44,6 +53,14 @@ export function tabsPlugin(): ProRouterPlugin {
         return false
       }
       return index
+    })
+
+    // 如果新增路由配置 fixedInTabs，则移动到固定区最后一项
+    guards.afterAdd(async (route) => {
+      if (route?.meta?.fixedInTabs) {
+        const fixedCount = routes.filter(r => r.meta?.fixedInTabs).length - 1
+        await move(routes.length - 1, Math.max(0, fixedCount))
+      }
     })
 
     // 标签页持久化
@@ -82,9 +99,14 @@ function resolveActiveIndexAndTabs(route: RouteLocationNormalized): [number, Rou
       cachedTabs,
     ]
   }
-  const finalTabs = [...cachedTabs, route]
-  return [
-    finalTabs.length - 1,
-    finalTabs,
-  ]
+  // 如果新增路由配置 fixedInTabs，则插到已有固定项之后，否则插到最末尾
+  if (route.meta?.fixedInTabs) {
+    const insertIndex = cachedTabs.findIndex(item => !item.meta?.fixedInTabs)
+    if (~insertIndex) {
+      cachedTabs.splice(insertIndex, 0, route)
+      return [insertIndex, cachedTabs]
+    }
+    return [0, [route, ...cachedTabs]]
+  }
+  return [cachedTabs.length, [...cachedTabs, route]]
 }

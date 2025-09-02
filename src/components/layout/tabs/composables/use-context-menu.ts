@@ -78,12 +78,12 @@ export function useContextMenu() {
 
     switch (key) {
       case 'toggleFixed': {
-        route.meta.fixedInTabs = !route.meta?.fixedInTabs
-        const targetIndex = Math.max(
-          0,
-          routes.filter(route => route.meta?.fixedInTabs).length - 1,
-        )
-        await move(index, targetIndex)
+        route.meta ??= {}
+        route.meta.fixedInTabs = !route.meta.fixedInTabs
+        const fixedCount = routes.filter(r => r.meta?.fixedInTabs).length
+        // 目标索引 = 固定区长度变化后的右边界位置
+        const targetIndex = route.meta.fixedInTabs ? fixedCount - 1 : fixedCount
+        await move(index, Math.max(0, targetIndex))
         break
       }
       case 'close': {
