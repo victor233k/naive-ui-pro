@@ -329,7 +329,7 @@ const accessRoutes: RouteRecordRaw[] = [
         meta: {
           title: 'Loading 指令',
           titleI18nKey: 'routes.loading',
-          icon: 'mdi:loading',
+          icon: 'line-md:loading-twotone-loop',
         },
       },
     ],
