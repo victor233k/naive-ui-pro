@@ -120,7 +120,7 @@ function handleMenuGroupAndDivider(menus: MenuOption[] = []) {
           return icon
             ? (
                 <div class="flex items-center gap-8px">
-                  <span class="pl-3px">{icon()}</span>
+                  <span class="pl-3px flex items-center">{icon()}</span>
                   {label}
                 </div>
               )
