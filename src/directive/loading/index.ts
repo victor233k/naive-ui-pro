@@ -1,4 +1,4 @@
-import type { Directive, DirectiveBinding } from 'vue'
+import type { AppContext, Directive, DirectiveBinding } from 'vue'
 import type { LoadingBinding, LoadingOptions } from './types'
 import { hyphenate } from '@vueuse/core'
 import { isBoolean, isObject, isString } from 'lodash-es'
@@ -60,7 +60,6 @@ function parseLoadingOptions(el: LoadingEl, binding: DirectiveBinding<LoadingBin
   const options: LoadingOptions = {
     text: getProp('text'),
     svg: getProp('svg'),
-    svgViewBox: getProp('svgViewBox'),
     background: getProp('background'),
     customClass: getProp('customClass'),
     fullscreen,
@@ -88,7 +87,7 @@ function shouldShowLoading(binding: DirectiveBinding<LoadingBinding>): boolean {
   return false
 }
 
-function createLoadingMask(options: LoadingOptions = {}): HTMLDivElement {
+function createLoadingMask(options: LoadingOptions = {}, appContext?: AppContext): HTMLDivElement {
   const container = document.createElement('div')
 
   if (options.body || options.fullscreen) {
@@ -111,7 +110,6 @@ function createLoadingMask(options: LoadingOptions = {}): HTMLDivElement {
   const { primaryColor } = storeToRefs(useThemeStore())
 
   const svg = unref(options.svg)
-  const svgViewBox = unref(options.svgViewBox)
   const text = unref(options.text)
   const customClass = unref(options.customClass)
 
@@ -121,7 +119,6 @@ function createLoadingMask(options: LoadingOptions = {}): HTMLDivElement {
       'span',
       {
         class: customClass,
-        viewBox: svgViewBox || '0 0 50 50',
         innerHTML: svg,
       },
     )
@@ -135,16 +132,23 @@ function createLoadingMask(options: LoadingOptions = {}): HTMLDivElement {
     })
   }
 
+  // 补充 app 上下文
+  if (appContext) {
+    (spinVNode as any).appContext = appContext
+  }
+
   render(spinVNode, container)
   return container
 }
 
-function addLoadingMask(el: LoadingEl, options: LoadingOptions): LoadingInstance {
-  const mask = createLoadingMask(options)
+function addLoadingMask(el: LoadingEl, options: LoadingOptions, appContext?: AppContext): LoadingInstance {
+  const fullscreen = unref(options.fullscreen)
+
+  const mask = createLoadingMask(options, appContext)
   let originalOverflow = ''
 
   // 处理全屏模式
-  if (options.fullscreen) {
+  if (fullscreen) {
     if (fullscreenInstance) {
       removeLoadingMask(fullscreenInstance)
     }
@@ -170,13 +174,21 @@ function addLoadingMask(el: LoadingEl, options: LoadingOptions): LoadingInstance
   // 非全屏模式
   setPosition(el)
 
-  if (options.lock) {
-    const aimEl = options.target || el
-    originalOverflow = aimEl.style.overflow
-    aimEl.style.overflow = 'hidden'
-  }
   // 处理挂载
-  const target = options.body ? document.body : options.target || el
+  let target: HTMLElement
+  if (isString(options.target)) {
+    target
+      = document.querySelector<HTMLElement>(options.target) ?? document.body
+  }
+  else {
+    target = options.target || el
+  }
+
+  if (options.lock) {
+    originalOverflow = target.style.overflow
+    target.style.overflow = 'hidden'
+  }
+
   target.appendChild(mask)
 
   const instance: LoadingInstance = {
@@ -216,7 +228,8 @@ const loading: Directive<LoadingEl, LoadingBinding> = {
   mounted(el, binding) {
     if (shouldShowLoading(binding)) {
       const options = parseLoadingOptions(el, binding)
-      el[INSTANCE_KEY] = addLoadingMask(el, options)
+      const appContext = (binding.instance as any)?.$?.appContext as AppContext | undefined
+      el[INSTANCE_KEY] = addLoadingMask(el, options, appContext)
     }
   },
 
@@ -224,14 +237,16 @@ const loading: Directive<LoadingEl, LoadingBinding> = {
     const isShow = shouldShowLoading(binding)
     const hasInstance = !!el[INSTANCE_KEY]
 
+    const appContext = (binding.instance as any)?.$?.appContext as AppContext | undefined
+
     if (isShow && !hasInstance) {
       const options = parseLoadingOptions(el, binding)
-      el[INSTANCE_KEY] = addLoadingMask(el, options)
+      el[INSTANCE_KEY] = addLoadingMask(el, options, appContext)
     }
     else if (isShow && hasInstance) {
       removeLoadingMask(el[INSTANCE_KEY]!)
       const options = parseLoadingOptions(el, binding)
-      el[INSTANCE_KEY] = addLoadingMask(el, options)
+      el[INSTANCE_KEY] = addLoadingMask(el, options, appContext)
     }
     else if (!isShow && hasInstance) {
       removeLoadingMask(el[INSTANCE_KEY]!)

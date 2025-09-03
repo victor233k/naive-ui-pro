@@ -15,10 +15,6 @@ export interface LoadingOptions {
    */
   svg?: MaybeRef<string>
   /**
-   * @description this is the viewBox of svg
-   */
-  svgViewBox?: MaybeRef<string>
-  /**
    * @description 文字描述
    */
   text?: MaybeRef<string>
