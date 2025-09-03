@@ -79,30 +79,32 @@ export function transitionPlugin({
       let preElement: Element = null
       const resolvedTransitionName = resolveTransitionName(router, transitionName)
       const transitionProps = builtinTransitionNameToTransitionPropsRecord[resolvedTransitionName]
-      return {
-        ...transitionProps,
-        appear: true,
-        mode: 'out-in',
-        onEnter(el) {
-          lockScroll(el.parentElement)
-        },
-        onAfterEnter(el) {
-          unlockScroll(el.parentElement)
-        },
-        onEnterCancelled(el) {
-          unlockScroll(el.parentElement)
-        },
-        onLeave(el) {
-          preElement = el.parentElement
-          lockScroll(preElement)
-        },
-        onAfterLeave() {
-          unlockScroll(preElement)
-        },
-        onLeaveCancelled() {
-          unlockScroll(preElement)
-        },
-      }
+      return resolvedTransitionName === 'none'
+        ? transitionProps
+        : {
+            ...transitionProps,
+            appear: true,
+            mode: 'out-in',
+            onEnter(el) {
+              lockScroll(el.parentElement)
+            },
+            onAfterEnter(el) {
+              unlockScroll(el.parentElement)
+            },
+            onEnterCancelled(el) {
+              unlockScroll(el.parentElement)
+            },
+            onLeave(el) {
+              preElement = el.parentElement
+              lockScroll(preElement)
+            },
+            onAfterLeave() {
+              unlockScroll(preElement)
+            },
+            onLeaveCancelled() {
+              unlockScroll(preElement)
+            },
+          }
     })
 
     onUnmount(() => {
