@@ -373,6 +373,7 @@ export default {
     preference: {
       title: 'Preference Settings',
       resetConfig: 'Reset Config',
+      restoreConfig: 'Restore Config',
       copyConfig: 'Copy Config',
       other: 'Other',
       layout: {

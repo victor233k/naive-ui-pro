@@ -1,4 +1,5 @@
 import type { Pinia, PiniaPluginContext, Store } from 'pinia'
+import { preferenceConfig } from '@root/preference'
 import { useClipboard, useEventListener } from '@vueuse/core'
 import { cloneDeep, get, has, set } from 'lodash-es'
 
@@ -18,6 +19,10 @@ declare module 'pinia' {
      * 重置所有 store 的偏好
      */
     $resetAllPreference: () => void
+    /**
+     * 恢复所有 store 的偏好为配置文件默认值
+     */
+    $restoreAllPreference: () => void
     /**
      * 复制所有 store 的偏好到剪贴板
      */
@@ -64,6 +69,19 @@ export function preferencePlugin({ pinia, options, store, app }: PiniaPluginCont
       const { initialValueMap } = storeIdToKeysInitialValueRecord.get(s.$id)!
       initialValueMap.forEach((value, key) => {
         (s as any)[key] = value
+      })
+    })
+  }
+
+  store.$restoreAllPreference = () => {
+    const storeMap = (pinia as any)._s as Map<string, Store>
+    storeMap.forEach((s) => {
+      if (!storeIdToKeysInitialValueRecord.has(s.$id)) {
+        return
+      }
+      const { initialValueMap, prefixPath } = storeIdToKeysInitialValueRecord.get(s.$id)!
+      initialValueMap.forEach((_, key) => {
+        (s as any)[key] = get(preferenceConfig, `${prefixPath}.${key}`) as any
       })
     })
   }

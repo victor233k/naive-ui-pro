@@ -343,6 +343,7 @@ export default {
     preference: {
       title: '偏好设置',
       resetConfig: '重置配置',
+      restoreConfig: '恢复出厂配置',
       copyConfig: '复制配置',
       other: '其他',
       layout: {
