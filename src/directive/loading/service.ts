@@ -24,7 +24,6 @@ class LoadingService {
 
     // 设置默认选项
     const defaultOptions: LoadingOptions = {
-      text: 'Loading...',
       background: 'rgba(255, 255, 255, 0.7)',
       fullscreen: true,
       lock: true,

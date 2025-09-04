@@ -5,6 +5,7 @@ import { isBoolean, isObject, isString } from 'lodash-es'
 import { NSpin } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { h, ref, render, unref } from 'vue'
+import Spinner from '@/components/spin/index.vue'
 import { useThemeStore } from '@/store/use-theme-store'
 
 const INSTANCE_KEY = Symbol('loadingInstance')
@@ -60,6 +61,7 @@ function parseLoadingOptions(el: LoadingEl, binding: DirectiveBinding<LoadingBin
   const options: LoadingOptions = {
     text: getProp('text'),
     svg: getProp('svg'),
+    size: getProp('size'),
     background: getProp('background'),
     customClass: getProp('customClass'),
     fullscreen,
@@ -111,6 +113,7 @@ function createLoadingMask(options: LoadingOptions = {}, appContext?: AppContext
 
   const svg = unref(options.svg)
   const text = unref(options.text)
+  const size = options.size ?? 'medium'
   const customClass = unref(options.customClass)
 
   let spinVNode
@@ -125,10 +128,15 @@ function createLoadingMask(options: LoadingOptions = {}, appContext?: AppContext
   }
   else {
     spinVNode = h(NSpin, {
-      size: 'medium',
-      description: text || 'Loading...',
+      size,
+      description: text,
       stroke: primaryColor.value,
       class: customClass,
+      rotate: false,
+    }, {
+      icon: () => {
+        return h(Spinner, { size })
+      },
     })
   }
 

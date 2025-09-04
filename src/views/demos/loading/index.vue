@@ -149,6 +149,7 @@ onUnmounted(() => {
       <n-space vertical>
         <div
           v-loading.body.lock="bodyLoading"
+          element-loading-size="large"
           class="loading-container"
         >
           <p>{{ $t('pages.demos.loading.bodyMount.description') }}</p>
