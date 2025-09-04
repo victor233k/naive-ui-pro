@@ -170,6 +170,18 @@ export default {
           inputPlaceholder: '请输入内容测试缓存...',
         },
       },
+      pageComponent: {
+        title: '页面级组件',
+        description: '页面级别的 loading 效果，开启 loading 后可以切换布局或折叠查看效果',
+        description2: '可以传递丰富的 loading 配置',
+        description3: '底部固定 footer，它也是适配布局的',
+        itemText: '你好啊，',
+        startLoading: '开启 Loading',
+        randomNumber: '随机数字',
+        currentNumber: '当前数字',
+        loadingText: '加载中...',
+        loadingTime: '加载时间',
+      },
       loading: {
         title: 'Loading 指令演示',
         basicUsage: {

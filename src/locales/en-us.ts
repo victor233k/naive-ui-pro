@@ -185,6 +185,18 @@ export default {
           inputPlaceholder: 'Please enter content to test cache...',
         },
       },
+      pageComponent: {
+        title: 'Page Component',
+        description: 'Page-level loading effect, you can switch layout or collapse to see the effect after enabling loading',
+        description2: 'Can pass rich loading configuration',
+        description3: 'Fixed bottom footer, which is also layout-adaptive',
+        itemText: 'Hello, ',
+        startLoading: 'Start Loading',
+        randomNumber: 'Random Number',
+        currentNumber: 'Current Number',
+        loadingText: 'Loading...',
+        loadingTime: 'Loading Time',
+      },
       loading: {
         title: 'Loading Directive Demo',
         basicUsage: {

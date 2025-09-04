@@ -307,6 +307,15 @@ const accessRoutes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'page-component',
+        component: () => import('@/views/demos/page-component/index.vue'),
+        meta: {
+          title: '页面级组件',
+          titleI18nKey: 'routes.pageComponent',
+          icon: 'material-symbols:pageview-outline',
+        },
+      },
+      {
         path: 'editor',
         component: () => import('@/views/demos/wang-editor/index.vue'),
         meta: {
