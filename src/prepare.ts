@@ -1,6 +1,6 @@
 import type { App } from 'vue'
 import { preferenceConfig } from '@root/preference'
-import { merge } from 'lodash-es'
+import { cloneDeep, merge } from 'lodash-es'
 import { create, ProInput, ProSelect } from 'pro-naive-ui'
 import { ProIconifyIcons, ProIconifyIcons2 } from './components/iconify-icons'
 import { WangEditor } from './components/wang-editor'
@@ -40,7 +40,7 @@ function setupComponents(app: App) {
 function setupAppLoading() {
   const cachedPreference = localStorage.getItem('preference')
   const finalPreference: typeof preferenceConfig = cachedPreference
-    ? merge(JSON.parse(cachedPreference), preferenceConfig)
+    ? merge(cloneDeep(preferenceConfig), JSON.parse(cachedPreference))
     : preferenceConfig
   const { title } = finalPreference.app
   const { mode, primaryColor } = finalPreference.theme
@@ -60,7 +60,7 @@ function setupAppLoading() {
             var(--_c) left,
             var(--_c) right,
             var(--_c) bottom;
-          background-size: 12px 12px;
+          background-size: 14px 14px;
           animation: spin 1s infinite;
         }
         @keyframes spin {
