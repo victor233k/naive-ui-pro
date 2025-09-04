@@ -170,7 +170,6 @@ onUnmounted(() => {
           v-loading="{
             loading: svgLoading,
             svg: customSvg,
-            svgViewBox: '0 0 50 50',
             text: $t('pages.demos.loading.customSvg.loadingText'),
             background: 'rgba(255, 255, 255, 0.9)',
           }"

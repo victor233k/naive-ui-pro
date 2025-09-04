@@ -1,5 +1,6 @@
 <script setup lang='tsx'>
 import { Icon } from '@iconify/vue'
+import { ref } from 'vue'
 import { $t } from '@/locales/locales'
 import { useAppStore } from '@/store/use-app-store'
 import { useLayoutStore } from '@/store/use-layout-store'
@@ -9,7 +10,14 @@ import ThemePreference from './theme-preference.vue'
 
 const itemHeight = 32
 const appStore = useAppStore()
+const showDropdown = ref(false)
 const layoutStore = useLayoutStore()
+const dropdownOptions = [
+  {
+    label: () => $t('common.preference.restoreConfig'),
+    key: 'restore',
+  },
+]
 </script>
 
 <template>
@@ -55,8 +63,20 @@ const layoutStore = useLayoutStore()
             justify="space-between"
             class="w-full"
           >
-            <n-button @click="appStore.$resetAllPreference">
+            <n-button
+              icon-placement="right"
+              @click="appStore.$resetAllPreference"
+            >
               {{ $t('common.preference.resetConfig') }}
+              <template #icon>
+                <n-dropdown
+                  :options="dropdownOptions"
+                  @update:show="showDropdown = $event"
+                  @select="appStore.$restoreAllPreference"
+                >
+                  <icon icon="tabler:chevron-down" />
+                </n-dropdown>
+              </template>
             </n-button>
             <n-button
               type="primary"

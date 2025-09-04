@@ -15,10 +15,6 @@ export interface LoadingOptions {
    */
   svg?: MaybeRef<string>
   /**
-   * @description this is the viewBox of svg
-   */
-  svgViewBox?: MaybeRef<string>
-  /**
    * @description 文字描述
    */
   text?: MaybeRef<string>
@@ -37,7 +33,7 @@ export interface LoadingOptions {
   /**
    * @description 目标元素
    */
-  target?: HTMLElement
+  target?: HTMLElement | string
   /**
    * @description 在body上展示的修饰符
    */

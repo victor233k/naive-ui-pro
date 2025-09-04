@@ -106,41 +106,24 @@ function findAvailableMenuKey() {
 
 function handleMenuGroupAndDivider(menus: MenuOption[] = []) {
   let finalMenus: MenuOption[] = menus
-  // 处理菜单分组
-  if (sidebarMenuGroup.value) {
-    finalMenus = finalMenus.map((item) => {
-      if ((item.children ?? []).length <= 0) {
-        return item
-      }
-      const { icon, label, ...rest } = item
-      return {
-        ...rest,
-        type: 'group',
-        label: () => {
-          return icon
-            ? (
-                <div class="flex items-center gap-8px">
-                  <span class="pl-3px flex items-center">{icon()}</span>
-                  {label}
-                </div>
-              )
-            : label
-        },
-      }
-    })
-  }
   // 处理菜单分割线
   if (sidebarMenuDivider.value) {
-    const tempMenus: MenuOption[] = []
-    finalMenus.forEach((item) => {
-      tempMenus.push(item)
-      if ((item.children ?? []).length > 0) {
-        tempMenus.push({
-          type: 'divider',
-        })
-      }
+    finalMenus = finalMenus.flatMap((item) => {
+      return item.children?.length ? [item, { type: 'divider' }] : [item]
     })
-    finalMenus = tempMenus
+  }
+  // 处理菜单分组
+  if (sidebarMenuGroup.value) {
+    if (collapsed.value) {
+      finalMenus = finalMenus.flatMap((item) => {
+        return item.children?.length ? [...item.children] : [item]
+      })
+    }
+    else {
+      finalMenus = finalMenus.map((item) => {
+        return item.children?.length ? { ...item, type: 'group' } : item
+      })
+    }
   }
   return finalMenus
 }
